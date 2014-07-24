@@ -9,8 +9,8 @@ metro = read_csv('./data/metro.csv')
 s_tog = read_csv('./data/s-tog.csv')
 geoplotlib.scatter(metro,
                    color=[0,0,255],
-                   f_tooltip=lambda data, i: '%s' % data['name'][i])
+                   f_tooltip=lambda data, i: data['name'][i])
 geoplotlib.scatter(s_tog,
                    color=[255,0,0],
-                   f_tooltip=lambda data, i: '%s' % data['name'][i])
+                   f_tooltip=lambda data, i: data['name'][i])
 geoplotlib.show()
