@@ -9,16 +9,23 @@ def read_csv(fname):
         reader = csv.DictReader(f)
         for row in reader:
             for (k,v) in row.items():
-                try:
-                    v = float(v)
-                except:
-                    try:
-                        v = v.decode('utf-8')
-                    except:
-                        pass
-                values[k].append(v)
+                values[k].append(parse_raw_str(v))
     return {k: values[k] for k in values.keys()}
 
 
 def epoch_to_str(epoch, fmt='%Y-%m-%d %H:%M:%S'):
     return datetime.fromtimestamp(epoch).strftime(fmt)
+
+
+def parse_raw_str(v):
+    try:
+        v = float(v)
+    except:
+        try:
+            v = v.decode('utf-8')
+        except:
+            try:
+                v = v.decode('latin1')
+            except:
+                pass
+    return v

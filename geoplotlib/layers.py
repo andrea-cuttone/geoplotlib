@@ -6,8 +6,8 @@ from sklearn.cluster import DBSCAN
 import numpy as np
 import colors
 from geoplotlib.core import BatchPainter, SCREEN_W, SCREEN_H, TILE_SIZE
-from geoplotlib.utils import epoch_to_str
-
+from geoplotlib.utils import epoch_to_str, parse_raw_str
+import shapefile
 
 class ScatterLayer():
 
@@ -229,3 +229,53 @@ class ClusterLayer():
                     self.painter.points(points[:,0], points[:,1])
             self.worker = None
         self.painter.batch_draw()
+
+
+class Shape():
+
+    def __init__(self, points, attr):
+        self.points = np.array(points)
+        self.attr = attr
+
+
+    def lon(self):
+        return self.points[:,0]
+
+
+    def lat(self):
+        return self.points[:,1]
+
+
+class PolyLayer():
+
+    def __init__(self, fname, f_tooltip=None, color=None, linewidth=3):
+        if color is None:
+            color = [255, 0, 0]
+        self.color = color
+        self.linewidth = linewidth
+        self.f_tooltip = f_tooltip
+
+        reader = shapefile.Reader(fname)
+        records = reader.shapeRecords()
+        self.shapes = []
+        for r in records:
+            self.shapes.append(Shape(r.shape.points,
+                                     {t[0][0]:parse_raw_str(t[1]) for t in zip(reader.fields[1:], r.record)}))
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        self.hotspots = HotspotManager()
+        self.painter.set_color(self.color)
+        for s in self.shapes:
+            x, y = proj.lonlat_to_screen(s.lon(), s.lat())
+            self.painter.linestrip(x, y, self.linewidth, closed=True)
+            if self.f_tooltip:
+                self.hotspots.add_poly(x, y, self.f_tooltip(s.attr))
+
+
+    def draw(self, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+        picked = self.hotspots.pick(mouse_x, mouse_y)
+        if picked:
+            ui_manager.tooltip(picked)

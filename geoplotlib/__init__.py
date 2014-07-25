@@ -1,5 +1,5 @@
 from geoplotlib.core import BaseApp
-from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer
+from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer
 
 
 _app = BaseApp()
@@ -35,3 +35,7 @@ def tiles_provider(tiles_provider):
 
 def add_layer(layer):
     _app.add_layer(layer)
+
+
+def shapes(fname, **kwargs):
+    _app.add_layer(PolyLayer(fname, **kwargs))
