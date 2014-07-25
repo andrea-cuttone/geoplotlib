@@ -46,21 +46,54 @@ class HotspotManager():
 
 
     def __init__(self):
-        self.rects = {}
+        self.rects = []
+        self.poly = []
 
+
+    @staticmethod
+    # adapted from:
+    # http://stackoverflow.com/questions/16625507/python-checking-if-point-is-inside-a-polygon
+    def point_in_poly(x, y, bbox, poly):
+        left, top, right, bottom = bbox
+        if x < left or x > right or y < top or y > bottom:
+            return False
+
+        n = len(poly)
+        inside = False
+
+        p1x,p1y = poly[0]
+        for i in range(n+1):
+            p2x,p2y = poly[i % n]
+            if y > min(p1y,p2y):
+                if y <= max(p1y,p2y):
+                    if x <= max(p1x,p2x):
+                        if p1y != p2y:
+                            xints = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                        if p1x == p2x or x <= xints:
+                            inside = not inside
+            p1x,p1y = p2x,p2y
+
+        return inside
 
     def add_rect(self, x, y, w, h, value):
-        self.rects[tuple(map(int, [x, y, w, h]))] = value
+        self.rects.append(((x, y, w, h), value))
+
+
+    def add_poly(self, x, y, value):
+        bbox = (x.min(), y.min(), x.max(), y.max())
+        self.poly.append((zip(x,y), bbox, value))
 
 
     def pick(self, mouse_x, mouse_y):
-        for (x, y, w, h) in self.rects.keys():
+        for (x, y, w, h), value in self.rects:
             if (x <= mouse_x <= x + w) and (y <= mouse_y <= y + h):
-                return self.rects[(x, y, w, h)]
-        return None
+                return value
 
-    def __str__(self):
-        return str(self.rects)
+        for points, bbox, value in self.poly:
+            if HotspotManager.point_in_poly(mouse_x, mouse_y, bbox, points):
+                return value
+
+        return None
 
 
 class HistogramLayer():

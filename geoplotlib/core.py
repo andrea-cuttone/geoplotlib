@@ -271,12 +271,17 @@ class BatchPainter:
                       ('c4B', self.color * (len(vertices)/VERT_PER_POINT)))
 
 
-    def linestrip(self, x, y, width=1.0):
+    def linestrip(self, x, y, width=1.0, closed=False):
         glLineWidth(width)
         vertices = _flatten_xy(x, y)
         indices = [i // 2 for i in range(len(vertices))]
+        indices = indices[1:-1]
+        if closed:
+            indices.append(indices[-1])
+            indices.append(indices[0])
+
         self.batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_LINES, None,
-                      indices[1:-1],
+                      indices,
                       ('v2f', vertices),
                       ('c4B', self.color * (len(vertices)/VERT_PER_POINT)))
 

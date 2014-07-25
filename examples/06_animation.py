@@ -12,12 +12,12 @@ class TrailsLayer():
 
     def __init__(self):
         self.data = pd.read_csv('data/taxi.csv') # TODO: remove pandas dependency
-        self.cmap = colorbrewer(self.data.taxi_id, alpha=220)
         self.data = self.data[(self.data.lon > 115.950) &
                               (self.data.lon < 116.796) &
                               (self.data.lat < 40.212) &
                               (self.data.lat > 39.631)
         ]
+        self.cmap = colorbrewer(self.data.taxi_id, alpha=220)
         self.t = self.data.timestamp.min()
 
 
