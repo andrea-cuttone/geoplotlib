@@ -30,9 +30,10 @@ class ScatterLayer():
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
         if self.f_tooltip:
             for i in range(0, len(x)):
+                record = {k: self.data[k][i] for k in self.data.keys()}
                 self.hotspots.add_rect(x[i] - self.point_size, y[i] - self.point_size,
                                        2*self.point_size, 2*self.point_size,
-                                       self.f_tooltip(self.data, i))
+                                       self.f_tooltip(record))
         self.painter.set_color(self.color)
         self.painter.points(x, y, 2*self.point_size, False)
 

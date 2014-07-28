@@ -120,8 +120,8 @@ class VoronoiLayer():
             polygon = vertices[region]
             self.painter.linestrip(polygon[:,0], polygon[:,1], width=5, closed=True)
             if self.f_tooltip:
-                # TODO: pass record
-                self.hotspots.add_poly(polygon[:,0], polygon[:,1], self.f_tooltip(self.data, idx))
+                record = {k: self.data[k][idx] for k in self.data.keys()}
+                self.hotspots.add_poly(polygon[:,0], polygon[:,1], self.f_tooltip(record))
         self.painter.set_color([0,0,255])
         self.painter.points(x, y)
 
@@ -134,5 +134,5 @@ class VoronoiLayer():
 
 
 data = read_csv('/Users/ancu/Dropbox/phd/code-projects/geoplotlib/examples/data/s-tog.csv')
-geoplotlib.add_layer(VoronoiLayer(data, f_tooltip=lambda data, idx: data['name'][idx]))
+geoplotlib.add_layer(VoronoiLayer(data, f_tooltip=lambda r: r['name']))
 geoplotlib.show()
