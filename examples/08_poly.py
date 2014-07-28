@@ -8,7 +8,7 @@ sys.path.append(os.path.realpath('..'))
 import geoplotlib
 
 
-geoplotlib.shapes('data/dk_kommune/dk_kommune',
+geoplotlib.shapefiles('data/dk_kommune/dk_kommune',
                   f_tooltip=lambda attr: attr['STEDNAVN'],
                   color=[0,0,255])
 

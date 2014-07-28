@@ -37,5 +37,5 @@ def add_layer(layer):
     _app.add_layer(layer)
 
 
-def shapes(fname, **kwargs):
+def shapefiles(fname, **kwargs):
     _app.add_layer(PolyLayer(fname, **kwargs))
