@@ -9,4 +9,7 @@ import geoplotlib
 
 
 geoplotlib.shapes('data/dk_kommune/dk_kommune', f_tooltip=lambda attr: attr['STEDNAVN'])
+
+#geoplotlib.shapes('/Users/ancu/Downloads/aaa/denmark-latest.shp/buildings')
+
 geoplotlib.show()

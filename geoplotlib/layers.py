@@ -234,7 +234,7 @@ class ClusterLayer():
 class Shape():
 
     def __init__(self, points, attr):
-        self.points = np.array(points)
+        self.points = points
         self.attr = attr
 
 
@@ -248,34 +248,48 @@ class Shape():
 
 class PolyLayer():
 
-    def __init__(self, fname, f_tooltip=None, color=None, linewidth=3):
+    def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
         if color is None:
             color = [255, 0, 0]
         self.color = color
         self.linewidth = linewidth
         self.f_tooltip = f_tooltip
+        self.shape_type = shape_type
 
-        reader = shapefile.Reader(fname)
-        records = reader.shapeRecords()
-        self.shapes = []
-        for r in records:
-            self.shapes.append(Shape(r.shape.points,
-                                     {t[0][0]:parse_raw_str(t[1]) for t in zip(reader.fields[1:], r.record)}))
+        self.reader = shapefile.Reader(fname)
 
 
     def invalidate(self, proj):
+        self.count_records = 0
+
         self.painter = BatchPainter()
         self.hotspots = HotspotManager()
         self.painter.set_color(self.color)
-        for s in self.shapes:
-            x, y = proj.lonlat_to_screen(s.lon(), s.lat())
-            self.painter.linestrip(x, y, self.linewidth, closed=True)
-            if self.f_tooltip:
-                self.hotspots.add_poly(x, y, self.f_tooltip(s.attr))
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
+        ui_manager.info('shapes: %d/%d' % (self.count_records, self.reader.numRecords))
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
             ui_manager.tooltip(picked)
+
+
+    def on_tick(self, dt, proj):
+        for i in xrange(2000):
+            if self.count_records == self.reader.numRecords:
+                return
+            r = self.reader.shapeRecord(self.count_records)
+            if self.shape_type == 'bbox':
+                top, left, bottom, right =  r.shape.bbox
+                vertices = np.array([top, left, top, right, bottom, right, bottom, left]).reshape(-1,2)
+            else:
+                vertices = np.array(r.shape.points)
+            x, y = proj.lonlat_to_screen(vertices[:,0], vertices[:,1])
+            self.painter.linestrip(x, y, self.linewidth, closed=True)
+            if self.f_tooltip:
+                # todo: use rect
+                attr = {t[0][0]:parse_raw_str(t[1]) for t in zip(self.reader.fields[1:], r.record)}
+                self.hotspots.add_poly(x, y, self.f_tooltip(attr))
+
+            self.count_records += 1
