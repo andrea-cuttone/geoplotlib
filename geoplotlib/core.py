@@ -205,12 +205,12 @@ class BaseApp(pyglet.window.Window):
                 self.proj.zoomin(self.mouse_x, self.mouse_y)
                 for l in self._layers:
                     l.invalidate(self.proj)
-                self.scroll_delay = 1000
+                self.scroll_delay = 120
             elif scroll_y > 0:
                 self.proj.zoomout(self.mouse_x, self.mouse_y)
                 for l in self._layers:
                     l.invalidate(self.proj)
-                self.scroll_delay = 1000
+                self.scroll_delay = 120
 
 
     def on_key_release(self, symbol, modifiers):
@@ -224,7 +224,7 @@ class BaseApp(pyglet.window.Window):
         self.ticks += dt*1000
 
         if self.scroll_delay > 0:
-            self.scroll_delay = max(self.scroll_delay - dt*1000, 0)
+            self.scroll_delay -= 1
 
         if abs(self.drag_x) > 1e-3 or abs(self.drag_y) > 1e-3:
             self.drag_x *= 0.93
@@ -337,8 +337,8 @@ class Projector():
 
 
     def fit(self, lons, lats):
-        north, west = lats.max(), lons.min()
-        south, east = lats.min(), lons.max()
+        north, west = max(lats), min(lons)
+        south, east = min(lats), max(lons)
         for zoom in range(MAX_ZOOM + 1, MIN_ZOOM, -1):
             self.zoom = zoom
             left, top = self.lonlat_to_screen([west], [north])

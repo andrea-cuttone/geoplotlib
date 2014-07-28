@@ -319,8 +319,16 @@ class ShapeLoadingThread(Thread):
 
 class VoronoiLayer():
 
-    def __init__(self, data, f_tooltip=None):
+    def __init__(self, data, line_color=None, line_width=2, draw_points=False, points_color=None, f_tooltip=None):
         self.data = data
+        if line_color is None:
+            line_color = [255,136,0]
+        self.line_color = line_color
+        self.line_width = line_width
+        self.draw_points = draw_points
+        if points_color is None:
+            points_color = [255,0,0]
+        self.points_color = points_color
         self.f_tooltip = f_tooltip
 
 
@@ -375,6 +383,9 @@ class VoronoiLayer():
                 continue
 
             # reconstruct a non-finite region
+            if p1 not in all_ridges:
+                continue
+
             ridges = all_ridges[p1]
             new_region = [v for v in vertices if v >= 0]
 
@@ -425,15 +436,16 @@ class VoronoiLayer():
 
         self.hotspots = HotspotManager()
         self.painter = BatchPainter()
-        self.painter.set_color([255,0,0])
+        self.painter.set_color(self.line_color)
         for idx, region in enumerate(regions):
             polygon = vertices[region]
-            self.painter.linestrip(polygon[:,0], polygon[:,1], width=5, closed=True)
+            self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
             if self.f_tooltip:
                 record = {k: self.data[k][idx] for k in self.data.keys()}
                 self.hotspots.add_poly(polygon[:,0], polygon[:,1], self.f_tooltip(record))
-        self.painter.set_color([0,0,255])
-        self.painter.points(x, y)
+        if self.draw_points:
+            self.painter.set_color(self.points_color)
+            self.painter.points(x, y, 4)
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):

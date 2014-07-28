@@ -1,5 +1,5 @@
 flights.csv: citiesTable.csv from http://www.visualizing.org/datasets/global-flights-network
 taxi.csv: subset of data from http://www.andresmh.com/nyctaxitrips/
-s-tog.csv and metro.csv: http://geo.oiorest.dk/holdepladser.json?holdepladstype=1 and http://geo.oiorest.dk/holdepladser.json?holdepladstype=3
+s-tog.csv, metro.csv and bus.csv: http://geo.oiorest.dk/holdepladser.json
 cellid_dk.csv: danish celltowers from opencellid.org
 dk: http://geocommons.com/overlays/276034
