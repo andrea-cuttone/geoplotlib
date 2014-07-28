@@ -9,7 +9,7 @@ def read_csv(fname):
         reader = csv.DictReader(f)
         for row in reader:
             for (k,v) in row.items():
-                values[k].append(parse_raw_str(v))
+                values[k].append(parse_raw_value(v))
     return {k: values[k] for k in values.keys()}
 
 
@@ -19,13 +19,18 @@ def epoch_to_str(epoch, fmt='%Y-%m-%d %H:%M:%S'):
 
 def parse_raw_str(v):
     try:
-        v = float(v)
+        v = v.decode('utf-8')
     except:
         try:
-            v = v.decode('utf-8')
+            v = v.decode('latin1')
         except:
-            try:
-                v = v.decode('latin1')
-            except:
-                pass
+            pass
+    return v
+
+
+def parse_raw_value(v):
+    try:
+        v = float(v)
+    except:
+        v = parse_raw_str(v)
     return v

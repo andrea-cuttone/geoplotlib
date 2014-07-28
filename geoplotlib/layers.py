@@ -1,5 +1,7 @@
+import Queue
 from collections import defaultdict
 from threading import Thread
+import threading
 import pyglet
 from scipy.stats import gaussian_kde
 from sklearn.cluster import DBSCAN
@@ -257,39 +259,73 @@ class PolyLayer():
         self.shape_type = shape_type
 
         self.reader = shapefile.Reader(fname)
+        self.worker = None
 
 
     def invalidate(self, proj):
-        self.count_records = 0
-
         self.painter = BatchPainter()
         self.hotspots = HotspotManager()
         self.painter.set_color(self.color)
 
+        if self.worker:
+            self.worker.stop()
+            self.worker.join()
+        self.queue = Queue.Queue()
+        self.worker = ShapeLoadingThread(self.queue, self.reader, self.shape_type, proj)
+        self.worker.start()
+
 
     def draw(self, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
-        ui_manager.info('shapes: %d/%d' % (self.count_records, self.reader.numRecords))
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
             ui_manager.tooltip(picked)
 
 
     def on_tick(self, dt, proj):
-        for i in xrange(2000):
-            if self.count_records == self.reader.numRecords:
-                return
-            r = self.reader.shapeRecord(self.count_records)
+        while True:
+            try:
+                x, y, record = self.queue.get_nowait()
+                self.painter.linestrip(x, y, self.linewidth, closed=True)
+                if self.f_tooltip:
+                    attr = {t[0][0]: parse_raw_str(t[1]) for t in zip(self.reader.fields[1:], record)}
+                    value = self.f_tooltip(attr)
+                    if self.shape_type == 'bbox':
+                        self.hotspots.add_rect(x.min(), y.min(), x.max()-x.min(), y.max()-y.min(), value)
+                    else:
+                        self.hotspots.add_poly(x, y, value)
+            except Queue.Empty:
+                break
+
+
+class ShapeLoadingThread(Thread):
+
+    def __init__(self, queue, reader, shape_type, proj):
+        Thread.__init__(self)
+
+        self.queue = queue
+        self.reader = reader
+        self.shape_type = shape_type
+        self.proj = proj
+        self.stop_flag = threading.Event()
+
+        self.counter = 0
+
+        self.daemon = True
+
+
+    def stop(self):
+        self.stop_flag.set()
+
+
+    def run(self):
+        while (self.counter < self.reader.numRecords) and (not self.stop_flag.is_set()):
+            r = self.reader.shapeRecord(self.counter)
             if self.shape_type == 'bbox':
                 top, left, bottom, right =  r.shape.bbox
                 vertices = np.array([top, left, top, right, bottom, right, bottom, left]).reshape(-1,2)
             else:
                 vertices = np.array(r.shape.points)
-            x, y = proj.lonlat_to_screen(vertices[:,0], vertices[:,1])
-            self.painter.linestrip(x, y, self.linewidth, closed=True)
-            if self.f_tooltip:
-                # todo: use rect
-                attr = {t[0][0]:parse_raw_str(t[1]) for t in zip(self.reader.fields[1:], r.record)}
-                self.hotspots.add_poly(x, y, self.f_tooltip(attr))
-
-            self.count_records += 1
+            x, y = self.proj.lonlat_to_screen(vertices[:,0], vertices[:,1])
+            self.queue.put((x, y, r.record))
+            self.counter += 1
