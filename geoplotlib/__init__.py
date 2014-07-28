@@ -1,5 +1,5 @@
 from geoplotlib.core import BaseApp
-from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer
+from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer, VoronoiLayer
 
 
 _app = BaseApp()
@@ -39,3 +39,7 @@ def add_layer(layer):
 
 def shapefiles(fname, **kwargs):
     _app.add_layer(PolyLayer(fname, **kwargs))
+
+
+def voronoi(data, **kwargs):
+    _app.add_layer(VoronoiLayer(data, **kwargs))
