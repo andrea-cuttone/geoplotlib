@@ -233,21 +233,6 @@ class ClusterLayer():
         self.painter.batch_draw()
 
 
-class Shape():
-
-    def __init__(self, points, attr):
-        self.points = points
-        self.attr = attr
-
-
-    def lon(self):
-        return self.points[:,0]
-
-
-    def lat(self):
-        return self.points[:,1]
-
-
 class PolyLayer():
 
     def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
