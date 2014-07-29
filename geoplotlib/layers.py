@@ -1,5 +1,6 @@
 import Queue
 from collections import defaultdict
+from math import log10
 from threading import Thread
 import threading
 import pyglet
@@ -135,18 +136,28 @@ class HistogramLayer():
 
 class GraphLayer():
 
-    def __init__(self, lat0, lon0, lat1, lon1, **kwargs):
-        self.lon = np.vstack((lon0, lon1)).T.flatten()
-        self.lat = np.vstack((lat0, lat1)).T.flatten()
-        self.linewidth = kwargs.get('linewidth', 1.0)
-        self.color = kwargs.get('color', [255,0,0,255])
+    def __init__(self, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
+        self.src_lon = src_lon
+        self.src_lat = src_lat
+        self.dest_lon = dest_lon
+        self.dest_lat = dest_lat
+
+        self.linewidth = kwargs.get('linewidth', 3.0)
+        self.cmap = kwargs.get('cmap', 'OrRd')
+        self.alpha = kwargs.get('alpha', 32)
 
 
     def invalidate(self, proj):
         self.painter = BatchPainter()
-        x, y = proj.lonlat_to_screen(self.lon, self.lat)
-        self.painter.set_color(self.color)
-        self.painter.lines(x, y, self.linewidth)
+        x0, y0 = proj.lonlat_to_screen(self.src_lon, self.src_lat)
+        x1, y1 = proj.lonlat_to_screen(self.dest_lon, self.dest_lat)
+        manhattan = np.abs(x0-x1) + np.abs(y0-y1)
+        cols = colors.create_log_cmap(manhattan.max(), self.cmap, alpha=self.alpha)
+        distances = np.logspace(0, log10(manhattan.max()), 20)
+        for i in range(len(distances)-1, 1, -1):
+            mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
+            self.painter.set_color(cols(distances[i]))
+            self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], self.linewidth)
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):
@@ -157,7 +168,6 @@ class KDELayer():
 
     def __init__(self, data):
         self.data = data
-        self.invalidate()
 
 
     def invalidate(self, proj):

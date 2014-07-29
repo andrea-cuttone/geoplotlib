@@ -9,8 +9,5 @@ data = read_csv('./data/flights.csv')
 geoplotlib.graph(src_lat=data['lat. departure (decimal)'],
                  src_lon=data['long. departure (decimal)'],
                  dest_lat=data['lat. arrival (decimal)'],
-                 dest_lon=data['long. arrival (decimal)'],
-                 linewidth=3.0,
-                 color=[0,0,255,6]
-                 )
+                 dest_lon=data['long. arrival (decimal)'])
 geoplotlib.show()

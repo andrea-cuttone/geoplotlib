@@ -1,5 +1,6 @@
 from geoplotlib.core import BaseApp
 from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer, VoronoiLayer
+import numpy as np
 
 
 _app = BaseApp()
@@ -17,8 +18,8 @@ def hist(data):
     _app.add_layer(HistogramLayer(data))
 
 
-def graph(lat0, lon0, lat1, lon1, **kwargs):
-    _app.add_layer(GraphLayer(lat0, lon0, lat1, lon1, **kwargs))
+def graph(src_lat, src_lon, dest_lat, dest_lon, **kwargs):
+    _app.add_layer(GraphLayer(src_lat, src_lon, dest_lat, dest_lon, **kwargs))
 
 
 def clusters(data):

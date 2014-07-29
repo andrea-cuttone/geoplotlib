@@ -128,8 +128,8 @@ class BaseApp(pyglet.window.Window):
 
         glEnable(GL_LINE_SMOOTH);
         glEnable(GL_POLYGON_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+        # glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        # glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -205,12 +205,12 @@ class BaseApp(pyglet.window.Window):
                 self.proj.zoomin(self.mouse_x, self.mouse_y)
                 for l in self._layers:
                     l.invalidate(self.proj)
-                self.scroll_delay = 120
+                self.scroll_delay = 60
             elif scroll_y > 0:
                 self.proj.zoomout(self.mouse_x, self.mouse_y)
                 for l in self._layers:
                     l.invalidate(self.proj)
-                self.scroll_delay = 120
+                self.scroll_delay = 60
 
 
     def on_key_release(self, symbol, modifiers):
@@ -263,8 +263,10 @@ class BatchPainter:
             raise Exception('invalid color format')
 
 
-    def lines(self, x, y, width=1.0):
+    def lines(self, x0, y0, x1, y1, width=1.0):
         glLineWidth(width)
+        x = _flatten_xy(x0, x1)
+        y = _flatten_xy(y0, y1)
         vertices = _flatten_xy(x, y)
         self.batch.add(len(vertices)/VERT_PER_POINT, GL_LINES, None,
                       ('v2f', vertices),
