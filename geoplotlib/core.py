@@ -25,8 +25,6 @@ TILE_SIZE = 256
 MIN_ZOOM = 1
 MAX_ZOOM = 24
 
-GeoPoint = namedtuple('GeoPoint', ['lat', 'lon'])
-
 
 class UiManager:
 
@@ -116,7 +114,7 @@ class BaseApp(pyglet.window.Window):
         super(BaseApp, self).__init__(SCREEN_W, SCREEN_H)
         self.ticks = 0
         self.ui_manager = UiManager()
-        self.proj = Projector.show_dtu(False)
+        self.proj = Projector()
         self.map_layer = MapLayer('toner', skipdl=False)
         self._layers = []
 
@@ -124,6 +122,7 @@ class BaseApp(pyglet.window.Window):
         self.drag_x = self.drag_y = 0
         self.dragging = False
         self.drag_start_timestamp = 0
+        self.autofit = True
 
         self.mouse_x = self.mouse_y = 0
 
@@ -240,15 +239,18 @@ class BaseApp(pyglet.window.Window):
 
     def run(self):
         #pyglet.options['debug_gl'] = False
-        self.fit()
-        pyglet.app.run()
-
-
-    def fit(self):
-        self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self._layers]))
+        if self.autofit:
+            self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self._layers]))
 
         for l in self._layers:
             l.invalidate(self.proj)
+
+        pyglet.app.run()
+
+
+    def set_bbox(self, bbox):
+        self.proj.fit(bbox)
+        self.autofit = False
 
 
 def _flatten_xy(x, y):
@@ -327,23 +329,15 @@ class BatchPainter:
 
 class Projector():
 
-    def __init__(self, north, west, zoom, fourk):
-        if fourk:
-            self.canvas_w = 3840
-            self.canvas_h = 2160
-        else:
-            self.canvas_w = 1280
-            self.canvas_h = 768
-        self.fourk= fourk
-        self.tiles_horizontally = int(math.ceil(1.*self.canvas_w / TILE_SIZE))
-        self.tiles_vertically = int(math.ceil(1.*self.canvas_h / TILE_SIZE))
-        self.set_to(north, west, zoom)
+    def __init__(self):
+        self.tiles_horizontally = int(math.ceil(1.*SCREEN_W / TILE_SIZE))
+        self.tiles_vertically = int(math.ceil(1.*SCREEN_H / TILE_SIZE))
+        self.fit(BoundingBox.WORLD)
 
 
     def set_to(self, north, west, zoom):
         self.zoom = zoom
         self.xtile, self.ytile = self.deg2num(north, west, zoom)
-        self.calculate_bounds()
 
 
     def fit(self, bbox):
@@ -378,19 +372,16 @@ class Projector():
         return (lat_deg, lon_deg)
 
 
-    def calculate_bounds(self):
+    def bbox(self):
         north, west = self.num2deg(self.xtile, self.ytile, self.zoom)
-        self.nw = GeoPoint(lat=north, lon=west)
         south, east = self.num2deg(self.xtile + self.tiles_horizontally, self.ytile + self.tiles_vertically, self.zoom)
-        self.se = GeoPoint(lat=south, lon=east)
-
+        return BoundingBox(north=north, west=west, south=south, east=east)
         #print 'moving to', self.nw, self.zoom
 
 
     def pan(self, deltax, deltay):
         self.xtile += deltax
         self.ytile -= deltay
-        self.calculate_bounds()
 
 
     def zoomin(self, mouse_x, mouse_y):
@@ -399,7 +390,6 @@ class Projector():
         self.xtile, self.ytile = self.deg2num(mouse_lat, mouse_lon, self.zoom)
         self.xtile -= 1. * mouse_x / TILE_SIZE
         self.ytile -= 1. * mouse_y / TILE_SIZE
-        self.calculate_bounds()
 
 
     def zoomout(self, mouse_x, mouse_y):
@@ -408,7 +398,6 @@ class Projector():
         self.xtile, self.ytile = self.deg2num(mouse_lat, mouse_lon, self.zoom)
         self.xtile -= 1. * mouse_x / TILE_SIZE
         self.ytile -= 1. * mouse_y / TILE_SIZE
-        self.calculate_bounds()
 
 
     def lonlat_to_screen(self, lon, lat):
@@ -421,8 +410,8 @@ class Projector():
         n = 2.0 ** self.zoom
         xtile = (lon + 180.0) / 360.0 * n
         ytile = (1.0 - np.log(np.tan(lat_rad) + (1 / np.cos(lat_rad))) / math.pi) / 2.0 * n
-        x = ((xtile)*TILE_SIZE).astype(int)
-        y = (self.canvas_h - (ytile)*TILE_SIZE).astype(int)
+        x = (xtile * TILE_SIZE).astype(int)
+        y = (SCREEN_H - ytile * TILE_SIZE).astype(int)
         return x, y
 
 
@@ -430,59 +419,6 @@ class Projector():
         xtile = 1. * x / TILE_SIZE + self.xtile
         ytile = 1. * y / TILE_SIZE + self.ytile
         return self.num2deg(xtile, ytile, self.zoom)
-
-
-    @staticmethod
-    def show_DK(fourk):
-        if fourk:
-            return Projector(north=57.704047, west=4.921875, zoom=9, fourk=fourk)
-        else:
-            return Projector(north=58.813642, west=5.625000, zoom=7, fourk=fourk)
-
-
-    @staticmethod
-    def show_dtu(fourk):
-        if fourk:
-            return Projector(north=55.792017, west=12.499695, zoom=17, fourk=fourk)
-        else:
-            return Projector(north=55.795105, west=12.503441, zoom=15, fourk=fourk)
-
-
-    @staticmethod
-    def show_kbh_area(fourk):
-        if fourk:
-            return Projector(north=55.825873, west=12.041050, zoom=13, fourk=fourk)
-        else:
-            return Projector(north=55.875211, west=11.953125, zoom=11, fourk=fourk)
-
-
-    @staticmethod
-    def show_skuespillet(fourk):
-        return Projector(north=55.681301, west=12.589646, zoom=18, fourk=fourk)
-
-
-    @staticmethod
-    def show_city_center(fourk):
-        if fourk:
-            return Projector(north=55.692068, west=12.518921, zoom=16, fourk=fourk)
-        else:
-            return Projector(north=55.684972, west=12.56387, zoom=15, fourk=fourk)
-
-
-    @staticmethod
-    def show_DK_DE(fourk):
-        if fourk:
-            return Projector(north=58.813742, west=-11.250000, zoom=7, fourk=fourk)
-        else:
-            return Projector(north=61.606396, west=-11.250000, zoom=5, fourk=fourk)
-
-
-    @staticmethod
-    def show_world(fourk):
-        if fourk:
-            return Projector(north=74.019543, west=-157.500000, zoom=4, fourk=fourk)
-        else:
-            return Projector(north=85.051129, west=-180.000000, zoom=2, fourk=fourk)
 
 
 class SetQueue(Queue):
@@ -577,7 +513,7 @@ class MapLayer():
                 tilesurf = self.get_tile(proj.zoom, x, y)
                 if tilesurf is not None:
                     x_screen = int((x - proj.xtile)*TILE_SIZE)
-                    y_screen = int(proj.canvas_h - (y - proj.ytile + 1)*TILE_SIZE)
+                    y_screen = int(SCREEN_H - (y - proj.ytile + 1)*TILE_SIZE)
                     try:
                         tilesurf.blit(x_screen, y_screen, 0)
                     except Exception as e:

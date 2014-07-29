@@ -44,3 +44,7 @@ def shapefiles(fname, **kwargs):
 
 def voronoi(data, **kwargs):
     _app.add_layer(VoronoiLayer(data, **kwargs))
+
+
+def set_bbox(bbox):
+    _app.set_bbox(bbox)
