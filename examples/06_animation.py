@@ -1,14 +1,16 @@
 import sys,os
+from geoplotlib.layers import BaseLayer
+
 sys.path.append(os.path.realpath('..'))
 
 import pandas as pd
 from geoplotlib.core import BatchPainter
 import geoplotlib
 from geoplotlib.colors import colorbrewer
-from geoplotlib.utils import epoch_to_str
+from geoplotlib.utils import epoch_to_str, BoundingBox
 
 
-class TrailsLayer():
+class TrailsLayer(BaseLayer):
 
     def __init__(self):
         self.data = pd.read_csv('data/taxi.csv') # TODO: remove pandas dependency
@@ -33,7 +35,7 @@ class TrailsLayer():
     def on_tick(self, dt, proj):
         self.painter = BatchPainter()
         df = self.data[(self.data.timestamp > self.t) & (self.data.timestamp <= self.t + 15*60)]
-        proj.fit(df.lon.values, df.lat.values)
+        proj.fit(BoundingBox.from_points(lons=df.lon.values, lats=df.lat.values))
         for taxi_id, grp in df.groupby('taxi_id'):
             self.painter.set_color(self.cmap[taxi_id])
             x, y = proj.lonlat_to_screen(grp.lon.values, grp.lat.values)

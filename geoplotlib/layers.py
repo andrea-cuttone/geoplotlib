@@ -9,41 +9,8 @@ from sklearn.cluster import DBSCAN
 import numpy as np
 import colors
 from geoplotlib.core import BatchPainter, SCREEN_W, SCREEN_H, TILE_SIZE
-from geoplotlib.utils import epoch_to_str, parse_raw_str
+from geoplotlib.utils import epoch_to_str, parse_raw_str, BoundingBox
 import shapefile
-
-class ScatterLayer():
-
-    def __init__(self, data, color=None, point_size=6, f_tooltip=None):
-        self.data = data
-
-        if color is None:
-            color = [255,0,0]
-        self.color = color
-        self.point_size = point_size
-        self.f_tooltip = f_tooltip
-
-        self.hotspots = HotspotManager()
-
-
-    def invalidate(self, proj):
-        self.painter = BatchPainter()
-        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        if self.f_tooltip:
-            for i in range(0, len(x)):
-                record = {k: self.data[k][i] for k in self.data.keys()}
-                self.hotspots.add_rect(x[i] - self.point_size, y[i] - self.point_size,
-                                       2*self.point_size, 2*self.point_size,
-                                       self.f_tooltip(record))
-        self.painter.set_color(self.color)
-        self.painter.points(x, y, 2*self.point_size, False)
-
-
-    def draw(self, mouse_x, mouse_y, ui_manager):
-        self.painter.batch_draw()
-        picked = self.hotspots.pick(mouse_x, mouse_y)
-        if picked:
-            ui_manager.tooltip(picked)
 
 
 class HotspotManager():
@@ -100,7 +67,59 @@ class HotspotManager():
         return None
 
 
-class HistogramLayer():
+class BaseLayer():
+
+    def invalidate(self, proj):
+        pass
+
+
+    def draw(self, mouse_x, mouse_y, ui_manager):
+        pass
+
+
+    def bbox(self):
+        return BoundingBox.WORLD
+
+
+class ScatterLayer(BaseLayer):
+
+    def __init__(self, data, color=None, point_size=6, f_tooltip=None):
+        self.data = data
+
+        if color is None:
+            color = [255,0,0]
+        self.color = color
+        self.point_size = point_size
+        self.f_tooltip = f_tooltip
+
+        self.hotspots = HotspotManager()
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
+        if self.f_tooltip:
+            for i in range(0, len(x)):
+                record = {k: self.data[k][i] for k in self.data.keys()}
+                self.hotspots.add_rect(x[i] - self.point_size, y[i] - self.point_size,
+                                       2*self.point_size, 2*self.point_size,
+                                       self.f_tooltip(record))
+        self.painter.set_color(self.color)
+        self.painter.points(x, y, 2*self.point_size, False)
+
+
+    def draw(self, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+        picked = self.hotspots.pick(mouse_x, mouse_y)
+        if picked:
+            ui_manager.tooltip(picked)
+
+
+    def bbox(self):
+        return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])
+
+
+class HistogramLayer(BaseLayer):
 
     def __init__(self, data):
         self.data = data
@@ -133,8 +152,11 @@ class HistogramLayer():
         if picked:
             ui_manager.tooltip(picked)
 
+    def bbox(self):
+        return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])
 
-class GraphLayer():
+
+class GraphLayer(BaseLayer):
 
     def __init__(self, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
         self.src_lon = src_lon
@@ -164,7 +186,12 @@ class GraphLayer():
         self.painter.batch_draw()
 
 
-class KDELayer():
+    def bbox(self):
+        return BoundingBox.from_points(lons=np.hstack([self.src_lon, self.dest_lon]),
+                                       lats=np.hstack([self.src_lat, self.dest_lat]))
+
+
+class KDELayer(BaseLayer):
 
     def __init__(self, data):
         self.data = data
@@ -215,7 +242,7 @@ class WorkerThread(Thread):
         print 'done'
 
 
-class ClusterLayer():
+class ClusterLayer(BaseLayer):
 
     def __init__(self, data):
         self.data = data
@@ -244,7 +271,7 @@ class ClusterLayer():
         self.painter.batch_draw()
 
 
-class PolyLayer():
+class PolyLayer(BaseLayer):
 
     def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
         if color is None:
@@ -327,7 +354,7 @@ class ShapeLoadingThread(Thread):
             self.counter += 1
 
 
-class VoronoiLayer():
+class VoronoiLayer(BaseLayer):
 
     def __init__(self, data, line_color=None, line_width=2, draw_points=False, points_color=None, f_tooltip=None):
         self.data = data
@@ -375,7 +402,7 @@ class VoronoiLayer():
 
         center = vor.points.mean(axis=0)
         if radius is None:
-            radius = vor.points.ptp().max()*2
+            radius = vor.points.ptp().max()
 
         # Construct a map containing all ridges for a given point
         all_ridges = {}
@@ -463,3 +490,7 @@ class VoronoiLayer():
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
             ui_manager.tooltip(picked)
+
+
+    def bbox(self):
+        return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])

@@ -14,6 +14,7 @@ import random
 import urllib2
 import pyglet
 from os.path import expanduser
+from geoplotlib.utils import BoundingBox
 
 
 VERT_PER_POINT = 2
@@ -115,7 +116,7 @@ class BaseApp(pyglet.window.Window):
         super(BaseApp, self).__init__(SCREEN_W, SCREEN_H)
         self.ticks = 0
         self.ui_manager = UiManager()
-        self.proj = Projector.show_kbh_area(False)
+        self.proj = Projector.show_dtu(False)
         self.map_layer = MapLayer('toner', skipdl=False)
         self._layers = []
 
@@ -137,7 +138,6 @@ class BaseApp(pyglet.window.Window):
 
 
     def add_layer(self, layer):
-        layer.invalidate(self.proj)
         self._layers.append(layer)
 
 
@@ -240,7 +240,15 @@ class BaseApp(pyglet.window.Window):
 
     def run(self):
         #pyglet.options['debug_gl'] = False
+        self.fit()
         pyglet.app.run()
+
+
+    def fit(self):
+        self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self._layers]))
+
+        for l in self._layers:
+            l.invalidate(self.proj)
 
 
 def _flatten_xy(x, y):
@@ -338,18 +346,16 @@ class Projector():
         self.calculate_bounds()
 
 
-    def fit(self, lons, lats):
-        north, west = max(lats), min(lons)
-        south, east = min(lats), max(lons)
+    def fit(self, bbox):
         for zoom in range(MAX_ZOOM + 1, MIN_ZOOM, -1):
             self.zoom = zoom
-            left, top = self.lonlat_to_screen([west], [north])
-            right, bottom = self.lonlat_to_screen([east], [south])
+            left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
+            right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])
             if (top - bottom < SCREEN_H) and (right - left < SCREEN_W):
                 break
         #self.zoom = zoom - 1
-        west_tile, north_tile = self.deg2num(north, west, self.zoom)
-        east_tile, south_tile = self.deg2num(south, east, self.zoom)
+        west_tile, north_tile = self.deg2num(bbox.north, bbox.west, self.zoom)
+        east_tile, south_tile = self.deg2num(bbox.south, bbox.east, self.zoom)
         self.xtile = west_tile - self.tiles_horizontally/2. + (east_tile - west_tile)/2
         self.ytile = north_tile - self.tiles_vertically/2. + (south_tile - north_tile)/2
 
