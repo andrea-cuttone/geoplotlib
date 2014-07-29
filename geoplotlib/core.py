@@ -22,8 +22,8 @@ SCREEN_W = 1280
 SCREEN_H = 768
 FPS = 60
 TILE_SIZE = 256
-MIN_ZOOM = 1
-MAX_ZOOM = 24
+MIN_ZOOM = 2
+MAX_ZOOM = 20
 
 
 class UiManager:
@@ -341,7 +341,7 @@ class Projector():
 
 
     def fit(self, bbox):
-        for zoom in range(MAX_ZOOM + 1, MIN_ZOOM, -1):
+        for zoom in range(MAX_ZOOM, MIN_ZOOM-1, -1):
             self.zoom = zoom
             left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
             right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])

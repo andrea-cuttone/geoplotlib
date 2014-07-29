@@ -1,7 +1,8 @@
 from collections import defaultdict
 import csv
 from datetime import datetime
-
+import json
+import urllib2
 
 def read_csv(fname):
     values = defaultdict(list)
@@ -58,6 +59,19 @@ class BoundingBox():
         south = min([b.south for b in bboxes])
         west = min([b.west for b in bboxes])
         east = max([b.east for b in bboxes])
+        return BoundingBox(north=north, west=west, south=south, east=east)
+
+
+    @staticmethod
+    def from_nominatim(query):
+        url = urllib2.urlopen('http://nominatim.openstreetmap.org/search.php?q=%s&format=json' % query)
+        jo = json.load(url)
+
+        if len(jo) == 0:
+            raise Exception('No results found')
+
+        south, north, west, east = map(float, jo[0]['boundingbox'])
+        print 'bbox from Nominatim:', south, north, west, east
         return BoundingBox(north=north, west=west, south=south, east=east)
 
 
