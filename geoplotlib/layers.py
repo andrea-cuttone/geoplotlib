@@ -7,6 +7,7 @@ import pyglet
 from scipy.stats import gaussian_kde
 from sklearn.cluster import DBSCAN
 import numpy as np
+import time
 import colors
 from geoplotlib.core import BatchPainter, SCREEN_W, SCREEN_H, TILE_SIZE
 from geoplotlib.utils import epoch_to_str, parse_raw_str, BoundingBox
@@ -121,29 +122,38 @@ class ScatterLayer(BaseLayer):
 
 class HistogramLayer(BaseLayer):
 
-    def __init__(self, data):
+    def __init__(self, data, **kwargs):
         self.data = data
+        self.alpha = kwargs.get('alpha')
+        self.cmap = kwargs.get('cmap')
+        self.binsize = kwargs.get('binsize')
+        self.show_tooltip = kwargs.get('show_tooltip')
+        self.vmin = kwargs.get('vmin')
+        self.f_group = kwargs.get('f_group', None)
+        if self.f_group is None:
+            self.f_group = lambda group_mask: len(group_mask)
 
 
     def invalidate(self, proj):
         self.painter = BatchPainter()
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        bin_size = 16
-        ix = x // bin_size
-        iy = y // bin_size
-        frequencies = defaultdict(int)
-        for k in zip(ix, iy):
-            frequencies[k] += 1
+        ix = (x / self.binsize).astype(int)
+        iy = (y / self.binsize).astype(int)
+        groups = defaultdict(list)
+        for i, k in enumerate(zip(ix, iy)):
+            groups[k].append(i)
+        results = {k: self.f_group(groups[k]) for k in groups.keys()}
 
         self.hotspot = HotspotManager()
-
-        vmax = max(frequencies.values())
+        vmax = max(results.values())
         if vmax > 1:
-            cmap = colors.create_log_cmap(vmax, 'coolwarm', alpha=200)
-            for (ix, iy), value in frequencies.items():
-                self.painter.set_color(cmap(value))
-                self.painter.rect(ix * bin_size, iy * bin_size, (ix+1)*bin_size, (iy+1)*bin_size)
-                self.hotspot.add_rect(ix * bin_size, iy * bin_size, bin_size, bin_size, 'Value: %d' % value)
+            cmap = colors.create_log_cmap(vmax, self.cmap, alpha=self.alpha)
+            for (ix, iy), value in results.items():
+                if value > self.vmin:
+                    self.painter.set_color(cmap(value))
+                    self.painter.rect(ix * self.binsize, iy * self.binsize, (ix+1)*self.binsize, (iy+1)*self.binsize)
+                    if self.show_tooltip:
+                        self.hotspot.add_rect(ix * self.binsize, iy * self.binsize, self.binsize, self.binsize, 'Value: %d' % value)
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):

@@ -475,6 +475,8 @@ class MapLayer():
             url = 'http://%s.tile.stamen.com/watercolor/%d/%d/%d.png' % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
         elif self.tiles_provider == 'toner':
             url = "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
+        elif self.tiles_provider == 'toner-lite':
+            url = "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
         elif self.tiles_provider == 'mapquest':
             url = "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile)
         elif self.tiles_provider == 'toolserver':

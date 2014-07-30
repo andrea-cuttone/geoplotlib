@@ -14,8 +14,8 @@ def scatter(data, **kwargs):
     _app.add_layer(ScatterLayer(data, **kwargs))
 
 
-def hist(data):
-    _app.add_layer(HistogramLayer(data))
+def hist(data, cmap='coolwarm', alpha=220, binsize=8, show_tooltip=True, vmin=1, f_group=None):
+    _app.add_layer(HistogramLayer(data, cmap=cmap, alpha=alpha, binsize=binsize, show_tooltip=show_tooltip, vmin=vmin, f_group=f_group))
 
 
 def graph(src_lat, src_lon, dest_lat, dest_lon, **kwargs):
