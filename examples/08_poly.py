@@ -1,7 +1,5 @@
 import sys,os
-from pyglet.gl import glPushMatrix, glPopMatrix
-from geoplotlib.layers import HotspotManager, PolyLayer
-from geoplotlib.utils import parse_raw_str, BoundingBox
+from geoplotlib.utils import BoundingBox
 
 sys.path.append(os.path.realpath('..'))
 
@@ -15,5 +13,6 @@ geoplotlib.shapefiles('data/dk_kommune/dk_kommune',
 # geoplotlib.shapes('/Users/ancu/denmark-latest.shp/buildings',
 #                   shape_type='full',
 #                   f_tooltip=lambda attr: attr['name'])
+
 geoplotlib.set_bbox(BoundingBox.DK)
 geoplotlib.show()

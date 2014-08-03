@@ -10,7 +10,7 @@ import numpy as np
 import time
 import colors
 from geoplotlib.core import BatchPainter, SCREEN_W, SCREEN_H, TILE_SIZE
-from geoplotlib.utils import epoch_to_str, parse_raw_str, BoundingBox
+from geoplotlib.utils import parse_raw_str, BoundingBox
 import shapefile
 
 
@@ -84,14 +84,13 @@ class BaseLayer():
 
 class ScatterLayer(BaseLayer):
 
-    def __init__(self, data, color=None, point_size=6, f_tooltip=None):
+    def __init__(self, data, **kwargs):
         self.data = data
-
-        if color is None:
-            color = [255,0,0]
-        self.color = color
-        self.point_size = point_size
-        self.f_tooltip = f_tooltip
+        self.color = kwargs.get('color')
+        if self.color is None:
+            self.color = [255,0,0]
+        self.point_size = kwargs.get('point_size')
+        self.f_tooltip = kwargs.get('f_tooltip')
 
         self.hotspots = HotspotManager()
 
@@ -168,7 +167,8 @@ class HistogramLayer(BaseLayer):
 
 class GraphLayer(BaseLayer):
 
-    def __init__(self, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
+    def __init__(self, data, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
+        self.data = data
         self.src_lon = src_lon
         self.src_lat = src_lat
         self.dest_lon = dest_lon
@@ -181,8 +181,8 @@ class GraphLayer(BaseLayer):
 
     def invalidate(self, proj):
         self.painter = BatchPainter()
-        x0, y0 = proj.lonlat_to_screen(self.src_lon, self.src_lat)
-        x1, y1 = proj.lonlat_to_screen(self.dest_lon, self.dest_lat)
+        x0, y0 = proj.lonlat_to_screen(self.data[self.src_lon], self.data[self.src_lat])
+        x1, y1 = proj.lonlat_to_screen(self.data[self.dest_lon], self.data[self.dest_lat])
         manhattan = np.abs(x0-x1) + np.abs(y0-y1)
         cols = colors.create_log_cmap(manhattan.max(), self.cmap, alpha=self.alpha)
         distances = np.logspace(0, log10(manhattan.max()), 20)
@@ -197,8 +197,8 @@ class GraphLayer(BaseLayer):
 
 
     def bbox(self):
-        return BoundingBox.from_points(lons=np.hstack([self.src_lon, self.dest_lon]),
-                                       lats=np.hstack([self.src_lat, self.dest_lat]))
+        return BoundingBox.from_points(lons=np.hstack([self.data[self.src_lon], self.data[self.dest_lon]]),
+                                       lats=np.hstack([self.data[self.src_lat], self.data[self.dest_lat]]))
 
 
 class KDELayer(BaseLayer):
@@ -247,7 +247,7 @@ class WorkerThread(Thread):
         print 'running'
         x, y = self.proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
         self.X = np.vstack((x,y)).T
-        self.dbscan = DBSCAN(eps=50, min_samples=2)
+        self.dbscan = DBSCAN(eps=25, min_samples=2)
         self.dbscan.fit(self.X)
         print 'done'
 
@@ -321,7 +321,7 @@ class PolyLayer(BaseLayer):
                 x, y, record = self.queue.get_nowait()
                 self.painter.linestrip(x, y, self.linewidth, closed=True)
                 if self.f_tooltip:
-                    attr = {t[0][0]: parse_raw_str(t[1]) for t in zip(self.reader.fields[1:], record)}
+                    attr = {t[0][0]: t[1] for t in zip(self.reader.fields[1:], record)}
                     value = self.f_tooltip(attr)
                     if self.shape_type == 'bbox':
                         self.hotspots.add_rect(x.min(), y.min(), x.max()-x.min(), y.max()-y.min(), value)

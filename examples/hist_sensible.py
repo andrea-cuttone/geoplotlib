@@ -2,13 +2,13 @@ import sys,os
 sys.path.append(os.path.realpath('..'))
 
 import geoplotlib
-from geoplotlib.utils import read_csv, BoundingBox
+from geoplotlib.utils import BoundingBox, DataAccessObject
 
 
-#data = read_csv('somedata.csv')
 import pandas as pd
 df = pd.read_csv('somedata.csv')
-data = {'lon': df.lon.values, 'lat': df.lat.values, 'user': df.user.values}
+
+data = DataAccessObject({'lon': df.lon.values, 'lat': df.lat.values, 'user': df.user.values})
 geoplotlib.hist(data,
                 alpha=220,
                 vmin=3,

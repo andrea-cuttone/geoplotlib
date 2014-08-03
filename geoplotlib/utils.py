@@ -3,6 +3,52 @@ import csv
 from datetime import datetime
 import json
 import urllib2
+import numpy as np
+
+
+class DataAccessObject():
+
+    def __init__(self, dict):
+        self.dict = dict
+
+
+    def __getitem__(self, key):
+        return self.dict[key]
+
+
+    def __setitem__(self, key, value):
+        self.dict[key] = value
+
+
+    def rename(self, mapping):
+        for old_key, new_key in mapping:
+            self.dict[new_key] = self.dict[old_key]
+            del self.dict[old_key]
+
+
+    def where(self, mask):
+        return DataAccessObject({k: self.dict[k][mask] for k in self.dict})
+
+
+    def head(self, n):
+        return DataAccessObject({k: self.dict[k][:n] for k in self.dict})
+
+
+    def keys(self):
+        return self.dict.keys()
+
+
+    def values(self):
+        return self.dict.values()
+
+
+    def __str__(self):
+        return 'DataAccessObject(%s x %d)' % (str(self.dict.keys()), len(self))
+
+
+    def __len__(self):
+        return len(self.dict.values()[0])
+
 
 def read_csv(fname):
     values = defaultdict(list)
@@ -10,8 +56,18 @@ def read_csv(fname):
         reader = csv.DictReader(f)
         for row in reader:
             for (k,v) in row.items():
-                values[k].append(parse_raw_value(v))
-    return {k: values[k] for k in values.keys()}
+                values[k].append(v)
+    npvalues = {k: np.array(values[k]) for k in values.keys()}
+    for k in npvalues.keys():
+        for datatype in [np.int, np.float]:
+            try:
+                npvalues[k][:1].astype(datatype)
+                npvalues[k] = npvalues[k].astype(datatype)
+                break
+            except:
+                pass
+    dao = DataAccessObject(npvalues)
+    return dao
 
 
 def epoch_to_str(epoch, fmt='%Y-%m-%d %H:%M:%S'):
@@ -26,14 +82,6 @@ def parse_raw_str(v):
             v = v.decode('latin1')
         except:
             pass
-    return v
-
-
-def parse_raw_value(v):
-    try:
-        v = float(v)
-    except:
-        v = parse_raw_str(v)
     return v
 
 
@@ -60,6 +108,10 @@ class BoundingBox():
         west = min([b.west for b in bboxes])
         east = max([b.east for b in bboxes])
         return BoundingBox(north=north, west=west, south=south, east=east)
+
+
+    def __str__(self):
+        return 'BoundingBox(north=%.6f,west=%.6f,south=%.6f,east=%.6f)' % (self.north, self.west, self.south, self.east)
 
 
     @staticmethod

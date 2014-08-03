@@ -6,7 +6,6 @@ from geoplotlib.utils import read_csv, BoundingBox
 
 
 data = read_csv('./data/loc-andrea-prod-resampled.csv')
-data = {'lon': data['lon'][:10000], 'lat': data['lat'][:10000]}
-geoplotlib.clusters(data)
+geoplotlib.clusters(data.head(10000))
 geoplotlib.set_bbox(BoundingBox.KBH)
 geoplotlib.show()

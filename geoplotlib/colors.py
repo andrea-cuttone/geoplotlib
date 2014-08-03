@@ -9,7 +9,7 @@ def _convert_color_format(col, alpha):
 
 def create_set_cmap(values, cmap_name, alpha=255):
     unique_values = list(set(values))
-    #shuffle(unique_values)
+    shuffle(unique_values)
     cmap = plt.get_cmap(cmap_name)
     d = {}
     for i in range(len(unique_values)):

@@ -14,7 +14,7 @@ import random
 import urllib2
 import pyglet
 from os.path import expanduser
-from geoplotlib.utils import BoundingBox
+from geoplotlib.utils import BoundingBox, parse_raw_str
 
 
 VERT_PER_POINT = 2
@@ -58,15 +58,15 @@ class UiManager:
                                        anchor_x='right', anchor_y='top')
 
     def tooltip(self, text):
-        self.labels['tooltip'].text = text
+        self.labels['tooltip'].text = parse_raw_str(text)
 
 
     def status(self, text):
-        self.labels['status'].text = text
+        self.labels['status'].text = parse_raw_str(text)
 
 
     def info(self, text):
-        self.labels['info'].text = text
+        self.labels['info'].text = parse_raw_str(text)
 
 
     @staticmethod
