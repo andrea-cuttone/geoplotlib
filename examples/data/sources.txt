@@ -1,5 +1,6 @@
-flights.csv: citiesTable.csv from http://www.visualizing.org/datasets/global-flights-network
+flights.csv:citiesTable.csv from http://www.visualizing.org/datasets/global-flights-network
 taxi.csv: subset of data from http://www.andresmh.com/nyctaxitrips/
 s-tog.csv, metro.csv and bus.csv: http://geo.oiorest.dk/holdepladser.json
 cellid_dk.csv: danish celltowers from opencellid.org
-dk: http://geocommons.com/overlays/276034
+dk_kommune: http://geocommons.com/overlays/276034
+S-tog and København Metro logos are owner by their respective owners

@@ -3,6 +3,7 @@ from inspect import isfunction
 from threading import Thread
 import pyglet
 from pyglet.gl import *
+from pyglet.sprite import Sprite
 from pyglet.window import mouse
 import time
 from pyglet.gl import *
@@ -260,15 +261,16 @@ def _flatten_xy(x, y):
 class BatchPainter:
 
     def __init__(self):
-        self.batch = pyglet.graphics.Batch()
-        self.color = [0, 0, 0, 255]
+        self._batch = pyglet.graphics.Batch()
+        self._color = [0, 0, 0, 255]
+        self._sprites = []
 
 
     def set_color(self, color):
         if len(color) == 4:
-            self.color = color
+            self._color = color
         elif len(color) == 3:
-            self.color = color + [255]
+            self._color = color + [255]
         else:
             raise Exception('invalid color format')
 
@@ -278,9 +280,9 @@ class BatchPainter:
         x = _flatten_xy(x0, x1)
         y = _flatten_xy(y0, y1)
         vertices = _flatten_xy(x, y)
-        self.batch.add(len(vertices)/VERT_PER_POINT, GL_LINES, None,
+        self._batch.add(len(vertices)/VERT_PER_POINT, GL_LINES, None,
                       ('v2f', vertices),
-                      ('c4B', self.color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
     def linestrip(self, x, y, width=1.0, closed=False):
@@ -292,16 +294,16 @@ class BatchPainter:
             indices.append(indices[-1])
             indices.append(indices[0])
 
-        self.batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_LINES, None,
+        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_LINES, None,
                       indices,
                       ('v2f', vertices),
-                      ('c4B', self.color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
     def triangle(self, vertices):
-        self.batch.add(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+        self._batch.add(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
                       ('v2f', vertices),
-                      ('c4B', self.color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
     def points(self, x, y, point_size=10, rounded=False):
@@ -314,17 +316,26 @@ class BatchPainter:
         # TODO: ravel? http://stackoverflow.com/questions/9057379/correct-and-efficient-way-to-flatten-array-in-numpy-in-python
         vertices = np.vstack((x, y)).T.flatten()
 
-        self.batch.add(len(vertices)/VERT_PER_POINT, GL_POINTS, None,
+        self._batch.add(len(vertices)/VERT_PER_POINT, GL_POINTS, None,
                       ('v2f', vertices),
-                      ('c4B', self.color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
     def rect(self, left, top, right, bottom):
         self.triangle([left, top, right, top, right, bottom, right, bottom, left, top, left, bottom])
 
 
+    def sprites(self, image, x, y, scale=1.0):
+        for i in range(len(x)):
+            sprite = Sprite(image, batch=self._batch)
+            sprite.x = x[i]
+            sprite.y = y[i]
+            sprite.scale = scale
+            self._sprites.append(sprite)
+
+
     def batch_draw(self):
-        self.batch.draw()
+        self._batch.draw()
 
 
 class Projector():

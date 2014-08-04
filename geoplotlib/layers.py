@@ -504,3 +504,45 @@ class VoronoiLayer(BaseLayer):
 
     def bbox(self):
         return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])
+
+
+class MarkersLayer(BaseLayer):
+
+    def __init__(self, data, marker, **kwargs):
+        self.data = data
+        self.f_tooltip = kwargs.get('f_tooltip')
+        self.marker_preferred_size = kwargs.get('marker_preferred_size', 32.)
+        self.marker = pyglet.image.load(marker)
+        self.marker.anchor_x = self.marker.width / 2
+        self.marker.anchor_y = self.marker.height / 2
+        self.scale = self.marker_preferred_size / max(self.marker.width, self.marker.height)
+
+        self.hotspots = HotspotManager()
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
+
+        if self.f_tooltip:
+            for i in range(0, len(x)):
+                record = {k: self.data[k][i] for k in self.data.keys()}
+                self.hotspots.add_rect(x[i] - self.marker_preferred_size/2,
+                                       y[i] - self.marker_preferred_size/2,
+                                       self.marker_preferred_size,
+                                       self.marker_preferred_size,
+                                       self.f_tooltip(record))
+
+        self.painter.sprites(self.marker, x, y, self.scale)
+
+
+    def draw(self, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+
+        picked = self.hotspots.pick(mouse_x, mouse_y)
+        if picked:
+            ui_manager.tooltip(picked)
+
+
+    def bbox(self):
+        return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])

@@ -1,5 +1,6 @@
 from geoplotlib.core import BaseApp
-from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer, VoronoiLayer
+from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer, VoronoiLayer, \
+    MarkersLayer
 import numpy as np
 
 
@@ -44,6 +45,10 @@ def shapefiles(fname, **kwargs):
 
 def voronoi(data, **kwargs):
     _app.add_layer(VoronoiLayer(data, **kwargs))
+
+
+def markers(data, marker, **kwargs):
+    _app.add_layer(MarkersLayer(data, marker, **kwargs))
 
 
 def set_bbox(bbox):
