@@ -111,7 +111,7 @@ class BoundingBox():
 
 
     def __str__(self):
-        return 'BoundingBox(north=%.6f,west=%.6f,south=%.6f,east=%.6f)' % (self.north, self.west, self.south, self.east)
+        return 'BoundingBox(north=%.6f, west=%.6f, south=%.6f, east=%.6f)' % (self.north, self.west, self.south, self.east)
 
 
     @staticmethod
