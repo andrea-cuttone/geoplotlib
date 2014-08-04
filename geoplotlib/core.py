@@ -501,10 +501,11 @@ class MapLayer():
         else:
             try:
                 tile_image = pyglet.image.load(download_path)
+                tile_image.blit(2*SCREEN_W, 2*SCREEN_H, 0) # blit offscreen to check if valid
                 self.tiles_cache[(zoom, xtile, ytile)] = tile_image
                 return tile_image
             except Exception as e:
-                print e
+                print 'exception downloading', download_path, e
                 os.unlink(download_path)
                 return None
 
@@ -519,4 +520,4 @@ class MapLayer():
                     try:
                         tilesurf.blit(x_screen, y_screen, 0)
                     except Exception as e:
-                        print e
+                        print 'exception blitting', x, y, proj.zoom, e
