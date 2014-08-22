@@ -15,6 +15,7 @@ import random
 import urllib2
 import pyglet
 from os.path import expanduser
+from geoplotlib import utils
 from geoplotlib.utils import BoundingBox, parse_raw_str
 
 
@@ -167,7 +168,8 @@ class BaseApp(pyglet.window.Window):
                    self.ui_manager)
         glPopMatrix()
 
-        self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
+        #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
+        self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
 
@@ -205,12 +207,12 @@ class BaseApp(pyglet.window.Window):
                 self.proj.zoomin(self.mouse_x, self.mouse_y)
                 for l in self._layers:
                     l.invalidate(self.proj)
-                self.scroll_delay = 60
+                self.scroll_delay = 5
             elif scroll_y > 0:
                 self.proj.zoomout(self.mouse_x, self.mouse_y)
                 for l in self._layers:
                     l.invalidate(self.proj)
-                self.scroll_delay = 60
+                self.scroll_delay = 5
 
 
     def on_key_release(self, symbol, modifiers):
@@ -363,6 +365,7 @@ class Projector():
         east_tile, south_tile = self.deg2num(bbox.south, bbox.east, self.zoom)
         self.xtile = west_tile - self.tiles_horizontally/2. + (east_tile - west_tile)/2
         self.ytile = north_tile - self.tiles_vertically/2. + (south_tile - north_tile)/2
+        self.calculate_viewport_size()
 
 
     @staticmethod
@@ -401,6 +404,7 @@ class Projector():
         self.xtile, self.ytile = self.deg2num(mouse_lat, mouse_lon, self.zoom)
         self.xtile -= 1. * mouse_x / TILE_SIZE
         self.ytile -= 1. * mouse_y / TILE_SIZE
+        self.calculate_viewport_size()
 
 
     def zoomout(self, mouse_x, mouse_y):
@@ -409,6 +413,14 @@ class Projector():
         self.xtile, self.ytile = self.deg2num(mouse_lat, mouse_lon, self.zoom)
         self.xtile -= 1. * mouse_x / TILE_SIZE
         self.ytile -= 1. * mouse_y / TILE_SIZE
+        self.calculate_viewport_size()
+
+
+    def calculate_viewport_size(self):
+        lat1, lon1 = Projector.num2deg(self.xtile, self.ytile, self.zoom)
+        lat2, lon2 = Projector.num2deg(self.xtile + self.tiles_horizontally, self.ytile + self.tiles_vertically, self.zoom)
+        self.viewport_w = utils.haversine(lat1=lat1, lon1=lon1, lat2=lat1, lon2=lon2)
+        self.viewport_h = utils.haversine(lat1=lat1, lon1=lon1, lat2=lat2, lon2=lon1)
 
 
     def lonlat_to_screen(self, lon, lat):

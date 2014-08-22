@@ -148,7 +148,7 @@ class HistogramLayer(BaseLayer):
         if vmax > 1:
             cmap = colors.create_log_cmap(vmax, self.cmap, alpha=self.alpha)
             for (ix, iy), value in results.items():
-                if value > self.vmin:
+                if value >= self.vmin:
                     self.painter.set_color(cmap(value))
                     self.painter.rect(ix * self.binsize, iy * self.binsize, (ix+1)*self.binsize, (iy+1)*self.binsize)
                     if self.show_tooltip:
