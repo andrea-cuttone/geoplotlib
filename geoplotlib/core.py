@@ -112,21 +112,20 @@ class UiManager:
 
 class BaseApp(pyglet.window.Window):
 
-    def __init__(self):
+    def __init__(self, geoplotlib_config):
         super(BaseApp, self).__init__(SCREEN_W, SCREEN_H)
         self.ticks = 0
         self.ui_manager = UiManager()
         self.proj = Projector()
         self.map_layer = MapLayer('toner', skipdl=False)
-        self._layers = []
 
         self.scroll_delay = 0
         self.drag_x = self.drag_y = 0
         self.dragging = False
         self.drag_start_timestamp = 0
-        self.autofit = True
-
         self.mouse_x = self.mouse_y = 0
+
+        self.geoplotlib_config = geoplotlib_config
 
         glEnable(GL_LINE_SMOOTH);
         glEnable(GL_POLYGON_SMOOTH);
@@ -136,14 +135,6 @@ class BaseApp(pyglet.window.Window):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         pyglet.clock.schedule_interval(self.on_update, 1. / FPS)
-
-
-    def add_layer(self, layer):
-        self._layers.append(layer)
-
-
-    def clear_layers(self):
-        self._layers = []
 
 
     def on_draw(self):
@@ -162,15 +153,20 @@ class BaseApp(pyglet.window.Window):
 
         glPushMatrix()
         glTranslatef(-self.proj.xtile * TILE_SIZE, self.proj.ytile * TILE_SIZE, 0)
-        for l in self._layers:
+        for l in self.geoplotlib_config.layers:
             l.draw(self.mouse_x + self.proj.xtile * TILE_SIZE,
                    SCREEN_H - self.mouse_y - self.proj.ytile * TILE_SIZE,
                    self.ui_manager)
         glPopMatrix()
 
         #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
-        self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
+        #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
+
+        if self.geoplotlib_config.savefig is not None:
+            self.screenshot()
+            self.close()
+            pyglet.app.exit()
 
 
     def on_mouse_motion(self, x, y, dx, dy):
@@ -205,21 +201,28 @@ class BaseApp(pyglet.window.Window):
         if self.scroll_delay == 0:
             if scroll_y < 0:
                 self.proj.zoomin(self.mouse_x, self.mouse_y)
-                for l in self._layers:
+                for l in self.geoplotlib_config.layers:
                     l.invalidate(self.proj)
                 self.scroll_delay = 5
             elif scroll_y > 0:
                 self.proj.zoomout(self.mouse_x, self.mouse_y)
-                for l in self._layers:
+                for l in self.geoplotlib_config.layers:
                     l.invalidate(self.proj)
                 self.scroll_delay = 5
 
 
     def on_key_release(self, symbol, modifiers):
         if symbol == pyglet.window.key.S:
+            self.screenshot()
+
+
+    def screenshot(self):
+        if self.geoplotlib_config.savefig is None:
             fname = '%d.png' % (time.time()*1000)
-            pyglet.image.get_buffer_manager().get_color_buffer().save(fname)
-            print fname + ' saved'
+        else:
+            fname = self.geoplotlib_config.savefig + '.png'
+        pyglet.image.get_buffer_manager().get_color_buffer().save(fname)
+        print fname + ' saved'
 
 
     def on_update(self, dt):
@@ -235,25 +238,22 @@ class BaseApp(pyglet.window.Window):
             if self.dragging == False:
                 self.proj.pan(self.drag_x, self.drag_y)
 
-        for l in self._layers:
+        for l in self.geoplotlib_config.layers:
             if hasattr(l, 'on_tick'):
                 l.on_tick(dt, self.proj)
 
 
     def run(self):
         #pyglet.options['debug_gl'] = False
-        if self.autofit:
-            self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self._layers]))
+        if self.geoplotlib_config.bbox is not None:
+            self.proj.fit(self.geoplotlib_config.bbox)
+        else:
+            self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self.geoplotlib_config.layers]))
 
-        for l in self._layers:
+        for l in self.geoplotlib_config.layers:
             l.invalidate(self.proj)
 
         pyglet.app.run()
-
-
-    def set_bbox(self, bbox):
-        self.proj.fit(bbox)
-        self.autofit = False
 
 
 def _flatten_xy(x, y):
@@ -467,7 +467,7 @@ class TileDownloaderThread(Thread):
         while True:
             url, download_path = self.queue.get()
             try:
-                print "downloading %s as %s" % (url, download_path)
+                # print "downloading %s as %s" % (url, download_path)
                 source = urllib2.urlopen(url)
                 content = source.read()
                 source.close()
