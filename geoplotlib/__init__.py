@@ -20,20 +20,21 @@ _global_config = AppConfig()
 
 
 def _runapp(app_config):
-    app = BaseApp(app_config)
-    app.run()
+    try:
+        app = BaseApp(app_config)
+        app.run()
+    finally:
+        app.close()
+        _global_config.reset()
+
 
 
 def show():
-    # proc = Process(target=_runapp, args=(_global_config,))
-    # proc.start()
     _runapp(_global_config)
 
 
 def savefig(fname):
     _global_config.savefig = fname
-    # proc = Process(target=_runapp, args=(_global_config,))
-    # proc.start()
     _runapp(_global_config)
 
 

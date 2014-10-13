@@ -82,6 +82,10 @@ class BaseLayer():
         return BoundingBox.WORLD
 
 
+    def on_key_release(self, key, modifiers):
+        return False
+
+
 class ScatterLayer(BaseLayer):
 
     def __init__(self, data, **kwargs):

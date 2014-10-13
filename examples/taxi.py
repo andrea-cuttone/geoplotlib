@@ -15,7 +15,7 @@ class TrailsLayer(BaseLayer):
         self.data = read_csv('data/taxi.csv')
         self.cmap = colorbrewer(self.data['taxi_id'], alpha=220)
         self.t = self.data['timestamp'].min()
-
+        self.painter = BatchPainter()
 
     def invalidate(self, proj):
         pass

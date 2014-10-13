@@ -1,6 +1,7 @@
 from Queue import Queue
 from inspect import isfunction
 from threading import Thread
+import pandas
 import pyglet
 from pyglet.gl import *
 from pyglet.sprite import Sprite
@@ -127,12 +128,12 @@ class BaseApp(pyglet.window.Window):
 
         self.geoplotlib_config = geoplotlib_config
 
-        glEnable(GL_LINE_SMOOTH);
-        glEnable(GL_POLYGON_SMOOTH);
+        glEnable(GL_LINE_SMOOTH)
+        glEnable(GL_POLYGON_SMOOTH)
         # glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         # glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         pyglet.clock.schedule_interval(self.on_update, 1. / FPS)
 
@@ -214,6 +215,11 @@ class BaseApp(pyglet.window.Window):
     def on_key_release(self, symbol, modifiers):
         if symbol == pyglet.window.key.S:
             self.screenshot()
+        else:
+            for l in self.geoplotlib_config.layers:
+                need_invalidate = l.on_key_release(symbol, modifiers)
+                if need_invalidate:
+                    l.invalidate(self.proj)
 
 
     def screenshot(self):
@@ -264,7 +270,7 @@ class BatchPainter:
 
     def __init__(self):
         self._batch = pyglet.graphics.Batch()
-        self._color = [0, 0, 0, 255]
+        self._color = [0, 0, 255, 255]
         self._sprites = []
 
 
@@ -353,8 +359,8 @@ class Projector():
         self.xtile, self.ytile = self.deg2num(north, west, zoom)
 
 
-    def fit(self, bbox):
-        for zoom in range(MAX_ZOOM, MIN_ZOOM-1, -1):
+    def fit(self, bbox, max_zoom=MAX_ZOOM):
+        for zoom in range(max_zoom, MIN_ZOOM-1, -1):
             self.zoom = zoom
             left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
             right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])
@@ -428,6 +434,10 @@ class Projector():
             lon = np.array(lon)
         if type(lat) == list:
             lat = np.array(lat)
+        if type(lat) == pandas.core.series.Series:
+            lat = lat.values
+        if type(lon) == pandas.core.series.Series:
+            lon = lon.values
 
         lat_rad = np.radians(lat)
         n = 2.0 ** self.zoom

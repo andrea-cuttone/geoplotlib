@@ -14,7 +14,7 @@ class TrailsLayer(BaseLayer):
         self.data = read_csv('data/taxi.csv')
         self.data = self.data.where(self.data['taxi_id'] == list(set(self.data['taxi_id']))[2])
         self.t = self.data['timestamp'].min()
-
+        self.painter = BatchPainter()
 
     def invalidate(self, proj):
         pass
