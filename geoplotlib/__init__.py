@@ -13,6 +13,7 @@ class AppConfig:
         self.layers = []
         self.bbox = None
         self.savefig = None
+        self.tiles_provider = 'toner'
 
 
 _global_config = AppConfig()
@@ -57,8 +58,8 @@ def clear():
     _global_config.layers = []
 
 
-# def tiles_provider(tiles_provider):
-#     _app.map_layer.tiles_provider = tiles_provider
+def tiles_provider(tiles_provider):
+    _global_config.tiles_provider = tiles_provider
 
 
 def add_layer(layer):

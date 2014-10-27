@@ -111,18 +111,19 @@ class BaseApp(pyglet.window.Window):
 
     def __init__(self, geoplotlib_config):
         super(BaseApp, self).__init__(SCREEN_W, SCREEN_H, fullscreen=False, caption='geoplotlib')
+
+        self.geoplotlib_config = geoplotlib_config
+
         self.ticks = 0
         self.ui_manager = UiManager()
         self.proj = Projector()
-        self.map_layer = MapLayer('toner', skipdl=False)
+        self.map_layer = MapLayer(geoplotlib_config.tiles_provider, skipdl=False)
 
         self.scroll_delay = 0
         self.drag_x = self.drag_y = 0
         self.dragging = False
         self.drag_start_timestamp = 0
         self.mouse_x = self.mouse_y = 0
-
-        self.geoplotlib_config = geoplotlib_config
 
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
