@@ -1,8 +1,4 @@
-import sys,os
 from geoplotlib.layers import BaseLayer
-
-sys.path.append(os.path.realpath('..'))
-
 import pandas as pd
 from geoplotlib.core import BatchPainter
 import geoplotlib
@@ -17,7 +13,7 @@ class CustomLayer(BaseLayer):
 
 
     def invalidate(self, proj):
-        pass
+        self.painter = BatchPainter()
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):

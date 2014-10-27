@@ -1,7 +1,3 @@
-import sys,os
-sys.path.append(os.path.realpath('..'))
-
-
 from geoplotlib.layers import BaseLayer
 from geoplotlib.core import BatchPainter
 import geoplotlib

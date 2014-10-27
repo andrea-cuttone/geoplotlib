@@ -1,4 +1,3 @@
-from multiprocessing import Process
 from geoplotlib.core import BaseApp
 from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer, VoronoiLayer, \
     MarkersLayer

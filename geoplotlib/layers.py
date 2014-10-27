@@ -1,17 +1,13 @@
-import Queue
 from collections import defaultdict
 from math import log10
 from threading import Thread
 import threading
 import pyglet
-from scipy.stats import gaussian_kde
-from sklearn.cluster import DBSCAN
 import numpy as np
-import time
 import colors
-from geoplotlib.core import BatchPainter, SCREEN_W, SCREEN_H, TILE_SIZE
-from geoplotlib.utils import parse_raw_str, BoundingBox
-import shapefile
+from geoplotlib.core import BatchPainter
+from geoplotlib.utils import BoundingBox
+import Queue
 
 
 class HotspotManager():
@@ -223,7 +219,7 @@ class KDELayer(BaseLayer):
         print x_flat.shape, y_flat.shape
         x,y = np.meshgrid(x_flat,y_flat)
         grid_coords = np.append(x.reshape(-1,1),y.reshape(-1,1),axis=1)
-
+        from scipy.stats import gaussian_kde
         kde = gaussian_kde(values.T, bw_method=.05)
         print 'kde done'
         z = kde(grid_coords.T)
@@ -251,6 +247,7 @@ class WorkerThread(Thread):
         print 'running'
         x, y = self.proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
         self.X = np.vstack((x,y)).T
+        from sklearn.cluster import DBSCAN
         self.dbscan = DBSCAN(eps=25, min_samples=2)
         self.dbscan.fit(self.X)
         print 'done'
@@ -295,6 +292,7 @@ class PolyLayer(BaseLayer):
         self.f_tooltip = f_tooltip
         self.shape_type = shape_type
 
+        import shapefile
         self.reader = shapefile.Reader(fname)
         self.worker = None
 

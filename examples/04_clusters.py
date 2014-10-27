@@ -1,6 +1,3 @@
-import sys,os
-sys.path.append(os.path.realpath('..'))
-
 import geoplotlib
 from geoplotlib.utils import read_csv, BoundingBox
 

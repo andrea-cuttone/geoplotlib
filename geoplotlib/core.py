@@ -1,14 +1,10 @@
 from Queue import Queue
 from inspect import isfunction
 from threading import Thread
-import pandas
-import pyglet
-from pyglet.gl import *
 from pyglet.sprite import Sprite
 from pyglet.window import mouse
 import time
 from pyglet.gl import *
-from collections import namedtuple
 import math
 import numpy as np
 import os
@@ -434,10 +430,6 @@ class Projector():
             lon = np.array(lon)
         if type(lat) == list:
             lat = np.array(lat)
-        if type(lat) == pandas.core.series.Series:
-            lat = lat.values
-        if type(lon) == pandas.core.series.Series:
-            lon = lon.values
 
         lat_rad = np.radians(lat)
         n = 2.0 ** self.zoom
