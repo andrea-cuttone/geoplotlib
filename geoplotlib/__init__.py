@@ -1,6 +1,5 @@
 from geoplotlib.core import BaseApp
-from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, ClusterLayer, PolyLayer, VoronoiLayer, \
-    MarkersLayer
+from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, PolyLayer, VoronoiLayer, MarkersLayer
 
 
 class AppConfig:
@@ -48,10 +47,6 @@ def hist(data, cmap='autumn', alpha=220, binsize=16, show_tooltip=False, vmin=1,
 
 def graph(data, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
     _global_config.layers.append(GraphLayer(data, src_lat, src_lon, dest_lat, dest_lon, **kwargs))
-
-
-def clusters(data):
-    _global_config.layers.append(ClusterLayer(data))
 
 
 def clear():

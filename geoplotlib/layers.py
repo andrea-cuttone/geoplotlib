@@ -234,52 +234,6 @@ class KDELayer(BaseLayer):
                     self.painter.set_color(cmap((z[j,i] / vmax)**.5))
                     self.painter.rect(x_flat[i], y_flat[j], x_flat[i+1], y_flat[j+1])
 
-# TODO: move in
-class WorkerThread(Thread):
-
-    def __init__(self, proj, data):
-        Thread.__init__(self)
-        self.proj = proj
-        self.data = data
-
-
-    def run(self):
-        print 'running'
-        x, y = self.proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        self.X = np.vstack((x,y)).T
-        from sklearn.cluster import DBSCAN
-        self.dbscan = DBSCAN(eps=25, min_samples=2)
-        self.dbscan.fit(self.X)
-        print 'done'
-
-
-class ClusterLayer(BaseLayer):
-
-    def __init__(self, data):
-        self.data = data
-
-
-    def invalidate(self, proj):
-        print 'invalidating'
-        self.painter = BatchPainter()
-        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        self.painter.points(x, y)
-        # TODO: synch arguments?
-        self.worker = WorkerThread(proj, self.data)
-        self.worker.start()
-
-
-    def draw(self, mouse_x, mouse_y, ui_manager):
-        if self.worker is not None and self.worker.is_alive() == False:
-            labels = self.worker.dbscan.labels_
-            cmap = colors.create_set_cmap(labels, 'jet')
-            for l in set(labels):
-                if l != -1:
-                    points = self.worker.X[labels == l]
-                    self.painter.set_color(cmap[l])
-                    self.painter.points(points[:,0], points[:,1])
-            self.worker = None
-        self.painter.batch_draw()
 
 
 class PolyLayer(BaseLayer):
