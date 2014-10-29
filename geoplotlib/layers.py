@@ -1,5 +1,5 @@
 from collections import defaultdict
-from math import log10
+from math import log10, log
 from threading import Thread
 import threading
 import pyglet
@@ -130,6 +130,7 @@ class HistogramLayer(BaseLayer):
         self.vmin = kwargs.get('vmin')
         self.logscale = kwargs.get('logscale')
         self.f_group = kwargs.get('f_group', None)
+        self.binscaling = kwargs.get('binscaling', None)
         if self.f_group is None:
             self.f_group = lambda grp: len(grp)
 
@@ -146,20 +147,29 @@ class HistogramLayer(BaseLayer):
         del self.data['_ybin']
 
         self.hotspot = HotspotManager()
-        vmax = max(results.values())
+        cmap = colors.create_linear_cmap(self.cmap, vmin=0, vmax=1.0, alpha=self.alpha)
+        vmax = max(results.values()) if len(results) > 0 else 0
+
         if vmax > 1:
-            if self.logscale:
-                cmap = colors.create_log_cmap(vmax, self.cmap, alpha=self.alpha)
-            else:
-                cmap = colors.create_linear_cmap(vmax, self.cmap, alpha=self.alpha)
             for (ix, iy), value in results.items():
+                if self.logscale:
+                    value = log(value)/log(vmax)
+                else:
+                    value = 1.*value/vmax
                 if value >= self.vmin:
                     self.painter.set_color(cmap(value))
-                    self.painter.rect(ix * self.binsize, iy * self.binsize,
-                                      (ix+1)*self.binsize, (iy+1)*self.binsize)
+                    if self.binscaling:
+                        l = self.binsize * value * 0.95
+                        rx = ix * self.binsize + 0.5 * (1-value) * self.binsize
+                        ry = iy * self.binsize + 0.5 * (1-value) * self.binsize
+                    else:
+                        l = self.binsize
+                        rx = ix * self.binsize
+                        ry = iy * self.binsize
+
+                    self.painter.rect(rx, ry, rx+l, ry+l)
                     if self.show_tooltip:
-                        self.hotspot.add_rect(ix * self.binsize, iy * self.binsize,
-                                              self.binsize, self.binsize, 'Value: %d' % value)
+                        self.hotspot.add_rect(rx, ry, l, l, 'Value: %d' % value)
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):
@@ -191,11 +201,11 @@ class GraphLayer(BaseLayer):
         x0, y0 = proj.lonlat_to_screen(self.data[self.src_lon], self.data[self.src_lat])
         x1, y1 = proj.lonlat_to_screen(self.data[self.dest_lon], self.data[self.dest_lat])
         manhattan = np.abs(x0-x1) + np.abs(y0-y1)
-        cols = colors.create_log_cmap(manhattan.max(), self.cmap, alpha=self.alpha)
+        cols = colors.create_linear_cmap(self.cmap, alpha=self.alpha)
         distances = np.logspace(0, log10(manhattan.max()), 20)
         for i in range(len(distances)-1, 1, -1):
             mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
-            self.painter.set_color(cols(distances[i]))
+            self.painter.set_color(cols(log(distances[i])/log(manhattan.max())))
             self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], self.linewidth)
 
 
@@ -233,7 +243,7 @@ class KDELayer(BaseLayer):
         z = z.reshape(len(y_flat), len(x_flat))
 
         vmax = z.max()
-        cmap = colors.create_linear_cmap(1.0, 'coolwarm', alpha=200)
+        cmap = colors.create_linear_cmap('coolwarm', alpha=200)
 
         for i in xrange(len(x_flat) - 1):
             for j in xrange(len(y_flat) - 1):

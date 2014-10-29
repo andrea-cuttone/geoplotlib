@@ -17,14 +17,9 @@ def create_set_cmap(values, cmap_name, alpha=255):
     return d
 
 
-def create_linear_cmap(vmax, cmap_name, vmin=0, alpha=255):
+def create_linear_cmap(cmap_name, alpha=255, vmin=0, vmax=1.0):
     cmap = plt.get_cmap(cmap_name)
     return lambda x: _convert_color_format(cmap(1.*(x - vmin)/(vmax - vmin)), alpha)
-
-
-def create_log_cmap(vmax, cmap_name, vmin=1, alpha=255):
-    cmap = plt.get_cmap(cmap_name)
-    return lambda x: _convert_color_format(cmap(log(x)/log(vmax)), alpha)
 
 
 def colorbrewer(values, alpha=255):
