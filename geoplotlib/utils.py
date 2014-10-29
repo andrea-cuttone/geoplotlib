@@ -17,14 +17,15 @@ def haversine(lon1, lat1, lon2, lat2):
     return m
 
 
-def dao_from_latlon(lat, lon):
-    return DataAccessObject({'lat':[lat], 'lon':[lon]})
-
-
 class DataAccessObject():
 
     def __init__(self, dict):
         self.dict = dict
+
+
+    @staticmethod
+    def from_dataframe(df):
+        return DataAccessObject({col: df[col].values for col in df.columns})
 
 
     def __getitem__(self, key):
@@ -32,7 +33,11 @@ class DataAccessObject():
 
 
     def __setitem__(self, key, value):
+        assert type(value) == np.ndarray
         self.dict[key] = value
+
+    def __delitem__(self, key):
+        del self.dict[key]
 
 
     def rename(self, mapping):
@@ -42,7 +47,18 @@ class DataAccessObject():
 
 
     def where(self, mask):
+        assert len(mask) == len(self)
         return DataAccessObject({k: self.dict[k][mask] for k in self.dict})
+
+
+    def groupby(self, field1, field2=None):
+        if field2 is None:
+            uniquevalues = list(set(self.dict[field1]))
+            return [(v, self.where(self.dict[field1] == v)) for v in uniquevalues]
+        else:
+            uniquevalues = set([tuple(row) for row in np.vstack([self.dict[field1],self.dict[field2]]).T])
+            return [((v1,v2), self.where((self.dict[field1] == v1) & (self.dict[field2] == v2))) \
+                    for v1,v2 in uniquevalues]
 
 
     def head(self, n):
@@ -59,6 +75,10 @@ class DataAccessObject():
 
     def __str__(self):
         return 'DataAccessObject(%s x %d)' % (str(self.dict.keys()), len(self))
+
+
+    def __repr__(self):
+        return self.__str__()
 
 
     def __len__(self):

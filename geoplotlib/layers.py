@@ -130,29 +130,31 @@ class HistogramLayer(BaseLayer):
         self.vmin = kwargs.get('vmin')
         self.f_group = kwargs.get('f_group', None)
         if self.f_group is None:
-            self.f_group = lambda group_mask: len(group_mask)
+            self.f_group = lambda grp: len(grp)
 
 
     def invalidate(self, proj):
         self.painter = BatchPainter()
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        ix = (x / self.binsize).astype(int)
-        iy = (y / self.binsize).astype(int)
-        groups = defaultdict(list)
-        for i, k in enumerate(zip(ix, iy)):
-            groups[k].append(i)
-        results = {k: self.f_group(groups[k]) for k in groups.keys()}
+        self.data['_xbin'] = (x / self.binsize).astype(int)
+        self.data['_ybin'] = (y / self.binsize).astype(int)
+        results = {pos: self.f_group(grp) for pos, grp in self.data.groupby('_xbin','_ybin')}
+        del self.data['_xbin']
+        del self.data['_ybin']
 
         self.hotspot = HotspotManager()
         vmax = max(results.values())
         if vmax > 1:
+            # TODO: lin colmap?
             cmap = colors.create_log_cmap(vmax, self.cmap, alpha=self.alpha)
             for (ix, iy), value in results.items():
                 if value >= self.vmin:
                     self.painter.set_color(cmap(value))
-                    self.painter.rect(ix * self.binsize, iy * self.binsize, (ix+1)*self.binsize, (iy+1)*self.binsize)
+                    self.painter.rect(ix * self.binsize, iy * self.binsize,
+                                      (ix+1)*self.binsize, (iy+1)*self.binsize)
                     if self.show_tooltip:
-                        self.hotspot.add_rect(ix * self.binsize, iy * self.binsize, self.binsize, self.binsize, 'Value: %d' % value)
+                        self.hotspot.add_rect(ix * self.binsize, iy * self.binsize,
+                                              self.binsize, self.binsize, 'Value: %d' % value)
 
 
     def draw(self, mouse_x, mouse_y, ui_manager):
