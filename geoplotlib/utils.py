@@ -36,6 +36,7 @@ class DataAccessObject():
         assert type(value) == np.ndarray
         self.dict[key] = value
 
+
     def __delitem__(self, key):
         del self.dict[key]
 

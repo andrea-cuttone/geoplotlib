@@ -128,6 +128,7 @@ class HistogramLayer(BaseLayer):
         self.binsize = kwargs.get('binsize')
         self.show_tooltip = kwargs.get('show_tooltip')
         self.vmin = kwargs.get('vmin')
+        self.logscale = kwargs.get('logscale')
         self.f_group = kwargs.get('f_group', None)
         if self.f_group is None:
             self.f_group = lambda grp: len(grp)
@@ -138,15 +139,19 @@ class HistogramLayer(BaseLayer):
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
         self.data['_xbin'] = (x / self.binsize).astype(int)
         self.data['_ybin'] = (y / self.binsize).astype(int)
-        results = {pos: self.f_group(grp) for pos, grp in self.data.groupby('_xbin','_ybin')}
+        uniquevalues = set([tuple(row) for row in np.vstack([self.data['_xbin'],self.data['_ybin']]).T])
+        results = {(v1,v2): self.f_group(self.data.where((self.data['_xbin'] == v1) & (self.data['_ybin'] == v2))) \
+                   for v1, v2 in uniquevalues}
         del self.data['_xbin']
         del self.data['_ybin']
 
         self.hotspot = HotspotManager()
         vmax = max(results.values())
         if vmax > 1:
-            # TODO: lin colmap?
-            cmap = colors.create_log_cmap(vmax, self.cmap, alpha=self.alpha)
+            if self.logscale:
+                cmap = colors.create_log_cmap(vmax, self.cmap, alpha=self.alpha)
+            else:
+                cmap = colors.create_linear_cmap(vmax, self.cmap, alpha=self.alpha)
             for (ix, iy), value in results.items():
                 if value >= self.vmin:
                     self.painter.set_color(cmap(value))

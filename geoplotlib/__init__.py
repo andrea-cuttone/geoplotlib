@@ -41,7 +41,7 @@ def scatter(data, color=None, point_size=6, f_tooltip=None):
     _global_config.layers.append(ScatterLayer(data, color=color, point_size=point_size, f_tooltip=f_tooltip))
 
 
-def hist(data, cmap='Reds', alpha=220, binsize=16, show_tooltip=False, vmin=1, f_group=None):
+def hist(data, cmap='Reds', alpha=220, logscale=False, binsize=16, show_tooltip=False, vmin=1, f_group=None):
     _global_config.layers.append(HistogramLayer(data, cmap=cmap, alpha=alpha, binsize=binsize, show_tooltip=show_tooltip, vmin=vmin, f_group=f_group))
 
 
