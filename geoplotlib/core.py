@@ -305,8 +305,68 @@ class BatchPainter:
                       ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
+    def poly(self, x, y, width=1.0):
+        glLineWidth(width)
+        vertices = _flatten_xy(x, y)
+        indices = []
+        for i in range(1, len(x) - 1):
+            indices.append(0)
+            indices.append(i)
+            indices.append(i+1)
+
+        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+                      indices,
+                      ('v2f', vertices),
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+
+
     def triangle(self, vertices):
         self._batch.add(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+                      ('v2f', vertices),
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+
+
+    def circle(self, cx, cy, r, width=2.0, precision=30):
+        glLineWidth(width)
+
+        vertices = []     
+        for alpha in np.linspace(0, 6.28, precision):
+            vertices.append(cx + r * math.cos(alpha))
+            vertices.append(cy + r * math.sin(alpha))
+
+        indices = []
+        for i in range(precision - 1):
+            indices.append(i)
+            indices.append(i+1)
+        indices.append(precision-1)
+        indices.append(0)
+
+        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_LINES, None,
+                      indices,
+                      ('v2f', vertices),
+                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+
+
+    def circle_filled(self, cx, cy, r, precision=30):
+        vertices = [] 
+        vertices.append(cx)
+        vertices.append(cy)
+            
+        for alpha in np.linspace(0, 6.28, precision):
+            vertices.append(cx + r * math.cos(alpha))
+            vertices.append(cy + r * math.sin(alpha))
+
+        indices = []
+        for i in range(1, precision):
+            indices.append(0)
+            indices.append(i)
+            indices.append(i+1)
+        indices.append(0)
+        indices.append(precision)
+        indices.append(1)
+
+        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+                      indices,
                       ('v2f', vertices),
                       ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
