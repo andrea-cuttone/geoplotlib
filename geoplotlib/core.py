@@ -146,20 +146,26 @@ class BaseApp(pyglet.window.Window):
 
         self.map_layer.draw(self.proj)
 
-        # glEnable(GL_LINE_SMOOTH);
-        # glEnable(GL_POLYGON_SMOOTH);
+        if self.scroll_delay > 0:
+            self.scroll_delay -= 1
+        if self.scroll_delay == 1:
+            for l in self.geoplotlib_config.layers:
+                    l.invalidate(self.proj)    
+        if self.scroll_delay == 0:
+            # glEnable(GL_LINE_SMOOTH);
+            # glEnable(GL_POLYGON_SMOOTH);
 
-        glPushMatrix()
-        glTranslatef(-self.proj.xtile * TILE_SIZE, self.proj.ytile * TILE_SIZE, 0)
-        for l in self.geoplotlib_config.layers:
-            l.draw(self.mouse_x + self.proj.xtile * TILE_SIZE,
-                   SCREEN_H - self.mouse_y - self.proj.ytile * TILE_SIZE,
-                   self.ui_manager)
-        glPopMatrix()
+            glPushMatrix()
+            glTranslatef(-self.proj.xtile * TILE_SIZE, self.proj.ytile * TILE_SIZE, 0)
+            for l in self.geoplotlib_config.layers:
+                l.draw(self.mouse_x + self.proj.xtile * TILE_SIZE,
+                       SCREEN_H - self.mouse_y - self.proj.ytile * TILE_SIZE,
+                       self.ui_manager)
+            glPopMatrix()
 
-        #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
-        #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
-        self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
+            #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
+            #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
+            self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
         if self.geoplotlib_config.savefig is not None:
             self.screenshot()
@@ -196,17 +202,12 @@ class BaseApp(pyglet.window.Window):
 
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        if self.scroll_delay == 0:
-            if scroll_y < 0:
-                self.proj.zoomin(self.mouse_x, self.mouse_y)
-                for l in self.geoplotlib_config.layers:
-                    l.invalidate(self.proj)
-                self.scroll_delay = 5
-            elif scroll_y > 0:
-                self.proj.zoomout(self.mouse_x, self.mouse_y)
-                for l in self.geoplotlib_config.layers:
-                    l.invalidate(self.proj)
-                self.scroll_delay = 5
+        if scroll_y < 0:
+            self.proj.zoomin(self.mouse_x, self.mouse_y)
+            self.scroll_delay = 5
+        elif scroll_y > 0:
+            self.proj.zoomout(self.mouse_x, self.mouse_y)
+            self.scroll_delay = 5
 
 
     def on_key_release(self, symbol, modifiers):
@@ -230,9 +231,6 @@ class BaseApp(pyglet.window.Window):
 
     def on_update(self, dt):
         self.ticks += dt*1000
-
-        if self.scroll_delay > 0:
-            self.scroll_delay -= 1
 
         if abs(self.drag_x) > 1e-3 or abs(self.drag_y) > 1e-3:
             self.drag_x *= 0.93
