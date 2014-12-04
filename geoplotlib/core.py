@@ -119,11 +119,12 @@ class BaseApp(pyglet.window.Window):
         self.proj = Projector()
         self.map_layer = MapLayer(geoplotlib_config.tiles_provider, skipdl=False)
 
-        self.scroll_delay = 0
+        self.scroll_delay = 60
         self.drag_x = self.drag_y = 0
         self.dragging = False
         self.drag_start_timestamp = 0
         self.mouse_x = self.mouse_y = 0
+        self.show_map = True
 
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
@@ -144,7 +145,8 @@ class BaseApp(pyglet.window.Window):
 
         self.ui_manager.clear()
 
-        self.map_layer.draw(self.proj)
+        if self.show_map:
+            self.map_layer.draw(self.proj)
 
         if self.scroll_delay > 0:
             self.scroll_delay -= 1
@@ -204,15 +206,17 @@ class BaseApp(pyglet.window.Window):
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         if scroll_y < 0:
             self.proj.zoomin(self.mouse_x, self.mouse_y)
-            self.scroll_delay = 5
+            self.scroll_delay = 30
         elif scroll_y > 0:
             self.proj.zoomout(self.mouse_x, self.mouse_y)
-            self.scroll_delay = 5
+            self.scroll_delay = 30
 
 
     def on_key_release(self, symbol, modifiers):
         if symbol == pyglet.window.key.S:
             self.screenshot()
+        elif symbol == pyglet.window.key.M:
+            self.show_map = not self.show_map
         else:
             for l in self.geoplotlib_config.layers:
                 need_invalidate = l.on_key_release(symbol, modifiers)
@@ -250,9 +254,6 @@ class BaseApp(pyglet.window.Window):
             self.proj.fit(self.geoplotlib_config.bbox)
         else:
             self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self.geoplotlib_config.layers]))
-
-        for l in self.geoplotlib_config.layers:
-            l.invalidate(self.proj)
 
         pyglet.app.run()
 
@@ -324,8 +325,10 @@ class BatchPainter:
                       ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
-    def circle(self, cx, cy, r, width=2.0, precision=30):
+    def circle(self, cx, cy, r, width=2.0):
         glLineWidth(width)
+
+        precision = int(10*math.log(r))
 
         vertices = []     
         for alpha in np.linspace(0, 6.28, precision):
@@ -345,11 +348,13 @@ class BatchPainter:
                       ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
 
 
-    def circle_filled(self, cx, cy, r, precision=30):
+    def circle_filled(self, cx, cy, r):
         vertices = [] 
         vertices.append(cx)
         vertices.append(cy)
-            
+        
+        precision = int(10*math.log(r))
+
         for alpha in np.linspace(0, 6.28, precision):
             vertices.append(cx + r * math.cos(alpha))
             vertices.append(cy + r * math.sin(alpha))
