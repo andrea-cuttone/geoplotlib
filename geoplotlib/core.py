@@ -1,7 +1,6 @@
 from Queue import Queue
 from inspect import isfunction
 from threading import Thread
-from pyglet.sprite import Sprite
 from pyglet.window import mouse
 import time
 from pyglet.gl import *
@@ -19,7 +18,7 @@ from geoplotlib.utils import BoundingBox, parse_raw_str
 VERT_PER_POINT = 2
 SCREEN_W = 1280 #1440
 SCREEN_H = 768 #900
-FPS = 60
+FPS = 30
 TILE_SIZE = 256
 MIN_ZOOM = 2
 MAX_ZOOM = 20
@@ -148,6 +147,14 @@ class BaseApp(pyglet.window.Window):
         if self.show_map:
             self.map_layer.draw(self.proj)
 
+
+        if abs(self.drag_x) > 1e-3 or abs(self.drag_y) > 1e-3:
+            self.drag_x *= 0.93
+            self.drag_y *= 0.93
+
+            if self.dragging == False:
+                self.proj.pan(self.drag_x, self.drag_y)
+
         if self.scroll_delay > 0:
             self.scroll_delay -= 1
         if self.scroll_delay == 1:
@@ -160,12 +167,13 @@ class BaseApp(pyglet.window.Window):
             glPushMatrix()
             glTranslatef(-self.proj.xtile * TILE_SIZE, self.proj.ytile * TILE_SIZE, 0)
             for l in self.geoplotlib_config.layers:
-                l.draw(self.mouse_x + self.proj.xtile * TILE_SIZE,
+                l.draw(self.proj,
+                       self.mouse_x + self.proj.xtile * TILE_SIZE,
                        SCREEN_H - self.mouse_y - self.proj.ytile * TILE_SIZE,
                        self.ui_manager)
             glPopMatrix()
 
-            #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
+            self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
             #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
             self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
@@ -236,23 +244,12 @@ class BaseApp(pyglet.window.Window):
     def on_update(self, dt):
         self.ticks += dt*1000
 
-        if abs(self.drag_x) > 1e-3 or abs(self.drag_y) > 1e-3:
-            self.drag_x *= 0.93
-            self.drag_y *= 0.93
 
-            if self.dragging == False:
-                self.proj.pan(self.drag_x, self.drag_y)
-
-        for l in self.geoplotlib_config.layers:
-            if hasattr(l, 'on_tick'):
-                l.on_tick(dt, self.proj)
-
-
-    def run(self):
+    def start(self):
         #pyglet.options['debug_gl'] = False
         if self.geoplotlib_config.bbox is not None:
             self.proj.fit(self.geoplotlib_config.bbox)
-        else:
+        elif len(self.geoplotlib_config.layers) > 0:
             self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self.geoplotlib_config.layers]))
 
         pyglet.app.run()
@@ -394,6 +391,7 @@ class BatchPainter:
 
 
     def sprites(self, image, x, y, scale=1.0):
+        from pyglet.sprite import Sprite
         for i in range(len(x)):
             sprite = Sprite(image, batch=self._batch)
             sprite.x = x[i]

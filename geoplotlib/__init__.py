@@ -21,7 +21,7 @@ _global_config = AppConfig()
 def _runapp(app_config):
     try:
         app = BaseApp(app_config)
-        app.run()
+        app.start()
     finally:
         app.close()
         _global_config.reset()
@@ -41,8 +41,8 @@ def scatter(data, color=None, point_size=6, f_tooltip=None):
     _global_config.layers.append(ScatterLayer(data, color=color, point_size=point_size, f_tooltip=f_tooltip))
 
 
-def hist(data, cmap='Reds', alpha=220, logscale=False, binsize=16, show_tooltip=False, vmin=0, f_group=None,
-         binscaling=True):
+def hist(data, cmap='Blues', alpha=220, logscale=False, binsize=16, show_tooltip=False, vmin=0, f_group=None,
+         binscaling=False):
     _global_config.layers.append(HistogramLayer(data, cmap=cmap, alpha=alpha, binsize=binsize,
             show_tooltip=show_tooltip, vmin=vmin, f_group=f_group, logscale=logscale, binscaling=binscaling))
 

@@ -1,6 +1,4 @@
 from random import shuffle
-from math import log
-import pylab as plt
 
 
 def _convert_color_format(col, alpha):
@@ -10,7 +8,8 @@ def _convert_color_format(col, alpha):
 def create_set_cmap(values, cmap_name, alpha=255):
     unique_values = list(set(values))
     shuffle(unique_values)
-    cmap = plt.get_cmap(cmap_name)
+    from pylab import get_cmap
+    cmap = get_cmap(cmap_name)
     d = {}
     for i in range(len(unique_values)):
         d[unique_values[i]] = _convert_color_format(cmap(1.*i/len(unique_values)), alpha)
@@ -18,7 +17,8 @@ def create_set_cmap(values, cmap_name, alpha=255):
 
 
 def create_linear_cmap(cmap_name, alpha=255, vmin=0, vmax=1.0):
-    cmap = plt.get_cmap(cmap_name)
+    from pylab import get_cmap
+    cmap = get_cmap(cmap_name)
     return lambda x: _convert_color_format(cmap(1.*(x - vmin)/(vmax - vmin)), alpha)
 
 

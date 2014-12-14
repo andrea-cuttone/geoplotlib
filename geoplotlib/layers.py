@@ -70,7 +70,7 @@ class BaseLayer():
         pass
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         pass
 
 
@@ -108,7 +108,7 @@ class ScatterLayer(BaseLayer):
         self.painter.points(x, y, 2*self.point_size, False)
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
@@ -172,7 +172,7 @@ class HistogramLayer(BaseLayer):
                         self.hotspot.add_rect(rx, ry, l, l, 'Value: %d' % value)
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
         picked = self.hotspot.pick(mouse_x, mouse_y)
         if picked:
@@ -209,48 +209,13 @@ class GraphLayer(BaseLayer):
             self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], self.linewidth)
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
 
 
     def bbox(self):
         return BoundingBox.from_points(lons=np.hstack([self.data[self.src_lon], self.data[self.dest_lon]]),
                                        lats=np.hstack([self.data[self.src_lat], self.data[self.dest_lat]]))
-
-
-class KDELayer(BaseLayer):
-
-    def __init__(self, data):
-        self.data = data
-
-
-    def invalidate(self, proj):
-        self.painter = BatchPainter()
-
-        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        values = np.vstack((x,y)).T
-        L = 16
-        print proj.zoom
-        x_flat = np.arange(x.min(), x.max(), L)
-        y_flat = np.arange(y.min(), y.max(), L)
-        print x_flat.shape, y_flat.shape
-        x,y = np.meshgrid(x_flat,y_flat)
-        grid_coords = np.append(x.reshape(-1,1),y.reshape(-1,1),axis=1)
-        from scipy.stats import gaussian_kde
-        kde = gaussian_kde(values.T, bw_method=.05)
-        print 'kde done'
-        z = kde(grid_coords.T)
-        z = z.reshape(len(y_flat), len(x_flat))
-
-        vmax = z.max()
-        cmap = colors.create_linear_cmap('coolwarm', alpha=200)
-
-        for i in xrange(len(x_flat) - 1):
-            for j in xrange(len(y_flat) - 1):
-                if z[j,i] > 0:
-                    self.painter.set_color(cmap((z[j,i] / vmax)**.5))
-                    self.painter.rect(x_flat[i], y_flat[j], x_flat[i+1], y_flat[j+1])
-
 
 
 class PolyLayer(BaseLayer):
@@ -266,6 +231,7 @@ class PolyLayer(BaseLayer):
         import shapefile
         self.reader = shapefile.Reader(fname)
         self.worker = None
+        self.queue = Queue.Queue()
 
 
     def invalidate(self, proj):
@@ -281,14 +247,12 @@ class PolyLayer(BaseLayer):
         self.worker.start()
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
             ui_manager.tooltip(picked)
 
-
-    def on_tick(self, dt, proj):
         while True:
             try:
                 x, y, record = self.queue.get_nowait()
@@ -468,7 +432,7 @@ class VoronoiLayer(BaseLayer):
             self.painter.points(x, y, 4)
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
@@ -509,7 +473,7 @@ class MarkersLayer(BaseLayer):
         self.painter.sprites(self.marker, x, y, self.scale)
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
 
         picked = self.hotspots.pick(mouse_x, mouse_y)
