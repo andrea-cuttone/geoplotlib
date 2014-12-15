@@ -13,6 +13,7 @@ class AppConfig:
         self.bbox = None
         self.savefig = None
         self.tiles_provider = 'toner'
+        self.smoothing = False
 
 
 _global_config = AppConfig()
@@ -77,3 +78,7 @@ def markers(data, marker, **kwargs):
 
 def set_bbox(bbox):
     _global_config.bbox = bbox
+
+
+def set_smoothing(smoothing):
+    _global_config.smoothing = smoothing

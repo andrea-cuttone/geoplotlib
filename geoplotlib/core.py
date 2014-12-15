@@ -118,7 +118,7 @@ class BaseApp(pyglet.window.Window):
         self.proj = Projector()
         self.map_layer = MapLayer(geoplotlib_config.tiles_provider, skipdl=False)
 
-        self.scroll_delay = 60
+        self.scroll_delay = 0
         self.drag_x = self.drag_y = 0
         self.dragging = False
         self.drag_start_timestamp = 0
@@ -161,8 +161,9 @@ class BaseApp(pyglet.window.Window):
             for l in self.geoplotlib_config.layers:
                     l.invalidate(self.proj)    
         if self.scroll_delay == 0:
-            # glEnable(GL_LINE_SMOOTH);
-            # glEnable(GL_POLYGON_SMOOTH);
+            if self.geoplotlib_config.smoothing:
+                glEnable(GL_LINE_SMOOTH)
+                glEnable(GL_POLYGON_SMOOTH)
 
             glPushMatrix()
             glTranslatef(-self.proj.xtile * TILE_SIZE, self.proj.ytile * TILE_SIZE, 0)
@@ -173,7 +174,7 @@ class BaseApp(pyglet.window.Window):
                        self.ui_manager)
             glPopMatrix()
 
-            self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
+            #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
             #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
             self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
@@ -251,6 +252,8 @@ class BaseApp(pyglet.window.Window):
             self.proj.fit(self.geoplotlib_config.bbox)
         elif len(self.geoplotlib_config.layers) > 0:
             self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self.geoplotlib_config.layers]))
+        for l in self.geoplotlib_config.layers:
+            l.invalidate(self.proj)
 
         pyglet.app.run()
 
