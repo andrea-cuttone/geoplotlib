@@ -16,23 +16,21 @@ class CustomLayer(BaseLayer):
         self.painter = BatchPainter()
 
 
-    def draw(self, mouse_x, mouse_y, ui_manager):
-        self.painter.batch_draw()
-        ui_manager.info(epoch_to_str(self.t))
-
-
-    def on_tick(self, dt, proj):
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter = BatchPainter()
         self.painter.set_color([255,0,0, 64])
         df = self.data[(self.data.timestamp > self.t) & (self.data.timestamp <= self.t + 60*60*4)]
         for user, grp in df.groupby('user'):
             x, y = proj.lonlat_to_screen(grp.lon.values, grp.lat.values)
             self.painter.linestrip(x, y, 3)
-        self.t += 1*60*60*dt
+        self.t += 1*60*60
+
+        self.painter.batch_draw()
+        ui_manager.info(epoch_to_str(self.t))
 
 
     def bbox(self):
-        return BoundingBox.DK
+        return BoundingBox.KBH
 
 
 geoplotlib.add_layer(CustomLayer())
