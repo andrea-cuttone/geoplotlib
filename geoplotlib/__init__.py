@@ -13,7 +13,7 @@ class AppConfig:
         self.bbox = None
         self.savefig = None
         self.tiles_provider = 'toner'
-        self.smoothing = False
+        self.smoothing = True
 
 
 _global_config = AppConfig()

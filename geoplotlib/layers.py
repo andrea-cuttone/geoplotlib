@@ -301,9 +301,67 @@ class ShapeLoadingThread(Thread):
             self.counter += 1
 
 
+class DelaunayLayer(BaseLayer):
+
+    def __init__(self, data, line_color=None, line_width=2, cmap=None, max_area=50):
+        self.data = data
+
+        if cmap is None and line_color is None:
+            raise Exception('need either cmap or line_color')
+
+        if cmap is not None:
+            cmap = colors.create_linear_cmap(cmap, alpha=196)
+
+        self.cmap = cmap
+        self.line_color = line_color
+        self.line_width = line_width
+        self.max_area = max_area
+
+
+    @staticmethod
+    def _get_area(p):
+        x1, y1, x2, y2, x3, y3 = p
+        return 0.5*(x1*(y2-y3)+x2*(y3-y1)+x3*(y1-y2))
+
+
+    def invalidate(self, proj):
+        try:
+            from scipy.spatial.qhull import Delaunay
+        except ImportError:
+            print 'DelaunayLayer needs scipy >= 0.12'
+            raise
+
+        self.painter = BatchPainter()
+
+        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
+        points = np.vstack((x,y)).T
+        dela = Delaunay(points)
+
+        for tria in dela.vertices:
+            p1 = dela.points[tria[0]]
+            p2 = dela.points[tria[1]]
+            p3 = dela.points[tria[2]]
+            tria_x = [p1[0], p2[0], p3[0]]
+            tria_y = [p1[1], p2[1], p3[1]]
+            if self.line_color:
+                self.painter.linestrip(tria_x, tria_y, closed=True)
+            if self.cmap:
+                area = DelaunayLayer._get_area(np.vstack((tria_x, tria_y)).T.flatten())
+                self.painter.set_color(self.cmap(1 - min(1, np.log(area) / np.log(self.max_area))))
+                self.painter.poly(tria_x, tria_y)
+
+
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+
+
+    def bbox(self):
+        return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])
+
+
 class VoronoiLayer(BaseLayer):
 
-    def __init__(self, data, line_color=None, line_width=2, points_color=None, f_tooltip=None, cmap=None):
+    def __init__(self, data, line_color=None, line_width=2, f_tooltip=None, cmap=None, max_area=1e4):
         self.data = data
 
         if cmap is None and line_color is None:
@@ -316,6 +374,7 @@ class VoronoiLayer(BaseLayer):
         self.line_color = line_color
         self.line_width = line_width
         self.f_tooltip = f_tooltip
+        self.max_area = max_area
 
 
     # source: https://gist.github.com/pv/8036995
@@ -444,7 +503,7 @@ class VoronoiLayer(BaseLayer):
                 self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
             if self.cmap:
                 area = VoronoiLayer._get_area(polygon.tolist())
-                self.painter.set_color(self.cmap(1 - min(1, np.log(area) / 10)))
+                self.painter.set_color(self.cmap(1 - min(1, np.log(area) / np.log(self.max_area))))
                 self.painter.poly(polygon[:,0], polygon[:,1])
 
             if self.f_tooltip:
