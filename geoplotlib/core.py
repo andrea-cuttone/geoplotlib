@@ -146,6 +146,10 @@ class BaseApp(pyglet.window.Window):
 
         if self.show_map:
             self.map_layer.draw(self.proj)
+            painter = BatchPainter()
+            painter.set_color([0,0,0,128])
+            painter.rect(0,0,SCREEN_W, SCREEN_H)
+            painter.batch_draw()
 
 
         if abs(self.drag_x) > 1e-3 or abs(self.drag_y) > 1e-3:

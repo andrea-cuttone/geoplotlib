@@ -303,16 +303,18 @@ class ShapeLoadingThread(Thread):
 
 class VoronoiLayer(BaseLayer):
 
-    def __init__(self, data, line_color=None, line_width=2, draw_points=False, points_color=None, f_tooltip=None):
+    def __init__(self, data, line_color=None, line_width=2, points_color=None, f_tooltip=None, cmap=None):
         self.data = data
-        if line_color is None:
-            line_color = [255,136,0]
+
+        if cmap is None and line_color is None:
+            raise Exception('need either cmap or line_color')
+
+        if cmap is not None:
+            cmap = colors.create_linear_cmap(cmap, alpha=196)
+
+        self.cmap = cmap
         self.line_color = line_color
         self.line_width = line_width
-        self.draw_points = draw_points
-        if points_color is None:
-            points_color = [255,0,0]
-        self.points_color = points_color
         self.f_tooltip = f_tooltip
 
 
@@ -405,6 +407,18 @@ class VoronoiLayer(BaseLayer):
         return new_regions, np.asarray(new_vertices)
 
 
+    # source: https://stackoverflow.com/questions/451426/how-do-i-calculate-the-surface-area-of-a-2d-polygon
+    @staticmethod
+    def _get_area(p):
+        return 0.5 * abs(sum(x0*y1 - x1*y0
+                             for ((x0, y0), (x1, y1)) in VoronoiLayer._segments(p)))
+
+    # source: https://stackoverflow.com/questions/451426/how-do-i-calculate-the-surface-area-of-a-2d-polygon
+    @staticmethod
+    def _segments(p):
+        return zip(p, p[1:] + [p[0]])
+
+
     def invalidate(self, proj):
         try:
             from scipy.spatial.qhull import Voronoi
@@ -420,16 +434,22 @@ class VoronoiLayer(BaseLayer):
 
         self.hotspots = HotspotManager()
         self.painter = BatchPainter()
-        self.painter.set_color(self.line_color)
+
+
         for idx, region in enumerate(regions):
             polygon = vertices[region]
-            self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
+
+            if self.line_color:
+                self.painter.set_color(self.line_color)
+                self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
+            if self.cmap:
+                area = VoronoiLayer._get_area(polygon.tolist())
+                self.painter.set_color(self.cmap(1 - min(1, np.log(area) / 10)))
+                self.painter.poly(polygon[:,0], polygon[:,1])
+
             if self.f_tooltip:
                 record = {k: self.data[k][idx] for k in self.data.keys()}
                 self.hotspots.add_poly(polygon[:,0], polygon[:,1], self.f_tooltip(record))
-        if self.draw_points:
-            self.painter.set_color(self.points_color)
-            self.painter.points(x, y, 4)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
