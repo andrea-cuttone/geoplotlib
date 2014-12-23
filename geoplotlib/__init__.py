@@ -1,5 +1,6 @@
 from geoplotlib.core import BaseApp
-from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, PolyLayer, VoronoiLayer, MarkersLayer
+from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, PolyLayer, VoronoiLayer, MarkersLayer, \
+    DelaunayLayer
 
 
 class AppConfig:
@@ -70,6 +71,10 @@ def shapefiles(fname, **kwargs):
 
 def voronoi(data, **kwargs):
     _global_config.layers.append(VoronoiLayer(data, **kwargs))
+
+
+def delaunay(data, **kwargs):
+    _global_config.layers.append(DelaunayLayer(data, **kwargs))
 
 
 def markers(data, marker, **kwargs):
