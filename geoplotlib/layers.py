@@ -562,3 +562,55 @@ class MarkersLayer(BaseLayer):
 
     def bbox(self):
         return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])
+
+
+class KDELayer(BaseLayer):
+
+    def __init__(self, values, bw, binsize=None, vmin=0, vmax=1, cmap='hot'):
+        self.values = values
+        self.bw = bw
+        self.cmap = colors.create_linear_cmap(cmap, alpha=196)
+        self.binsize=binsize
+        self.vmin = vmin
+        self.vmax = vmax
+        print 'init done'
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        xv, yv = proj.lonlat_to_screen(self.values['lon'], self.values['lat'])
+        try:
+            import statsmodels.api as sm
+        except:
+            raise Exception('KDELayer needs statsmodel')
+
+        kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
+        if self.binsize is None:
+            densities = kde_res.pdf()
+            for i in range(len(xv)):
+                self.painter.set_color(self.cmap(densities[i] / densities.max()))
+                self.painter.points(xv[i], yv[i], point_size=4)
+        else:
+            #west, north = proj.lonlat_to_screen([proj.bbox().west], [proj.bbox().north])
+            #east, south = proj.lonlat_to_screen([proj.bbox().east], [proj.bbox().south])
+            #xgrid = np.arange(west, east, self.binsize)
+            #ygrid = np.arange(south, north, self.binsize)
+
+            xgrid = np.arange(xv.min(), xv.max(), self.binsize)
+            ygrid = np.arange(yv.min(), yv.max(), self.binsize)
+            xmesh, ymesh = np.meshgrid(xgrid,ygrid)
+            grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
+            z = kde_res.pdf(grid_coords.T)
+            z = z.reshape(len(ygrid), len(xgrid))
+
+            for ix in range(len(xgrid)-1):
+                for iy in range(len(ygrid)-1):
+                    d = z[iy, ix] / z.max()
+                    if d > self.vmin:
+                        d = min(d, self.vmax) / self.vmax
+                        self.painter.set_color(self.cmap(d))
+                        self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
+
+
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
