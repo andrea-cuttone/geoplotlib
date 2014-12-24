@@ -127,7 +127,8 @@ class HistogramLayer(BaseLayer):
         self.cmap = kwargs.get('cmap')
         self.binsize = kwargs.get('binsize')
         self.show_tooltip = kwargs.get('show_tooltip')
-        self.vmin = kwargs.get('vmin')
+        self.scalemin = kwargs.get('scalemin')
+        self.scalemax = kwargs.get('scalemax')
         self.logscale = kwargs.get('logscale')
         self.f_group = kwargs.get('f_group', None)
         self.binscaling = kwargs.get('binscaling', None)
@@ -147,16 +148,16 @@ class HistogramLayer(BaseLayer):
         del self.data['_ybin']
 
         self.hotspot = HotspotManager()
-        cmap = colors.create_linear_cmap(self.cmap, vmin=0, vmax=1.0, alpha=self.alpha)
+        cmap = colors.create_cmap(self.cmap, alpha=self.alpha)
         vmax = max(results.values()) if len(results) > 0 else 0
 
         if vmax > 1:
             for (ix, iy), value in results.items():
                 if self.logscale:
-                    value = log(value)/log(vmax)
+                    value = colors.log_norm(value, vmax, self.scalemin, self.scalemax)
                 else:
-                    value = 1.*value/vmax
-                if value >= self.vmin:
+                    value = colors.lin_norm(value, vmax, self.scalemin, self.scalemax)
+                if value > 0:
                     self.painter.set_color(cmap(value))
                     if self.binscaling:
                         l = self.binsize * value * 0.95
@@ -201,11 +202,11 @@ class GraphLayer(BaseLayer):
         x0, y0 = proj.lonlat_to_screen(self.data[self.src_lon], self.data[self.src_lat])
         x1, y1 = proj.lonlat_to_screen(self.data[self.dest_lon], self.data[self.dest_lat])
         manhattan = np.abs(x0-x1) + np.abs(y0-y1)
-        cols = colors.create_linear_cmap(self.cmap, alpha=self.alpha)
+        cols = colors.create_cmap(self.cmap, alpha=self.alpha)
         distances = np.logspace(0, log10(manhattan.max()), 20)
         for i in range(len(distances)-1, 1, -1):
             mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
-            self.painter.set_color(cols(log(distances[i])/log(manhattan.max())))
+            self.painter.set_color(cols(colors.log_norm(distances[i], manhattan.max(), 0, 1)))
             self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], self.linewidth)
 
 
@@ -310,7 +311,7 @@ class DelaunayLayer(BaseLayer):
             raise Exception('need either cmap or line_color')
 
         if cmap is not None:
-            cmap = colors.create_linear_cmap(cmap, alpha=196)
+            cmap = colors.create_cmap(cmap, alpha=196)
 
         self.cmap = cmap
         self.line_color = line_color
@@ -368,7 +369,7 @@ class VoronoiLayer(BaseLayer):
             raise Exception('need either cmap or line_color')
 
         if cmap is not None:
-            cmap = colors.create_linear_cmap(cmap, alpha=196)
+            cmap = colors.create_cmap(cmap, alpha=196)
 
         self.cmap = cmap
         self.line_color = line_color
@@ -566,14 +567,14 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, method='hist', vmin=0, vmax=1, cmap='hot'):
+    def __init__(self, values, bw, method='hist', scaling='lin', alpha=196, scalemin=0, scalemax=1, cmap='hot'):
         self.values = values
         self.bw = bw
-        self.cmap = colors.create_linear_cmap(cmap, alpha=196)
+        self.cmap = colors.create_cmap(cmap, alpha=alpha)
         self.method = method
-        self.vmin = vmin
-        self.vmax = vmax
-        print 'init done'
+        self.scaling = scaling
+        self.scalemin = scalemin
+        self.scalemax = scalemax
 
 
     def _get_grid(self, proj):
@@ -598,8 +599,13 @@ class KDELayer(BaseLayer):
             if self.method == 'points':
                 densities = kde_res.pdf()
                 for i in range(len(xv)):
-                    self.painter.set_color(self.cmap(densities[i] / densities.max()))
-                    self.painter.points(xv[i], yv[i], point_size=4)
+                    if self.scaling == 'lin':
+                        d = colors.lin_norm(densities[i], densities.max(), self.scalemin, self.scalemax)
+                    else:
+                        d = colors.log_norm(densities[i], densities.max(), self.scalemin, self.scalemax)
+                    if d > 0:
+                        self.painter.set_color(self.cmap(d))
+                        self.painter.points(xv[i], yv[i], point_size=4)
             else:
                 xgrid, ygrid = self._get_grid(proj)
                 xmesh, ymesh = np.meshgrid(xgrid,ygrid)
@@ -609,9 +615,11 @@ class KDELayer(BaseLayer):
 
                 for ix in range(len(xgrid)-1):
                     for iy in range(len(ygrid)-1):
-                        d = z[iy, ix] / z.max()
-                        if d > self.vmin:
-                            d = min(d, self.vmax) / self.vmax
+                        if self.scaling == 'lin':
+                            d = colors.lin_norm(z[iy, ix], z.max(), self.scalemin, self.scalemax)
+                        else:
+                            d = colors.log_norm(z[iy, ix], z.max(), self.scalemin, self.scalemax)
+                        if d > 0:
                             self.painter.set_color(self.cmap(d))
                             self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
         elif self.method == 'hist':
@@ -625,9 +633,11 @@ class KDELayer(BaseLayer):
             H = gaussian_filter(H, sigma=self.bw)
             for ix in range(len(xgrid)-2):
                 for iy in range(len(ygrid)-2):
-                    d = H[iy, ix] / H.max()
-                    if d > self.vmin:
-                        d = min(d, self.vmax) / self.vmax
+                    if self.scaling == 'log':
+                        d = colors.log_norm(H[iy, ix], H.max(), self.scalemin, self.scalemax)
+                    else:
+                        d = colors.lin_norm(H[iy, ix], H.max(), self.scalemin, self.scalemax)
+                    if d > 0:
                         self.painter.set_color(self.cmap(d))
                         self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
         else:

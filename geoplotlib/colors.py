@@ -1,4 +1,5 @@
 from random import shuffle
+import numpy as np
 
 
 def _convert_color_format(col, alpha):
@@ -16,10 +17,18 @@ def create_set_cmap(values, cmap_name, alpha=255):
     return d
 
 
-def create_linear_cmap(cmap_name, alpha=255, vmin=0, vmax=1.0):
+def create_cmap(cmap_name, alpha=255):
     from pylab import get_cmap
     cmap = get_cmap(cmap_name)
-    return lambda x: _convert_color_format(cmap(1.*(x - vmin)/(vmax - vmin)), alpha)
+    return lambda x: _convert_color_format(cmap(x), alpha)
+
+
+def lin_norm(value, maxvalue, scalemin, scalemax):
+    return (value / maxvalue - scalemin) / (scalemax - scalemin)
+
+
+def log_norm(value, maxvalue, scalemin, scalemax):
+    return (np.log(1+value) / np.log(1+maxvalue) - scalemin) / (scalemax - scalemin)
 
 
 def colorbrewer(values, alpha=255):
