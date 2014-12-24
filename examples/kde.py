@@ -2,7 +2,9 @@ import geoplotlib
 from geoplotlib.utils import read_csv, BoundingBox
 
 
-data = read_csv('somedata.csv').head(10000)
-geoplotlib.kde(data, bw=[10,10], binsize=10, vmin=0.01, vmax=1)
+data = read_csv('somedata.csv')
+geoplotlib.kde(data, bw=[4,4], method='hist', vmin=0.1, vmax=1)
+#geoplotlib.scatter(data, color=[0,0,255])
+geoplotlib.set_smoothing(False)
 geoplotlib.set_bbox(BoundingBox.DTU)
 geoplotlib.show()

@@ -39,7 +39,7 @@ def savefig(fname):
     _runapp(_global_config)
 
 
-def scatter(data, color=None, point_size=6, f_tooltip=None):
+def scatter(data, color=None, point_size=3, f_tooltip=None):
     _global_config.layers.append(ScatterLayer(data, color=color, point_size=point_size, f_tooltip=f_tooltip))
 
 

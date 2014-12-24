@@ -566,50 +566,72 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, binsize=None, vmin=0, vmax=1, cmap='hot'):
+    def __init__(self, values, bw, method='hist', vmin=0, vmax=1, cmap='hot'):
         self.values = values
         self.bw = bw
         self.cmap = colors.create_linear_cmap(cmap, alpha=196)
-        self.binsize=binsize
+        self.method = method
         self.vmin = vmin
         self.vmax = vmax
         print 'init done'
 
 
+    def _get_grid(self, proj):
+        west, north = proj.lonlat_to_screen([proj.bbox().west], [proj.bbox().north])
+        east, south = proj.lonlat_to_screen([proj.bbox().east], [proj.bbox().south])
+        xgrid = np.arange(west, east, 4)
+        ygrid = np.arange(south, north, 4)
+        return xgrid, ygrid
+
+
     def invalidate(self, proj):
         self.painter = BatchPainter()
         xv, yv = proj.lonlat_to_screen(self.values['lon'], self.values['lat'])
-        try:
-            import statsmodels.api as sm
-        except:
-            raise Exception('KDELayer needs statsmodel')
 
-        kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
-        if self.binsize is None:
-            densities = kde_res.pdf()
-            for i in range(len(xv)):
-                self.painter.set_color(self.cmap(densities[i] / densities.max()))
-                self.painter.points(xv[i], yv[i], point_size=4)
-        else:
-            #west, north = proj.lonlat_to_screen([proj.bbox().west], [proj.bbox().north])
-            #east, south = proj.lonlat_to_screen([proj.bbox().east], [proj.bbox().south])
-            #xgrid = np.arange(west, east, self.binsize)
-            #ygrid = np.arange(south, north, self.binsize)
+        if self.method == 'kde' or self.method == 'points':
+            try:
+                import statsmodels.api as sm
+            except:
+                raise Exception('KDE requires statsmodel')
 
-            xgrid = np.arange(xv.min(), xv.max(), self.binsize)
-            ygrid = np.arange(yv.min(), yv.max(), self.binsize)
-            xmesh, ymesh = np.meshgrid(xgrid,ygrid)
-            grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
-            z = kde_res.pdf(grid_coords.T)
-            z = z.reshape(len(ygrid), len(xgrid))
+            kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
+            if self.method == 'points':
+                densities = kde_res.pdf()
+                for i in range(len(xv)):
+                    self.painter.set_color(self.cmap(densities[i] / densities.max()))
+                    self.painter.points(xv[i], yv[i], point_size=4)
+            else:
+                xgrid, ygrid = self._get_grid(proj)
+                xmesh, ymesh = np.meshgrid(xgrid,ygrid)
+                grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
+                z = kde_res.pdf(grid_coords.T)
+                z = z.reshape(len(ygrid), len(xgrid))
 
-            for ix in range(len(xgrid)-1):
-                for iy in range(len(ygrid)-1):
-                    d = z[iy, ix] / z.max()
+                for ix in range(len(xgrid)-1):
+                    for iy in range(len(ygrid)-1):
+                        d = z[iy, ix] / z.max()
+                        if d > self.vmin:
+                            d = min(d, self.vmax) / self.vmax
+                            self.painter.set_color(self.cmap(d))
+                            self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
+        elif self.method == 'hist':
+            try:
+                from scipy.ndimage import gaussian_filter
+            except:
+                raise Exception('KDE requires statsmodel')
+
+            xgrid, ygrid = self._get_grid(proj)
+            H, _, _ = np.histogram2d(yv, xv, bins=(ygrid, xgrid))
+            H = gaussian_filter(H, sigma=self.bw)
+            for ix in range(len(xgrid)-2):
+                for iy in range(len(ygrid)-2):
+                    d = H[iy, ix] / H.max()
                     if d > self.vmin:
                         d = min(d, self.vmax) / self.vmax
                         self.painter.set_color(self.cmap(d))
                         self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
+        else:
+            raise Exception('method not supported')
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
