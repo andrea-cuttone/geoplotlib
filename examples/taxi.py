@@ -24,7 +24,7 @@ class TrailsLayer(BaseLayer):
             x, y = proj.lonlat_to_screen(grp['lon'], grp['lat'])
             self.painter.points(x, y, 10)
 
-        self.t += 2*60
+        self.t += 3*60
 
         self.painter.batch_draw()
         ui_manager.info(epoch_to_str(self.t))

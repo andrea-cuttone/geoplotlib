@@ -193,8 +193,10 @@ class GraphLayer(BaseLayer):
         self.dest_lat = dest_lat
 
         self.linewidth = kwargs.get('linewidth', 3.0)
-        self.cmap = kwargs.get('cmap', 'OrRd')
-        self.alpha = kwargs.get('alpha', 32)
+        alpha = kwargs.get('alpha', 128)
+        self.color = kwargs.get('color', [255,0,0, alpha])
+        if type(self.color) == str:
+            self.color = colors.create_cmap(self.color, alpha)
 
 
     def invalidate(self, proj):
@@ -202,11 +204,13 @@ class GraphLayer(BaseLayer):
         x0, y0 = proj.lonlat_to_screen(self.data[self.src_lon], self.data[self.src_lat])
         x1, y1 = proj.lonlat_to_screen(self.data[self.dest_lon], self.data[self.dest_lat])
         manhattan = np.abs(x0-x1) + np.abs(y0-y1)
-        cols = colors.create_cmap(self.cmap, alpha=self.alpha)
         distances = np.logspace(0, log10(manhattan.max()), 20)
         for i in range(len(distances)-1, 1, -1):
             mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
-            self.painter.set_color(cols(colors.log_norm(distances[i], manhattan.max(), 0, 1)))
+            if type(self.color) == list:
+                self.painter.set_color(self.color)
+            else:
+                self.painter.set_color(self.color(colors.log_norm(distances[i], manhattan.max(), 0, 1)))
             self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], self.linewidth)
 
 

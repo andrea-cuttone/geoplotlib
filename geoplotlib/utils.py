@@ -164,6 +164,6 @@ class BoundingBox():
 
 
 BoundingBox.WORLD = BoundingBox(north=85, west=-170, south=-85, east=190)
-BoundingBox.DK = BoundingBox(north=57.769, west=7.932, south=54.444, east=12.843)
+BoundingBox.DK = BoundingBox(north=57.769, west=7.932, south=54.444, east=13.282)
 BoundingBox.DTU = BoundingBox(north=55.7925, west=12.5092, south=55.7784, east=12.5309)
 BoundingBox.KBH = BoundingBox(north=55.8190, west=12.0369, south=55.5582, east=12.7002)
