@@ -22,6 +22,7 @@ FPS = 30
 TILE_SIZE = 256
 MIN_ZOOM = 2
 MAX_ZOOM = 20
+KEYBOARD_PAN = 0.1
 
 
 class UiManager:
@@ -146,10 +147,11 @@ class BaseApp(pyglet.window.Window):
 
         if self.show_map:
             self.map_layer.draw(self.proj)
-            painter = BatchPainter()
-            painter.set_color([0,0,0,128])
-            painter.rect(0,0,SCREEN_W, SCREEN_H)
-            painter.batch_draw()
+            if self.geoplotlib_config.map_alpha < 255:
+                painter = BatchPainter()
+                painter.set_color([0,0,0, 255 - self.geoplotlib_config.map_alpha])
+                painter.rect(0,0,SCREEN_W, SCREEN_H)
+                painter.batch_draw()
 
 
         if abs(self.drag_x) > 1e-3 or abs(self.drag_y) > 1e-3:
@@ -230,6 +232,20 @@ class BaseApp(pyglet.window.Window):
             self.screenshot()
         elif symbol == pyglet.window.key.M:
             self.show_map = not self.show_map
+        elif symbol == pyglet.window.key.I:
+            self.proj.zoomin(SCREEN_W/2, SCREEN_H/2)
+            self.scroll_delay = 30
+        elif symbol == pyglet.window.key.O:
+            self.proj.zoomout(SCREEN_W/2, SCREEN_H/2)
+            self.scroll_delay = 30
+        elif symbol == pyglet.window.key.LEFT:
+            self.proj.pan(-KEYBOARD_PAN, 0)
+        elif symbol == pyglet.window.key.RIGHT:
+            self.proj.pan(+KEYBOARD_PAN, 0)
+        elif symbol == pyglet.window.key.UP:
+            self.proj.pan(0, +KEYBOARD_PAN)
+        elif symbol == pyglet.window.key.DOWN:
+            self.proj.pan(0, -KEYBOARD_PAN)
         else:
             for l in self.geoplotlib_config.layers:
                 need_invalidate = l.on_key_release(symbol, modifiers)
@@ -556,7 +572,9 @@ class MapLayer():
         self.skipdl = skipdl
         self.tiles_cache = {}
         self.download_queue = SetQueue()
-        self.download_threads = [TileDownloaderThread(self.download_queue).start() for i in range(4)]
+        self.download_threads = [TileDownloaderThread(self.download_queue) for i in range(2)]
+        for t in self.download_threads:
+            t.start()
 
 
     def get_tile(self, zoom, xtile, ytile):
@@ -575,11 +593,15 @@ class MapLayer():
             url = "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile)
         elif self.tiles_provider == 'toolserver':
             url = 'http://%s.www.toolserver.org/tiles/bw-mapnik/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
+        elif self.tiles_provider == 'darkmatter':
+            url = 'http://%s.basemaps.cartocdn.com/dark_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
+        elif self.tiles_provider == 'positron':
+            url = 'http://%s.basemaps.cartocdn.com/light_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
         elif isfunction(self.tiles_provider):
             url = self.tiles_provider(zoom, xtile, ytile)
             tiles_dir = 'custom'
         else:
-            raise Exception('unknown style')
+            raise Exception('unknown style ' + self.tiles_provider)
 
         dir_path = expanduser('~') + '/geoplotlib_tiles/%s/%d/%d/' % (tiles_dir, zoom, xtile)
         download_path = dir_path + '%d.png' % ytile

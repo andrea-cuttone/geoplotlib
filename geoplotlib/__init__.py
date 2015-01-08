@@ -13,8 +13,9 @@ class AppConfig:
         self.layers = []
         self.bbox = None
         self.savefig = None
-        self.tiles_provider = 'toner'
-        self.smoothing = True
+        self.tiles_provider = 'positron'
+        self.smoothing = False
+        self.map_alpha = 196
 
 
 _global_config = AppConfig()
@@ -78,8 +79,8 @@ def delaunay(data, **kwargs):
     _global_config.layers.append(DelaunayLayer(data, **kwargs))
 
 
-def kde(data, **kwargs):
-    _global_config.layers.append(KDELayer(data, **kwargs))
+def kde(data, bw, **kwargs):
+    _global_config.layers.append(KDELayer(data, bw, **kwargs))
 
 
 def markers(data, marker, **kwargs):
@@ -92,3 +93,9 @@ def set_bbox(bbox):
 
 def set_smoothing(smoothing):
     _global_config.smoothing = smoothing
+
+
+def set_map_alpha(alpha):
+    if alpha < 0 or alpha > 255:
+        raise Exception('invalid alpha '  + str(alpha))
+    _global_config.map_alpha = alpha
