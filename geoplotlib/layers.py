@@ -571,78 +571,78 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, method='hist', scaling='lin', alpha=196, scalemin=0, scalemax=1, cmap='hot'):
+    def __init__(self, values, bw, cmap='hot', method='hist', scaling='lin', alpha=128, cut_below=0, clip_above=100, binsize=2):
         self.values = values
         self.bw = bw
-        self.cmap = colors.create_cmap(cmap, alpha=alpha)
+        self.cmap = colors.ColorMap(cmap, alpha=alpha)
         self.method = method
         self.scaling = scaling
-        self.scalemin = scalemin
-        self.scalemax = scalemax
+        self.cut_below = cut_below
+        self.clip_above = clip_above
+        self.binsize = binsize
 
 
     def _get_grid(self, proj):
         west, north = proj.lonlat_to_screen([proj.bbox().west], [proj.bbox().north])
         east, south = proj.lonlat_to_screen([proj.bbox().east], [proj.bbox().south])
-        xgrid = np.arange(west, east, 4)
-        ygrid = np.arange(south, north, 4)
+        xgrid = np.arange(west, east, self.binsize)
+        ygrid = np.arange(south, north, self.binsize)
         return xgrid, ygrid
 
 
+    @profile
     def invalidate(self, proj):
         self.painter = BatchPainter()
         xv, yv = proj.lonlat_to_screen(self.values['lon'], self.values['lat'])
 
-        if self.method == 'kde' or self.method == 'points':
+        if self.method == 'kde':
             try:
                 import statsmodels.api as sm
             except:
                 raise Exception('KDE requires statsmodel')
 
             kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
-            if self.method == 'points':
-                densities = kde_res.pdf()
-                for i in range(len(xv)):
+            xgrid, ygrid = self._get_grid(proj)
+            xmesh, ymesh = np.meshgrid(xgrid,ygrid)
+            grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
+            z = kde_res.pdf(grid_coords.T)
+            z = z.reshape(len(ygrid), len(xgrid))
+            z[z > np.percentile(z, self.clip_above)] = np.percentile(z, self.clip_above)
+            zmin = np.percentile(z, self.cut_below)
+            zmax = z.max()
+            for ix in range(len(xgrid)-1):
+                for iy in range(len(ygrid)-1):
                     if self.scaling == 'lin':
-                        d = colors.lin_norm(densities[i], densities.max(), self.scalemin, self.scalemax)
+                        d = colors.lin_norm(z[iy, ix], zmax)
                     else:
-                        d = colors.log_norm(densities[i], densities.max(), self.scalemin, self.scalemax)
-                    if d > 0:
-                        self.painter.set_color(self.cmap(d))
-                        self.painter.points(xv[i], yv[i], point_size=4)
-            else:
-                xgrid, ygrid = self._get_grid(proj)
-                xmesh, ymesh = np.meshgrid(xgrid,ygrid)
-                grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
-                z = kde_res.pdf(grid_coords.T)
-                z = z.reshape(len(ygrid), len(xgrid))
-
-                for ix in range(len(xgrid)-1):
-                    for iy in range(len(ygrid)-1):
-                        if self.scaling == 'lin':
-                            d = colors.lin_norm(z[iy, ix], z.max(), self.scalemin, self.scalemax)
-                        else:
-                            d = colors.log_norm(z[iy, ix], z.max(), self.scalemin, self.scalemax)
-                        if d > 0:
-                            self.painter.set_color(self.cmap(d))
-                            self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
+                        d = colors.log_norm(z[iy, ix], zmax)
+                    if d > zmin:
+                        self.painter.set_color(self.cmap.to_color(d))
+                        self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
         elif self.method == 'hist':
             try:
                 from scipy.ndimage import gaussian_filter
             except:
-                raise Exception('KDE requires statsmodel')
+                raise Exception('KDE requires scipy')
 
             xgrid, ygrid = self._get_grid(proj)
             H, _, _ = np.histogram2d(yv, xv, bins=(ygrid, xgrid))
             H = gaussian_filter(H, sigma=self.bw)
+            H[H > np.percentile(H, self.clip_above)] = np.percentile(H, self.clip_above)
+            Hmin = np.percentile(H, self.cut_below)
+            Hmax = H.max()
             for ix in range(len(xgrid)-2):
                 for iy in range(len(ygrid)-2):
-                    if self.scaling == 'log':
-                        d = colors.log_norm(H[iy, ix], H.max(), self.scalemin, self.scalemax)
-                    else:
-                        d = colors.lin_norm(H[iy, ix], H.max(), self.scalemin, self.scalemax)
-                    if d > 0:
-                        self.painter.set_color(self.cmap(d))
+                    if H[iy, ix] > Hmin :
+                        if self.scaling == 'log':
+                            d = colors.log_norm(H[iy, ix], Hmax)
+                        elif self.scaling == 'lin':
+                            d = colors.lin_norm(H[iy, ix], Hmax)
+                        else:
+                            raise Exception('invalid scaling ' + self.scaling)
+
+                        self.painter.set_color(self.cmap.to_color(d))
+                        # TODO: need to optimize the following line
                         self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
         else:
             raise Exception('method not supported')

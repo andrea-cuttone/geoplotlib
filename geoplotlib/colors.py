@@ -1,9 +1,27 @@
 from random import shuffle
-import numpy as np
+import math
 
 
 def _convert_color_format(col, alpha):
     return [int(c * 255) for c in col[:3]] + [alpha]
+
+
+class ColorMap():
+
+    def __init__(self, cmap_name, alpha=255, step=0.2):
+        from pylab import get_cmap
+        self.cmap = get_cmap(cmap_name)
+        self.alpha = alpha
+        self.step = step
+        self.mapping = {}
+
+
+    def to_color(self, value):
+        value = max(min(value,1),0)
+        value = int(value // self.step) * self.step
+        if value not in self.mapping:
+            self.mapping[value] = _convert_color_format(self.cmap(value), self.alpha)
+        return self.mapping[value]
 
 
 def create_set_cmap(values, cmap_name, alpha=255):
@@ -17,18 +35,12 @@ def create_set_cmap(values, cmap_name, alpha=255):
     return d
 
 
-def create_cmap(cmap_name, alpha=255):
-    from pylab import get_cmap
-    cmap = get_cmap(cmap_name)
-    return lambda x: _convert_color_format(cmap(x), alpha)
+def lin_norm(value, maxvalue):
+    return value / maxvalue
 
 
-def lin_norm(value, maxvalue, scalemin, scalemax):
-    return (value / maxvalue - scalemin) / (scalemax - scalemin)
-
-
-def log_norm(value, maxvalue, scalemin, scalemax):
-    return (np.log(1+value) / np.log(1+maxvalue) - scalemin) / (scalemax - scalemin)
+def log_norm(value, maxvalue):
+    return math.log(1+value) / math.log(1+maxvalue)
 
 
 def colorbrewer(values, alpha=255):
