@@ -238,6 +238,9 @@ class BaseApp(pyglet.window.Window):
         elif symbol == pyglet.window.key.O:
             self.proj.zoomout(SCREEN_W/2, SCREEN_H/2)
             self.scroll_delay = 30
+        elif symbol == pyglet.window.key.R:
+            # hack to force invalidate
+            self.scroll_delay = 2
         elif symbol == pyglet.window.key.LEFT:
             self.proj.pan(-KEYBOARD_PAN, 0)
         elif symbol == pyglet.window.key.RIGHT:
@@ -411,6 +414,21 @@ class BatchPainter:
 
     def rect(self, left, top, right, bottom):
         self.triangle([left, top, right, top, right, bottom, right, bottom, left, top, left, bottom])
+
+
+    def batch_rects(self, rects_vertices, rects_colors):
+        triangles = []
+        colors = []
+        for i in range(len(rects_vertices)):
+            r = rects_vertices[i]
+            c = rects_colors[i]
+            left, top, right, bottom = r
+            triangles.extend([left, top, right, top, right, bottom, right, bottom, left, top, left, bottom])
+            colors.extend(c * 6)
+
+        self._batch.add(len(triangles)/VERT_PER_POINT, GL_TRIANGLES, None,
+                      ('v2f', triangles),
+                      ('c4B', colors))
 
 
     def sprites(self, image, x, y, scale=1.0):

@@ -571,7 +571,7 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, cmap='hot', method='hist', scaling='lin', alpha=128, cut_below=0, clip_above=100, binsize=2):
+    def __init__(self, values, bw, cmap='hot', method='hist', scaling='lin', alpha=128, cut_below=0, clip_above=100, binsize=1):
         self.values = values
         self.bw = bw
         self.cmap = colors.ColorMap(cmap, alpha=alpha)
@@ -595,6 +595,9 @@ class KDELayer(BaseLayer):
         self.painter = BatchPainter()
         xv, yv = proj.lonlat_to_screen(self.values['lon'], self.values['lat'])
 
+        rects_vertices = []
+        rects_colors = []
+
         if self.method == 'kde':
             try:
                 import statsmodels.api as sm
@@ -617,8 +620,8 @@ class KDELayer(BaseLayer):
                     else:
                         d = colors.log_norm(z[iy, ix], zmax)
                     if d > zmin:
-                        self.painter.set_color(self.cmap.to_color(d))
-                        self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
+                        rects_vertices.append((xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1]))
+                        rects_colors.append(self.cmap.to_color(d))
         elif self.method == 'hist':
             try:
                 from scipy.ndimage import gaussian_filter
@@ -641,11 +644,13 @@ class KDELayer(BaseLayer):
                         else:
                             raise Exception('invalid scaling ' + self.scaling)
 
-                        self.painter.set_color(self.cmap.to_color(d))
-                        # TODO: need to optimize the following line
-                        self.painter.rect(xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1])
+                        rects_vertices.append((xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1]))
+                        rects_colors.append(self.cmap.to_color(d))
         else:
             raise Exception('method not supported')
+
+        self.painter.batch_rects(rects_vertices, rects_colors)
+
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
