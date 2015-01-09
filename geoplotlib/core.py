@@ -228,26 +228,26 @@ class BaseApp(pyglet.window.Window):
 
 
     def on_key_release(self, symbol, modifiers):
-        if symbol == pyglet.window.key.S:
+        if symbol == pyglet.window.key.P:
             self.screenshot()
         elif symbol == pyglet.window.key.M:
             self.show_map = not self.show_map
-        elif symbol == pyglet.window.key.I:
+        elif symbol == pyglet.window.key.Z:
             self.proj.zoomin(SCREEN_W/2, SCREEN_H/2)
             self.scroll_delay = 30
-        elif symbol == pyglet.window.key.O:
+        elif symbol == pyglet.window.key.X:
             self.proj.zoomout(SCREEN_W/2, SCREEN_H/2)
             self.scroll_delay = 30
         elif symbol == pyglet.window.key.R:
             # hack to force invalidate
             self.scroll_delay = 2
-        elif symbol == pyglet.window.key.LEFT:
+        elif symbol == pyglet.window.key.A:
             self.proj.pan(-KEYBOARD_PAN, 0)
-        elif symbol == pyglet.window.key.RIGHT:
+        elif symbol == pyglet.window.key.D:
             self.proj.pan(+KEYBOARD_PAN, 0)
-        elif symbol == pyglet.window.key.UP:
+        elif symbol == pyglet.window.key.W:
             self.proj.pan(0, +KEYBOARD_PAN)
-        elif symbol == pyglet.window.key.DOWN:
+        elif symbol == pyglet.window.key.S:
             self.proj.pan(0, -KEYBOARD_PAN)
         else:
             for l in self.geoplotlib_config.layers:
@@ -302,14 +302,17 @@ class BatchPainter:
             raise Exception('invalid color format')
 
 
-    def lines(self, x0, y0, x1, y1, width=1.0):
+    def lines(self, x0, y0, x1, y1, colors=None, width=1.0):
         glLineWidth(width)
         x = _flatten_xy(x0, x1)
         y = _flatten_xy(y0, y1)
         vertices = _flatten_xy(x, y)
+        if colors is None:
+            colors = self._color * (len(vertices)/VERT_PER_POINT)
+
         self._batch.add(len(vertices)/VERT_PER_POINT, GL_LINES, None,
                       ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', np.array(colors).flatten()))
 
 
     def linestrip(self, x, y, width=1.0, closed=False):

@@ -40,7 +40,7 @@ class QuadsLayer(BaseLayer):
     def __init__(self, data, cmap='hot_r'):
         self.data = data
         if cmap is not None:
-            self.cmap = geoplotlib.colors.create_cmap(cmap, alpha=196)
+            self.cmap = geoplotlib.colors.ColorMap(cmap, alpha=196)
         else:
             self.cmap = None
             
@@ -71,8 +71,7 @@ class QuadsLayer(BaseLayer):
         if self.cmap is not None:
             for qt in done:
                 area = (qt.right - qt.left) * (qt.top - qt.bottom)
-                v = geoplotlib.colors.log_norm(area, maxarea, 0, 1)
-                self.painter.set_color(self.cmap(v))
+                self.painter.set_color(self.cmap.to_color(area, maxarea, 'log'))
                 self.painter.rect(qt.left, qt.top, qt.right, qt.bottom)
         else:
             for qt in done:

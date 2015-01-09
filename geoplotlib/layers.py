@@ -2,6 +2,7 @@ from collections import defaultdict
 from math import log10, log
 from threading import Thread
 import threading
+import math
 import pyglet
 import numpy as np
 import colors
@@ -123,8 +124,7 @@ class HistogramLayer(BaseLayer):
 
     def __init__(self, data, **kwargs):
         self.data = data
-        self.alpha = kwargs.get('alpha')
-        self.cmap = kwargs.get('cmap')
+        self.cmap = colors.ColorMap(kwargs.get('cmap'), alpha=kwargs.get('alpha'))
         self.binsize = kwargs.get('binsize')
         self.show_tooltip = kwargs.get('show_tooltip')
         self.scalemin = kwargs.get('scalemin')
@@ -148,17 +148,12 @@ class HistogramLayer(BaseLayer):
         del self.data['_ybin']
 
         self.hotspot = HotspotManager()
-        cmap = colors.create_cmap(self.cmap, alpha=self.alpha)
         vmax = max(results.values()) if len(results) > 0 else 0
 
         if vmax > 1:
             for (ix, iy), value in results.items():
-                if self.logscale:
-                    value = colors.log_norm(value, vmax, self.scalemin, self.scalemax)
-                else:
-                    value = colors.lin_norm(value, vmax, self.scalemin, self.scalemax)
                 if value > 0:
-                    self.painter.set_color(cmap(value))
+                    self.painter.set_color(self.cmap.to_color(value, vmax, 'log' if self.logscale else 'lin'))
                     if self.binscaling:
                         l = self.binsize * value * 0.95
                         rx = ix * self.binsize + 0.5 * (1-value) * self.binsize
@@ -196,7 +191,7 @@ class GraphLayer(BaseLayer):
         alpha = kwargs.get('alpha', 128)
         self.color = kwargs.get('color', [255,0,0, alpha])
         if type(self.color) == str:
-            self.color = colors.create_cmap(self.color, alpha)
+            self.cmap = colors.ColorMap(self.color, alpha)
 
 
     def invalidate(self, proj):
@@ -204,14 +199,15 @@ class GraphLayer(BaseLayer):
         x0, y0 = proj.lonlat_to_screen(self.data[self.src_lon], self.data[self.src_lat])
         x1, y1 = proj.lonlat_to_screen(self.data[self.dest_lon], self.data[self.dest_lat])
         manhattan = np.abs(x0-x1) + np.abs(y0-y1)
+        vmax = manhattan.max()
         distances = np.logspace(0, log10(manhattan.max()), 20)
         for i in range(len(distances)-1, 1, -1):
             mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
             if type(self.color) == list:
                 self.painter.set_color(self.color)
             else:
-                self.painter.set_color(self.color(colors.log_norm(distances[i], manhattan.max(), 0, 1)))
-            self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], self.linewidth)
+                self.painter.set_color(self.cmap.to_color(distances[i], vmax, 'log'))
+            self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], width=self.linewidth)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
@@ -308,25 +304,26 @@ class ShapeLoadingThread(Thread):
 
 class DelaunayLayer(BaseLayer):
 
-    def __init__(self, data, line_color=None, line_width=2, cmap=None, max_area=50):
+    def __init__(self, data, line_color=None, line_width=2, cmap=None, max_lenght=100):
         self.data = data
 
         if cmap is None and line_color is None:
             raise Exception('need either cmap or line_color')
 
         if cmap is not None:
-            cmap = colors.create_cmap(cmap, alpha=196)
+            cmap = colors.ColorMap(cmap, alpha=196)
 
         self.cmap = cmap
         self.line_color = line_color
         self.line_width = line_width
-        self.max_area = max_area
+        self.max_lenght = max_lenght
 
 
     @staticmethod
     def _get_area(p):
         x1, y1, x2, y2, x3, y3 = p
         return 0.5*(x1*(y2-y3)+x2*(y3-y1)+x3*(y1-y2))
+
 
 
     def invalidate(self, proj):
@@ -342,18 +339,37 @@ class DelaunayLayer(BaseLayer):
         points = np.unique(zip(x,y))
         dela = Delaunay(points)
 
+        edges = set()
         for tria in dela.vertices:
-            p1 = dela.points[tria[0]]
-            p2 = dela.points[tria[1]]
-            p3 = dela.points[tria[2]]
-            tria_x = [p1[0], p2[0], p3[0]]
-            tria_y = [p1[1], p2[1], p3[1]]
+            edges.add((tria[0], tria[1]))
+            edges.add((tria[1], tria[2]))
+            edges.add((tria[2], tria[0]))
+
+        allx0 = []
+        ally0 = []
+        allx1 = []
+        ally1 = []
+        colors = []
+
+        for a, b in edges:
+            x0, y0 = dela.points[a]
+            x1, y1 = dela.points[b]
+
+            allx0.append(x0)
+            ally0.append(y0)
+            allx1.append(x1)
+            ally1.append(y1)
+
             if self.line_color:
-                self.painter.linestrip(tria_x, tria_y, closed=True)
-            if self.cmap:
-                area = DelaunayLayer._get_area(np.vstack((tria_x, tria_y)).T.flatten())
-                self.painter.set_color(self.cmap(1 - min(1, np.log(area) / np.log(self.max_area))))
-                self.painter.poly(tria_x, tria_y)
+                colors.append(self.line_color)
+                colors.append(self.line_color)
+            elif self.cmap:
+                l = math.sqrt((x0 - x1)**2+(y0 - y1)**2)
+                c = self.cmap.to_color(l, self.max_lenght, 'log')
+                colors.append(c)
+                colors.append(c)
+
+        self.painter.lines(allx0, ally0, allx1, ally1, colors)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
@@ -373,7 +389,7 @@ class VoronoiLayer(BaseLayer):
             raise Exception('need either cmap or line_color')
 
         if cmap is not None:
-            cmap = colors.create_cmap(cmap, alpha=196)
+            cmap = colors.ColorMap(cmap, alpha=196, step=0.05)
 
         self.cmap = cmap
         self.line_color = line_color
@@ -508,7 +524,7 @@ class VoronoiLayer(BaseLayer):
                 self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
             if self.cmap:
                 area = VoronoiLayer._get_area(polygon.tolist())
-                self.painter.set_color(self.cmap(1 - min(1, np.log(area) / np.log(self.max_area))))
+                self.painter.set_color(self.cmap.to_color(area, self.max_area, 'log'))
                 self.painter.poly(polygon[:,0], polygon[:,1])
 
             if self.f_tooltip:
@@ -590,7 +606,6 @@ class KDELayer(BaseLayer):
         return xgrid, ygrid
 
 
-    @profile
     def invalidate(self, proj):
         self.painter = BatchPainter()
         xv, yv = proj.lonlat_to_screen(self.values['lon'], self.values['lat'])
@@ -610,18 +625,13 @@ class KDELayer(BaseLayer):
             grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
             z = kde_res.pdf(grid_coords.T)
             z = z.reshape(len(ygrid), len(xgrid))
-            z[z > np.percentile(z, self.clip_above)] = np.percentile(z, self.clip_above)
             zmin = np.percentile(z, self.cut_below)
-            zmax = z.max()
+            zmax = np.percentile(z, self.clip_above)
             for ix in range(len(xgrid)-1):
                 for iy in range(len(ygrid)-1):
-                    if self.scaling == 'lin':
-                        d = colors.lin_norm(z[iy, ix], zmax)
-                    else:
-                        d = colors.log_norm(z[iy, ix], zmax)
-                    if d > zmin:
+                    if z[iy, ix] > zmin:
                         rects_vertices.append((xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1]))
-                        rects_colors.append(self.cmap.to_color(d))
+                        rects_colors.append(self.cmap.to_color(z[iy, ix], zmax, self.scaling))
         elif self.method == 'hist':
             try:
                 from scipy.ndimage import gaussian_filter
@@ -631,26 +641,17 @@ class KDELayer(BaseLayer):
             xgrid, ygrid = self._get_grid(proj)
             H, _, _ = np.histogram2d(yv, xv, bins=(ygrid, xgrid))
             H = gaussian_filter(H, sigma=self.bw)
-            H[H > np.percentile(H, self.clip_above)] = np.percentile(H, self.clip_above)
             Hmin = np.percentile(H, self.cut_below)
-            Hmax = H.max()
+            Hmax = np.percentile(H, self.clip_above)
             for ix in range(len(xgrid)-2):
                 for iy in range(len(ygrid)-2):
-                    if H[iy, ix] > Hmin :
-                        if self.scaling == 'log':
-                            d = colors.log_norm(H[iy, ix], Hmax)
-                        elif self.scaling == 'lin':
-                            d = colors.lin_norm(H[iy, ix], Hmax)
-                        else:
-                            raise Exception('invalid scaling ' + self.scaling)
-
+                    if H[iy, ix] > Hmin:
                         rects_vertices.append((xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1]))
-                        rects_colors.append(self.cmap.to_color(d))
+                        rects_colors.append(self.cmap.to_color(H[iy, ix], Hmax, self.scaling))
         else:
             raise Exception('method not supported')
 
         self.painter.batch_rects(rects_vertices, rects_colors)
-
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):

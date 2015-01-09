@@ -16,9 +16,17 @@ class ColorMap():
         self.mapping = {}
 
 
-    def to_color(self, value):
-        value = max(min(value,1),0)
-        value = int(value // self.step) * self.step
+    def to_color(self, value, maxvalue, scale):
+
+        if scale == 'lin':
+            value = value / maxvalue
+        elif scale == 'log':
+            value = math.log(1+value) / math.log(1+maxvalue)
+        else:
+            raise Exception('scale must be lin or log')
+
+        value = min(value,1)
+        value = round(value / self.step) * self.step
         if value not in self.mapping:
             self.mapping[value] = _convert_color_format(self.cmap(value), self.alpha)
         return self.mapping[value]
@@ -33,14 +41,6 @@ def create_set_cmap(values, cmap_name, alpha=255):
     for i in range(len(unique_values)):
         d[unique_values[i]] = _convert_color_format(cmap(1.*i/len(unique_values)), alpha)
     return d
-
-
-def lin_norm(value, maxvalue):
-    return value / maxvalue
-
-
-def log_norm(value, maxvalue):
-    return math.log(1+value) / math.log(1+maxvalue)
 
 
 def colorbrewer(values, alpha=255):
