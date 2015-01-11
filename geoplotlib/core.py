@@ -22,14 +22,14 @@ FPS = 30
 TILE_SIZE = 256
 MIN_ZOOM = 2
 MAX_ZOOM = 20
-KEYBOARD_PAN = 0.1
-
+KEYBOARD_PAN = 0.2
+TOTAL_INVALIDATE_DELAY = 50
 
 class UiManager:
 
     def __init__(self):
         self.font_color = (0,0,0,255)
-        self.font_size = 20
+        self.font_size = 16
         self.font_name = 'Times New Roman'
         self.padding = 2
 
@@ -120,6 +120,7 @@ class BaseApp(pyglet.window.Window):
         self.map_layer = MapLayer(geoplotlib_config.tiles_provider, skipdl=False)
 
         self.scroll_delay = 0
+        self.invalidate_delay = 0
         self.drag_x = self.drag_y = 0
         self.dragging = False
         self.drag_start_timestamp = 0
@@ -163,10 +164,13 @@ class BaseApp(pyglet.window.Window):
 
         if self.scroll_delay > 0:
             self.scroll_delay -= 1
-        if self.scroll_delay == 1:
+
+        if self.invalidate_delay > 0:
+            self.invalidate_delay -= 1
+        if self.invalidate_delay == 1:
             for l in self.geoplotlib_config.layers:
-                    l.invalidate(self.proj)    
-        if self.scroll_delay == 0:
+                l.invalidate(self.proj)
+        if self.invalidate_delay == 0:
             if self.geoplotlib_config.smoothing:
                 glEnable(GL_LINE_SMOOTH)
                 glEnable(GL_POLYGON_SMOOTH)
@@ -182,7 +186,10 @@ class BaseApp(pyglet.window.Window):
 
             #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
             #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
-            self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
+
+        if self.invalidate_delay == 2:
+            self.ui_manager.status('rendering...')
+        self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
         if self.geoplotlib_config.savefig is not None:
             self.screenshot()
@@ -201,6 +208,8 @@ class BaseApp(pyglet.window.Window):
             self.drag_x = -1. * dx / TILE_SIZE
             self.drag_y = -1. * dy / TILE_SIZE
             self.proj.pan(self.drag_x, self.drag_y)
+            if self.invalidate_delay > 0:
+                    self.invalidate_delay = TOTAL_INVALIDATE_DELAY
 
 
     def on_mouse_release(self, x, y, buttons, modifiers):
@@ -216,15 +225,20 @@ class BaseApp(pyglet.window.Window):
                 self.dragging = True
                 self.drag_start_timestamp = self.ticks
                 self.drag_x = self.drag_y = 0
+                if self.invalidate_delay > 0:
+                    self.invalidate_delay = TOTAL_INVALIDATE_DELAY
 
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        if scroll_y < 0:
-            self.proj.zoomin(self.mouse_x, self.mouse_y)
-            self.scroll_delay = 30
-        elif scroll_y > 0:
-            self.proj.zoomout(self.mouse_x, self.mouse_y)
-            self.scroll_delay = 30
+        if self.scroll_delay == 0:
+            if scroll_y < 0:
+                self.proj.zoomin(self.mouse_x, self.mouse_y)
+                self.invalidate_delay = TOTAL_INVALIDATE_DELAY
+                self.scroll_delay = 3
+            elif scroll_y > 0:
+                self.proj.zoomout(self.mouse_x, self.mouse_y)
+                self.invalidate_delay = TOTAL_INVALIDATE_DELAY
+                self.scroll_delay = 3
 
 
     def on_key_release(self, symbol, modifiers):
@@ -232,15 +246,15 @@ class BaseApp(pyglet.window.Window):
             self.screenshot()
         elif symbol == pyglet.window.key.M:
             self.show_map = not self.show_map
-        elif symbol == pyglet.window.key.Z:
+        elif symbol == pyglet.window.key.I:
             self.proj.zoomin(SCREEN_W/2, SCREEN_H/2)
-            self.scroll_delay = 30
-        elif symbol == pyglet.window.key.X:
+            self.invalidate_delay = TOTAL_INVALIDATE_DELAY
+        elif symbol == pyglet.window.key.O:
             self.proj.zoomout(SCREEN_W/2, SCREEN_H/2)
-            self.scroll_delay = 30
+            self.invalidate_delay = TOTAL_INVALIDATE_DELAY
         elif symbol == pyglet.window.key.R:
             # hack to force invalidate
-            self.scroll_delay = 2
+            self.invalidate_delay = 2
         elif symbol == pyglet.window.key.A:
             self.proj.pan(-KEYBOARD_PAN, 0)
         elif symbol == pyglet.window.key.D:
