@@ -126,6 +126,7 @@ class BaseApp(pyglet.window.Window):
         self.drag_start_timestamp = 0
         self.mouse_x = self.mouse_y = 0
         self.show_map = True
+        self.show_layers = True
 
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
@@ -135,6 +136,9 @@ class BaseApp(pyglet.window.Window):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         pyglet.clock.schedule_interval(self.on_update, 1. / FPS)
+
+        if self.geoplotlib_config.savefig is not None:
+            self.minimize()
 
 
     def on_draw(self):
@@ -170,7 +174,7 @@ class BaseApp(pyglet.window.Window):
         if self.invalidate_delay == 1:
             for l in self.geoplotlib_config.layers:
                 l.invalidate(self.proj)
-        if self.invalidate_delay == 0:
+        if self.show_layers and self.invalidate_delay == 0:
             if self.geoplotlib_config.smoothing:
                 glEnable(GL_LINE_SMOOTH)
                 glEnable(GL_POLYGON_SMOOTH)
@@ -192,7 +196,7 @@ class BaseApp(pyglet.window.Window):
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
         if self.geoplotlib_config.savefig is not None:
-            self.screenshot()
+            BaseApp.screenshot(self.geoplotlib_config.savefig + '.png')
             self.close()
             pyglet.app.exit()
 
@@ -243,9 +247,11 @@ class BaseApp(pyglet.window.Window):
 
     def on_key_release(self, symbol, modifiers):
         if symbol == pyglet.window.key.P:
-            self.screenshot()
+            BaseApp.screenshot('%d.png' % (time.time()*1000))
         elif symbol == pyglet.window.key.M:
             self.show_map = not self.show_map
+        elif symbol == pyglet.window.key.L:
+            self.show_layers = not self.show_layers
         elif symbol == pyglet.window.key.I:
             self.proj.zoomin(SCREEN_W/2, SCREEN_H/2)
             self.invalidate_delay = TOTAL_INVALIDATE_DELAY
@@ -254,7 +260,7 @@ class BaseApp(pyglet.window.Window):
             self.invalidate_delay = TOTAL_INVALIDATE_DELAY
         elif symbol == pyglet.window.key.R:
             # hack to force invalidate
-            self.invalidate_delay = 2
+            self.invalidate_delay = 3
         elif symbol == pyglet.window.key.A:
             self.proj.pan(-KEYBOARD_PAN, 0)
         elif symbol == pyglet.window.key.D:
@@ -270,12 +276,12 @@ class BaseApp(pyglet.window.Window):
                     l.invalidate(self.proj)
 
 
-    def screenshot(self):
-        if self.geoplotlib_config.savefig is None:
-            fname = '%d.png' % (time.time()*1000)
-        else:
-            fname = self.geoplotlib_config.savefig + '.png'
-        pyglet.image.get_buffer_manager().get_color_buffer().save(fname)
+    @staticmethod
+    def screenshot(fname):
+        glPixelTransferf(gl.GL_ALPHA_BIAS, 1.0)
+        image = pyglet.image.ColorBufferImage(0, 0, SCREEN_W, SCREEN_H)
+        image.save(fname)
+        glPixelTransferf(gl.GL_ALPHA_BIAS, 0.0)
         print fname + ' saved'
 
 

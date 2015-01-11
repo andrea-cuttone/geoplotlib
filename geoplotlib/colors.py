@@ -17,13 +17,15 @@ class ColorMap():
 
 
     def to_color(self, value, maxvalue, scale):
-
-        if scale == 'lin':
-            value = value / maxvalue
-        elif scale == 'log':
-            value = math.log(1+value) / math.log(1+maxvalue)
-        else:
-            raise Exception('scale must be lin or log')
+        try:
+            if scale == 'lin':
+                value = value / maxvalue
+            elif scale == 'log':
+                value = math.log(1+value) / math.log(1+maxvalue)
+            else:
+                raise Exception('scale must be lin or log')
+        except ZeroDivisionError:
+            value = 0
 
         value = min(value,1)
         value = round(value / self.step) * self.step
