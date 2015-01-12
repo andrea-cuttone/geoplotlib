@@ -314,7 +314,15 @@ class BatchPainter:
 
 
     def set_color(self, color):
-        if len(color) == 4:
+        if color == 'k' or color == 'black':
+            self._color = [0,0,0,255]
+        elif color == 'r' or color == 'red':
+            self._color = [255,0,0,255]
+        elif color == 'g' or color == 'green':
+            self._color = [0,255,0,255]
+        elif color == 'b' or color == 'blue':
+            self._color = [0,0,255,255]
+        elif len(color) == 4:
             self._color = color
         elif len(color) == 3:
             self._color = color + [255]

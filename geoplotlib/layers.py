@@ -524,6 +524,7 @@ class VoronoiLayer(BaseLayer):
                 self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
             if self.cmap:
                 area = VoronoiLayer._get_area(polygon.tolist())
+                area = max(area, 1)
                 self.painter.set_color(self.cmap.to_color(area, self.max_area, 'log'))
                 self.painter.poly(polygon[:,0], polygon[:,1])
 
@@ -587,10 +588,11 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, cmap='hot', method='hist', scaling='lin', alpha=128, cut_below=None, clip_above=None, binsize=1):
+    def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=128,
+                 cut_below=None, clip_above=None, binsize=1, cmap_step=0.2):
         self.values = values
         self.bw = bw
-        self.cmap = colors.ColorMap(cmap, alpha=alpha)
+        self.cmap = colors.ColorMap(cmap, alpha=alpha, step=cmap_step)
         self.method = method
         self.scaling = scaling
         self.cut_below = cut_below
@@ -678,6 +680,39 @@ class KDELayer(BaseLayer):
             raise Exception('method not supported')
 
         self.painter.batch_rects(rects_vertices, rects_colors)
+
+
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+
+
+class ConvexHullLayer(BaseLayer):
+
+    def __init__(self, data, col):
+        self.data = data
+        self.col = col
+
+
+    def invalidate(self, proj):
+        try:
+            from scipy.spatial import ConvexHull
+            from scipy.spatial.qhull import QhullError
+        except:
+            raise Exception('ConvexHull requires scipy')
+
+        self.painter = BatchPainter()
+        self.painter.set_color(self.col)
+
+        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
+        points = np.vstack((x,y)).T
+        try:
+            hull = ConvexHull(points)
+            lx = points[hull.vertices,0]
+            ly = points[hull.vertices,1]
+            self.painter.poly(lx,ly)
+        except QhullError as qerr:
+            pass
+        self.painter.points(x, y)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
