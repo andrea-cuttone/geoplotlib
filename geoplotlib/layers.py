@@ -587,7 +587,7 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, cmap='hot', method='hist', scaling='lin', alpha=128, cut_below=0, clip_above=100, binsize=1):
+    def __init__(self, values, bw, cmap='hot', method='hist', scaling='lin', alpha=128, cut_below=None, clip_above=None, binsize=1):
         self.values = values
         self.bw = bw
         self.cmap = colors.ColorMap(cmap, alpha=alpha)
@@ -614,19 +614,34 @@ class KDELayer(BaseLayer):
         rects_colors = []
 
         if self.method == 'kde':
-            try:
-                import statsmodels.api as sm
-            except:
-                raise Exception('KDE requires statsmodel')
-
-            kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
+            # try:
+            #     import statsmodels.api as sm
+            # except:
+            #     raise Exception('KDE requires statsmodel')
+            #
+            # kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
             xgrid, ygrid = self._get_grid(proj)
-            xmesh, ymesh = np.meshgrid(xgrid,ygrid)
-            grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
-            z = kde_res.pdf(grid_coords.T)
-            z = z.reshape(len(ygrid), len(xgrid))
-            zmin = np.percentile(z, self.cut_below)
-            zmax = np.percentile(z, self.clip_above)
+            # xmesh, ymesh = np.meshgrid(xgrid,ygrid)
+            # grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
+            # z = kde_res.pdf(grid_coords.T)
+            # z = z.reshape(len(ygrid), len(xgrid))
+            # np.save('z.npy', z)
+
+            z = np.load('z.npy')
+
+            print 'smallest non-zero density:', z[z > 0][0]
+            print 'max density:', z.max()
+
+            if self.cut_below is None:
+                zmin = z[z > 0][0]
+            else:
+                zmin = self.cut_below
+
+            if self.clip_above is None:
+                zmax = z.max()
+            else:
+                zmax = self.clip_above
+
             for ix in range(len(xgrid)-1):
                 for iy in range(len(ygrid)-1):
                     if z[iy, ix] > zmin:
@@ -641,8 +656,19 @@ class KDELayer(BaseLayer):
             xgrid, ygrid = self._get_grid(proj)
             H, _, _ = np.histogram2d(yv, xv, bins=(ygrid, xgrid))
             H = gaussian_filter(H, sigma=self.bw)
-            Hmin = np.percentile(H, self.cut_below)
-            Hmax = np.percentile(H, self.clip_above)
+            print 'smallest non-zero count', H[H > 0][0]
+            print 'max count:', H.max()
+
+            if self.cut_below is None:
+                Hmin = H[H > 0][0]
+            else:
+                Hmin = self.cut_below
+
+            if self.clip_above is None:
+                Hmax = H.max()
+            else:
+                Hmax = self.clip_above
+
             for ix in range(len(xgrid)-2):
                 for iy in range(len(ygrid)-2):
                     if H[iy, ix] > Hmin:
