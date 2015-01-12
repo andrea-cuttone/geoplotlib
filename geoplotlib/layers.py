@@ -614,20 +614,20 @@ class KDELayer(BaseLayer):
         rects_colors = []
 
         if self.method == 'kde':
-            # try:
-            #     import statsmodels.api as sm
-            # except:
-            #     raise Exception('KDE requires statsmodel')
-            #
-            # kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
-            xgrid, ygrid = self._get_grid(proj)
-            # xmesh, ymesh = np.meshgrid(xgrid,ygrid)
-            # grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
-            # z = kde_res.pdf(grid_coords.T)
-            # z = z.reshape(len(ygrid), len(xgrid))
-            # np.save('z.npy', z)
+            try:
+                import statsmodels.api as sm
+            except:
+                raise Exception('KDE requires statsmodel')
 
-            z = np.load('z.npy')
+            kde_res = sm.nonparametric.KDEMultivariate(data=[xv, yv], var_type='cc', bw=self.bw)
+            xgrid, ygrid = self._get_grid(proj)
+            xmesh, ymesh = np.meshgrid(xgrid,ygrid)
+            grid_coords = np.append(xmesh.reshape(-1,1), ymesh.reshape(-1,1),axis=1)
+            z = kde_res.pdf(grid_coords.T)
+            z = z.reshape(len(ygrid), len(xgrid))
+
+            # np.save('z.npy', z)
+            # z = np.load('z.npy')
 
             print 'smallest non-zero density:', z[z > 0][0]
             print 'max density:', z.max()
