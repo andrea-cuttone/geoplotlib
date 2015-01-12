@@ -7,4 +7,5 @@ geoplotlib.shapefiles('/Users/ancu/denmark-latest.shp/buildings',
                    f_tooltip=lambda attr: attr['name'])
 
 geoplotlib.set_bbox(BoundingBox.KBH)
+geoplotlib.set_smoothing(True)
 geoplotlib.show()

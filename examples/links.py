@@ -34,4 +34,5 @@ class CustomLayer(BaseLayer):
 
 
 geoplotlib.add_layer(CustomLayer())
+geoplotlib.set_smoothing(True)
 geoplotlib.show()
