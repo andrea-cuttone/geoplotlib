@@ -671,11 +671,18 @@ class KDELayer(BaseLayer):
             else:
                 Hmax = self.clip_above
 
+            if self.scaling == 'ranking':
+                from statsmodels.distributions.empirical_distribution import ECDF
+                ecdf = ECDF(H.flatten())
+
             for ix in range(len(xgrid)-2):
                 for iy in range(len(ygrid)-2):
                     if H[iy, ix] > Hmin:
                         rects_vertices.append((xgrid[ix], ygrid[iy], xgrid[ix+1], ygrid[iy+1]))
-                        rects_colors.append(self.cmap.to_color(H[iy, ix], Hmax, self.scaling))
+                        if self.scaling == 'ranking':
+                            rects_colors.append(self.cmap.to_color(ecdf(H[iy, ix]) - ecdf(Hmin), 1 - ecdf(Hmin), 'lin'))
+                        else:
+                            rects_colors.append(self.cmap.to_color(H[iy, ix], Hmax, self.scaling))
         else:
             raise Exception('method not supported')
 
