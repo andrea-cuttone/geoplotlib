@@ -472,6 +472,79 @@ class BatchPainter:
             self._sprites.append(sprite)
 
 
+    def convexhull(self, x, y, fill=False, smooth=False):
+        try:
+            from scipy.spatial import ConvexHull
+            from scipy.spatial.qhull import QhullError
+        except:
+            raise Exception('ConvexHull requires scipy')
+
+        if len(x) < 3:
+            raise Exception('convexhull requires at least 3 points')
+
+
+        points = np.vstack((x,y)).T
+        try:
+            hull = ConvexHull(points)
+            xhull = points[hull.vertices,0]
+            yhull = points[hull.vertices,1]
+
+            if smooth:
+                xhull, yhull = self.__generate_spline(xhull, yhull, closed=True)
+
+            if fill:
+                self.poly(xhull,yhull)
+            else:
+                self.linestrip(xhull, yhull, 3, closed=True)
+
+        except QhullError as qerr:
+            self.linestrip(x, y, 3, closed=False)
+
+
+    """
+    catmullrom spline
+    http://www.mvps.org/directx/articles/catmull/
+    """
+    def __generate_spline(self, x, y, closed=False, steps=20):
+
+
+        if closed:
+            x = x.tolist()
+            x.insert(0, x[-1])
+            x.append(x[1])
+            x.append(x[2])
+
+            y = y.tolist()
+            y.insert(0, y[-1])
+            y.append(y[1])
+            y.append(y[2])
+
+        points = np.vstack((x,y)).T
+
+        curve = []
+
+        if not closed:
+            curve.append(points[0])
+
+        for j in range(1, len(points)-2):
+            for s in range(steps):
+                t = 1. * s / steps
+                p0, p1, p2, p3 = points[j-1], points[j], points[j+1], points[j+2]
+                pnew = 0.5 *((2 * p1) + (-p0 + p2) * t + (2*p0 - 5*p1 + 4*p2 - p3) * t**2 + (-p0 + 3*p1- 3*p2 + p3) * t**3)
+                curve.append(pnew)
+
+        if not closed:
+            curve.append(points[-1])
+
+        curve = np.array(curve)
+        return curve[:, 0], curve[:, 1]
+
+
+    def spline(self, x, y, width=3):
+        xcurve, ycurve = self.__generate_spline(x, y, closed=False)
+        self.linestrip(xcurve, ycurve, width)
+
+
     def batch_draw(self):
         self._batch.draw()
 
@@ -637,11 +710,9 @@ class MapLayer():
         elif self.tiles_provider == 'toner':
             url = "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
         elif self.tiles_provider == 'toner-lite':
-            url = "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
+            url = "http://%s.tile.stamen.com/toner-lite/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
         elif self.tiles_provider == 'mapquest':
             url = "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile)
-        elif self.tiles_provider == 'toolserver':
-            url = 'http://%s.www.toolserver.org/tiles/bw-mapnik/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
         elif self.tiles_provider == 'darkmatter':
             url = 'http://%s.basemaps.cartocdn.com/dark_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
         elif self.tiles_provider == 'positron':
@@ -670,7 +741,6 @@ class MapLayer():
                 self.tiles_cache[(zoom, xtile, ytile)] = tile_image
                 return tile_image
             except Exception as e:
-                print 'exception downloading', download_path, e
                 os.unlink(download_path)
                 return None
 

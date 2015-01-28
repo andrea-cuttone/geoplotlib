@@ -127,8 +127,8 @@ class HistogramLayer(BaseLayer):
         self.cmap = colors.ColorMap(kwargs.get('cmap'), alpha=kwargs.get('alpha'))
         self.binsize = kwargs.get('binsize')
         self.show_tooltip = kwargs.get('show_tooltip')
-        self.scalemin = kwargs.get('scalemin')
-        self.scalemax = kwargs.get('scalemax')
+        self.scalemin = kwargs.get('scalemin', 0)
+        self.scalemax = kwargs.get('scalemax', None)
         self.logscale = kwargs.get('logscale')
         self.f_group = kwargs.get('f_group', None)
         self.binscaling = kwargs.get('binscaling', None)
@@ -148,11 +148,15 @@ class HistogramLayer(BaseLayer):
         del self.data['_ybin']
 
         self.hotspot = HotspotManager()
-        vmax = max(results.values()) if len(results) > 0 else 0
+
+        if self.scalemax:
+            vmax = self.scalemax
+        else:
+            vmax = max(results.values()) if len(results) > 0 else 0
 
         if vmax > 1:
             for (ix, iy), value in results.items():
-                if value > 0:
+                if value > self.scalemin:
                     self.painter.set_color(self.cmap.to_color(value, vmax, 'log' if self.logscale else 'lin'))
                     if self.binscaling:
                         l = self.binsize * value * 0.95
@@ -695,31 +699,24 @@ class KDELayer(BaseLayer):
 
 class ConvexHullLayer(BaseLayer):
 
-    def __init__(self, data, col):
+    def __init__(self, data, col, fill=True, point_size=4):
         self.data = data
         self.col = col
+        self.fill = fill
+        self.point_size=point_size
 
 
     def invalidate(self, proj):
-        try:
-            from scipy.spatial import ConvexHull
-            from scipy.spatial.qhull import QhullError
-        except:
-            raise Exception('ConvexHull requires scipy')
-
         self.painter = BatchPainter()
         self.painter.set_color(self.col)
-
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        points = np.vstack((x,y)).T
-        try:
-            hull = ConvexHull(points)
-            lx = points[hull.vertices,0]
-            ly = points[hull.vertices,1]
-            self.painter.poly(lx,ly)
-        except QhullError as qerr:
-            pass
-        self.painter.points(x, y)
+        if len(x) >= 3:
+            self.painter.convexhull(x, y, self.fill)
+        else:
+            self.painter.linestrip(x, y)
+
+        if self.point_size > 0:
+            self.painter.points(x, y, self.point_size)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
