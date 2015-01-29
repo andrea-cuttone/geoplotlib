@@ -721,3 +721,42 @@ class ConvexHullLayer(BaseLayer):
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
+
+
+class GridLayer(BaseLayer):
+
+    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None):
+        self.lon_edges = lon_edges
+        self.lat_edges = lat_edges
+        self.values = values
+        self.cmap = colors.ColorMap(cmap, alpha=alpha)
+
+        if vmin:
+            self.vmin = vmin
+        else:
+            self.vmin = 0
+
+        if vmax:
+            self.vmax = vmax
+        else:
+            self.vmax = self.values.max()
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        xv, yv = proj.lonlat_to_screen(self.lon_edges, self.lat_edges)
+
+        rects = []
+        cols = []
+        for ix in range(len(xv)-1):
+            for iy in range(len(yv)-1):
+                d = self.values[iy, ix]
+                if d > self.vmin:
+                    rects.append((xv[ix], yv[iy], xv[ix+1], yv[iy+1]))
+                    cols.append(self.cmap.to_color(d, self.vmax, 'lin'))
+
+        self.painter.batch_rects(rects, cols)
+
+
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
