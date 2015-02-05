@@ -1,6 +1,5 @@
+import traceback
 from geoplotlib.core import BaseApp
-from geoplotlib.layers import ScatterLayer, HistogramLayer, GraphLayer, PolyLayer, VoronoiLayer, MarkersLayer, \
-    DelaunayLayer, KDELayer
 
 
 class AppConfig:
@@ -22,13 +21,14 @@ _global_config = AppConfig()
 
 
 def _runapp(app_config):
+    app = BaseApp(app_config)
     try:
-        app = BaseApp(app_config)
         app.start()
+    except:
+        traceback.print_exc()
     finally:
         app.close()
         _global_config.reset()
-
 
 
 def show():
@@ -41,18 +41,46 @@ def savefig(fname):
 
 
 def scatter(data, color=None, point_size=3, f_tooltip=None):
+    from geoplotlib.layers import ScatterLayer
     _global_config.layers.append(ScatterLayer(data, color=color, point_size=point_size, f_tooltip=f_tooltip))
 
 
 def hist(data, cmap='hot', alpha=220, logscale=False, binsize=16, show_tooltip=False,
          scalemin=0, scalemax=1, f_group=None, binscaling=False):
+    from geoplotlib.layers import HistogramLayer
     _global_config.layers.append(HistogramLayer(data, cmap=cmap, alpha=alpha, binsize=binsize,
             show_tooltip=show_tooltip, scalemin=scalemin, scalemax=scalemax, f_group=f_group,
             logscale=logscale, binscaling=binscaling))
 
 
 def graph(data, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
+    from geoplotlib.layers import GraphLayer
     _global_config.layers.append(GraphLayer(data, src_lat, src_lon, dest_lat, dest_lon, **kwargs))
+
+
+def shapefiles(fname, **kwargs):
+    from geoplotlib.layers import PolyLayer
+    _global_config.layers.append(PolyLayer(fname, **kwargs))
+
+
+def voronoi(data, **kwargs):
+    from geoplotlib.layers import VoronoiLayer
+    _global_config.layers.append(VoronoiLayer(data, **kwargs))
+
+
+def delaunay(data, **kwargs):
+    from geoplotlib.layers import DelaunayLayer
+    _global_config.layers.append(DelaunayLayer(data, **kwargs))
+
+
+def kde(data, bw, **kwargs):
+    from geoplotlib.layers import KDELayer
+    _global_config.layers.append(KDELayer(data, bw, **kwargs))
+
+
+def markers(data, marker, **kwargs):
+    from geoplotlib.layers import MarkersLayer
+    _global_config.layers.append(MarkersLayer(data, marker, **kwargs))
 
 
 def clear():
@@ -65,26 +93,6 @@ def tiles_provider(tiles_provider):
 
 def add_layer(layer):
     _global_config.layers.append(layer)
-
-
-def shapefiles(fname, **kwargs):
-    _global_config.layers.append(PolyLayer(fname, **kwargs))
-
-
-def voronoi(data, **kwargs):
-    _global_config.layers.append(VoronoiLayer(data, **kwargs))
-
-
-def delaunay(data, **kwargs):
-    _global_config.layers.append(DelaunayLayer(data, **kwargs))
-
-
-def kde(data, bw, **kwargs):
-    _global_config.layers.append(KDELayer(data, bw, **kwargs))
-
-
-def markers(data, marker, **kwargs):
-    _global_config.layers.append(MarkersLayer(data, marker, **kwargs))
 
 
 def set_bbox(bbox):

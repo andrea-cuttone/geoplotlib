@@ -34,9 +34,14 @@ class ColorMap():
             if maxvalue == 0:
                 value = 0
             else:
-                value = math.sqrt(value) / math.sqrt(maxvalue)
+                value = math.sqrt(value) / math.sqt(maxvalue)
+        elif scale == 'fifthroot':
+            if maxvalue == 0:
+                value = 0
+            else:
+                value = value**0.2 / maxvalue**0.2
         else:
-            raise Exception('scale must be lin or log')
+            raise Exception('scale must be lin, log, sqrt or fifthroot')
 
         value = min(value,1)
         value = round(value / self.step) * self.step

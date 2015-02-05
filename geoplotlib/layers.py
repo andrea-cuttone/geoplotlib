@@ -338,7 +338,6 @@ class DelaunayLayer(BaseLayer):
             raise
 
         self.painter = BatchPainter()
-
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
         points = np.unique(zip(x,y))
         dela = Delaunay(points)
@@ -373,7 +372,7 @@ class DelaunayLayer(BaseLayer):
                 colors.append(c)
                 colors.append(c)
 
-        self.painter.lines(allx0, ally0, allx1, ally1, colors)
+        self.painter.lines(allx0, ally0, allx1, ally1, colors, width=self.line_width)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
@@ -593,7 +592,7 @@ class MarkersLayer(BaseLayer):
 class KDELayer(BaseLayer):
 
     def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=128,
-                 cut_below=None, clip_above=None, binsize=1, cmap_step=0.2):
+                 cut_below=None, clip_above=None, binsize=1, cmap_step=0.1):
         self.values = values
         self.bw = bw
         self.cmap = colors.ColorMap(cmap, alpha=alpha, step=cmap_step)
