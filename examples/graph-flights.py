@@ -9,5 +9,5 @@ geoplotlib.graph(data,
                  dest_lat='lat. arrival (decimal)',
                  dest_lon='long. arrival (decimal)',
                  color='hot_r',
-                 alpha=64)
+                 alpha=16)
 geoplotlib.show()

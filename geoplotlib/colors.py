@@ -50,6 +50,7 @@ class ColorMap():
         return self.mapping[value]
 
 
+# TODO: this should be a class
 def create_set_cmap(values, cmap_name, alpha=255):
     unique_values = list(set(values))
     shuffle(unique_values)
@@ -61,6 +62,7 @@ def create_set_cmap(values, cmap_name, alpha=255):
     return d
 
 
+# TODO: this should be a class or reuse matplotlib colormaps
 def colorbrewer(values, alpha=255):
     basecolors = [
         [31, 120, 180],

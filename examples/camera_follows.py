@@ -17,10 +17,12 @@ class TrailsLayer(BaseLayer):
         self.painter = BatchPainter()
         self.painter.set_color([0,0,255])
         df = self.data.where((self.data['timestamp'] > self.t) & (self.data['timestamp'] <= self.t + 30*60))
-        proj.fit(BoundingBox.from_points(lons=df['lon'], lats=df['lat']))
+        proj.fit(BoundingBox.from_points(lons=df['lon'], lats=df['lat']), max_zoom=14)
         x, y = proj.lonlat_to_screen(df['lon'], df['lat'])
-        self.painter.points(x, y, 10)
-        self.t += 60
+        self.painter.linestrip(x, y, 10)
+        self.t += 30
+        if self.t > self.data['timestamp'].max():
+            self.t = self.data['timestamp'].min()
 
         self.painter.batch_draw()
         ui_manager.info(epoch_to_str(self.t))

@@ -24,7 +24,7 @@ class QuadTree:
 
 
     def can_split(self, x, y):
-        if self.right - self.left < 1:
+        if self.right - self.left < 4:
             return False
 
         mask = (x > self.left) & (x < self.right) & (y > self.bottom) & (y < self.top)
@@ -71,7 +71,7 @@ class QuadsLayer(BaseLayer):
         if self.cmap is not None:
             for qt in done:
                 area = (qt.right - qt.left) * (qt.top - qt.bottom)
-                self.painter.set_color(self.cmap.to_color(area, maxarea, 'log'))
+                self.painter.set_color(self.cmap.to_color(1 + area, 1 + maxarea, 'log'))
                 self.painter.rect(qt.left, qt.top, qt.right, qt.bottom)
         else:
             for qt in done:
@@ -83,8 +83,8 @@ class QuadsLayer(BaseLayer):
         self.painter.batch_draw()
   
 
-data = geoplotlib.utils.read_csv('/Users/ancu/Dropbox/phd/code-projects/geoplotlib/examples/data/loc-andrea-prod-resampled.csv')
-geoplotlib.add_layer(QuadsLayer(data))
+data = geoplotlib.utils.read_csv('data/bus.csv')
+geoplotlib.add_layer(QuadsLayer(data, cmap=None))
 geoplotlib.set_smoothing(False)
-geoplotlib.set_bbox(geoplotlib.utils.BoundingBox.KBH)
+geoplotlib.set_bbox(geoplotlib.utils.BoundingBox.DK)
 geoplotlib.show()

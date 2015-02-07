@@ -129,7 +129,7 @@ class HistogramLayer(BaseLayer):
         self.show_tooltip = kwargs.get('show_tooltip')
         self.scalemin = kwargs.get('scalemin', 0)
         self.scalemax = kwargs.get('scalemax', None)
-        self.logscale = kwargs.get('logscale')
+        self.colorscale = kwargs.get('colorscale')
         self.f_group = kwargs.get('f_group', None)
         self.binscaling = kwargs.get('binscaling', None)
         if self.f_group is None:
@@ -154,18 +154,13 @@ class HistogramLayer(BaseLayer):
         else:
             vmax = max(results.values()) if len(results) > 0 else 0
 
-        if vmax > 1:
+        if vmax >= 1:
             for (ix, iy), value in results.items():
                 if value > self.scalemin:
-                    self.painter.set_color(self.cmap.to_color(value, vmax, 'log' if self.logscale else 'lin'))
-                    if self.binscaling:
-                        l = self.binsize * value * 0.95
-                        rx = ix * self.binsize + 0.5 * (1-value) * self.binsize
-                        ry = iy * self.binsize + 0.5 * (1-value) * self.binsize
-                    else:
-                        l = self.binsize
-                        rx = ix * self.binsize
-                        ry = iy * self.binsize
+                    self.painter.set_color(self.cmap.to_color(value, vmax, self.colorscale))
+                    l = self.binsize
+                    rx = ix * self.binsize
+                    ry = iy * self.binsize
 
                     self.painter.rect(rx, ry, rx+l, ry+l)
                     if self.show_tooltip:
@@ -385,14 +380,14 @@ class DelaunayLayer(BaseLayer):
 
 class VoronoiLayer(BaseLayer):
 
-    def __init__(self, data, line_color=None, line_width=2, f_tooltip=None, cmap=None, max_area=1e4):
+    def __init__(self, data, line_color=None, line_width=2, f_tooltip=None, cmap=None, max_area=1e4, alpha=220):
         self.data = data
 
         if cmap is None and line_color is None:
             raise Exception('need either cmap or line_color')
 
         if cmap is not None:
-            cmap = colors.ColorMap(cmap, alpha=196, step=0.05)
+            cmap = colors.ColorMap(cmap, alpha=alpha, step=0.05)
 
         self.cmap = cmap
         self.line_color = line_color
@@ -591,7 +586,7 @@ class MarkersLayer(BaseLayer):
 
 class KDELayer(BaseLayer):
 
-    def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=128,
+    def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
                  cut_below=None, clip_above=None, binsize=1, cmap_step=0.1):
         self.values = values
         self.bw = bw

@@ -746,6 +746,9 @@ class MapLayer():
 
 
     def get_tile(self, zoom, xtile, ytile):
+        if xtile < 0 or ytile < 0 or xtile >= 2**zoom or ytile >= 2**zoom:
+            return None
+
         tile_image = self.tiles_cache.get((zoom, xtile, ytile))
         if tile_image is not None:
             return tile_image
