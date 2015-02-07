@@ -34,7 +34,7 @@ class ColorMap():
             if maxvalue == 0:
                 value = 0
             else:
-                value = math.sqrt(value) / math.sqt(maxvalue)
+                value = math.sqrt(value) / math.sqrt(maxvalue)
         elif scale == 'fifthroot':
             if maxvalue == 0:
                 value = 0

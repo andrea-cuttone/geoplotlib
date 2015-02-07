@@ -1,5 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from Queue import Queue
-from inspect import isfunction
 from threading import Thread
 from pyglet.window import mouse
 import time
@@ -24,34 +26,35 @@ MIN_ZOOM = 2
 MAX_ZOOM = 20
 KEYBOARD_PAN = 0.2
 TOTAL_INVALIDATE_DELAY = 50
+FONT_COLOR = (0,0,0,255)
+FONT_NAME = 'Helvetica'
+
 
 class UiManager:
 
     def __init__(self):
-        self.font_color = (0,0,0,255)
         self.font_size = 16
-        self.font_name = 'Times New Roman'
         self.padding = 2
 
         self.labels = {}
 
         self.labels['status'] = pyglet.text.Label('',
-                                       color=self.font_color,
-                                       font_name=self.font_name,
+                                       color=FONT_COLOR,
+                                       font_name=FONT_NAME,
                                        font_size=self.font_size,
                                        x=20, y=10,
                                        anchor_x='left', anchor_y='bottom')
 
         self.labels['tooltip'] = pyglet.text.Label('',
-                                       color=self.font_color,
-                                       font_name=self.font_name,
+                                       color=FONT_COLOR,
+                                       font_name=FONT_NAME,
                                        font_size=self.font_size,
                                        x=SCREEN_W, y=SCREEN_H,
                                        anchor_x='left', anchor_y='bottom')
 
         self.labels['info'] = pyglet.text.Label('',
-                                       color=self.font_color,
-                                       font_name=self.font_name,
+                                       color=FONT_COLOR,
+                                       font_name=FONT_NAME,
                                        font_size=self.font_size,
                                        x=SCREEN_W, y=SCREEN_H,
                                        anchor_x='right', anchor_y='top')
@@ -137,9 +140,6 @@ class BaseApp(pyglet.window.Window):
 
         pyglet.clock.schedule_interval(self.on_update, 1. / FPS)
 
-        if self.geoplotlib_config.savefig is not None:
-            self.minimize()
-
 
     def on_draw(self):
         self.clear()
@@ -189,10 +189,17 @@ class BaseApp(pyglet.window.Window):
             glPopMatrix()
 
             #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
-            #self.ui_manager.status('%dx%d' % (self.proj.viewport_w, self.proj.viewport_h))
 
         if self.invalidate_delay == 2:
             self.ui_manager.status('rendering...')
+
+        attribution = pyglet.text.Label(self.map_layer.attribution,
+                                       color=FONT_COLOR,
+                                       font_name=FONT_NAME,
+                                       font_size=10,
+                                       x=SCREEN_W, y=16,
+                                       anchor_x='right', anchor_y='top')
+        attribution.draw()
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
         if self.geoplotlib_config.savefig is not None:
@@ -684,13 +691,52 @@ class TileDownloaderThread(Thread):
                 destination.write(content)
                 destination.close()
             except Exception as e:
-                print e
+                print url, e
 
+
+_DEFAULT_TILE_PROVIDES = {
+    'watercolor': { 'url': lambda zoom, xtile, ytile:
+                            'http://%s.tile.stamen.com/watercolor/%d/%d/%d.png' % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
+                    'attribution': 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+    },
+    'toner': { 'url': lambda zoom, xtile, ytile:
+                        "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
+               'attribution': 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+    },
+    'toner-lite': { 'url': lambda zoom, xtile, ytile:
+                            "http://%s.tile.stamen.com/toner-lite/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
+                    'attribution': 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+    },
+    'mapquest': { 'url': lambda zoom, xtile, ytile:
+                            "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile),
+                  'attribution': 'Tiles Courtesy of MapQuest, Data by OpenStreetMap, under ODbL.'
+    },
+    'darkmatter': { 'url': lambda zoom, xtile, ytile:
+                            'http://%s.basemaps.cartocdn.com/dark_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile),
+                    'attribution': u'© OpenStreetMap contributors © CartoDB'
+    },
+    'positron': { 'url': lambda zoom, xtile, ytile:
+                            'http://%s.basemaps.cartocdn.com/light_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile),
+                    'attribution': u'© OpenStreetMap contributors © CartoDB'
+    }
+
+}
 
 class MapLayer():
 
     def __init__(self, tiles_provider, skipdl=False):
-        self.tiles_provider = tiles_provider
+        if type(tiles_provider) == str:
+            if tiles_provider in _DEFAULT_TILE_PROVIDES:
+                self.tiles_dir = tiles_provider
+                self.url_generator = _DEFAULT_TILE_PROVIDES[tiles_provider]['url']
+                self.attribution = _DEFAULT_TILE_PROVIDES[tiles_provider]['attribution']
+            else:
+                raise Exception('unknown style ' + tiles_provider)
+        else:
+            self.tiles_dir = tiles_provider['tiles_dir']
+            self.url_generator = tiles_provider['url']
+            self.attribution = tiles_provider['attribution']
+
         self.skipdl = skipdl
         self.tiles_cache = {}
         self.download_queue = SetQueue()
@@ -704,26 +750,8 @@ class MapLayer():
         if tile_image is not None:
             return tile_image
 
-        tiles_dir = self.tiles_provider
-        if self.tiles_provider == 'watercolor':
-            url = 'http://%s.tile.stamen.com/watercolor/%d/%d/%d.png' % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
-        elif self.tiles_provider == 'toner':
-            url = "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
-        elif self.tiles_provider == 'toner-lite':
-            url = "http://%s.tile.stamen.com/toner-lite/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile)
-        elif self.tiles_provider == 'mapquest':
-            url = "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile)
-        elif self.tiles_provider == 'darkmatter':
-            url = 'http://%s.basemaps.cartocdn.com/dark_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
-        elif self.tiles_provider == 'positron':
-            url = 'http://%s.basemaps.cartocdn.com/light_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile)
-        elif isfunction(self.tiles_provider):
-            url = self.tiles_provider(zoom, xtile, ytile)
-            tiles_dir = 'custom'
-        else:
-            raise Exception('unknown style ' + self.tiles_provider)
-
-        dir_path = expanduser('~') + '/geoplotlib_tiles/%s/%d/%d/' % (tiles_dir, zoom, xtile)
+        url = self.url_generator(zoom, xtile, ytile)
+        dir_path = expanduser('~') + '/geoplotlib_tiles/%s/%d/%d/' % (self.tiles_dir, zoom, xtile)
         download_path = dir_path + '%d.png' % ytile
 
         if not os.path.exists(dir_path):
