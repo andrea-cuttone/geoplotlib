@@ -638,7 +638,7 @@ class MarkersLayer(BaseLayer):
         """
         self.data = data
         self.f_tooltip = f_tooltip
-        self.marker_preferred_size = marker_preferred_size
+        self.marker_preferred_size = float(marker_preferred_size)
         self.marker = pyglet.image.load(marker)
         self.marker.anchor_x = self.marker.width / 2
         self.marker.anchor_y = self.marker.height / 2
