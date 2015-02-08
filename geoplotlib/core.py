@@ -110,10 +110,10 @@ class UiManager:
             l.text = ''
 
 
-class BaseApp(pyglet.window.Window):
+class GeoplotlibApp(pyglet.window.Window):
 
     def __init__(self, geoplotlib_config):
-        super(BaseApp, self).__init__(SCREEN_W, SCREEN_H, fullscreen=False, caption='geoplotlib')
+        super(GeoplotlibApp, self).__init__(SCREEN_W, SCREEN_H, fullscreen=False, caption='geoplotlib')
 
         self.geoplotlib_config = geoplotlib_config
 
@@ -203,7 +203,7 @@ class BaseApp(pyglet.window.Window):
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
 
         if self.geoplotlib_config.savefig is not None:
-            BaseApp.screenshot(self.geoplotlib_config.savefig + '.png')
+            GeoplotlibApp.screenshot(self.geoplotlib_config.savefig + '.png')
             self.close()
             pyglet.app.exit()
 
@@ -254,7 +254,7 @@ class BaseApp(pyglet.window.Window):
 
     def on_key_release(self, symbol, modifiers):
         if symbol == pyglet.window.key.P:
-            BaseApp.screenshot('%d.png' % (time.time()*1000))
+            GeoplotlibApp.screenshot('%d.png' % (time.time()*1000))
         elif symbol == pyglet.window.key.M:
             self.show_map = not self.show_map
         elif symbol == pyglet.window.key.L:

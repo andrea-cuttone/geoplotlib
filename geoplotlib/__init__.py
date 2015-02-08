@@ -1,5 +1,5 @@
 import traceback
-from geoplotlib.core import BaseApp
+from geoplotlib.core import GeoplotlibApp
 
 
 class AppConfig:
@@ -21,7 +21,7 @@ _global_config = AppConfig()
 
 
 def _runapp(app_config):
-    app = BaseApp(app_config)
+    app = GeoplotlibApp(app_config)
     try:
         app.start()
     except:
