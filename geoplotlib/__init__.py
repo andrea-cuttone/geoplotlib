@@ -15,6 +15,8 @@ class AppConfig:
         self.tiles_provider = 'mapquest'
         self.smoothing = False
         self.map_alpha = 196
+        self.screen_w = 1280
+        self.screen_h = 800
 
 
 _global_config = AppConfig()
@@ -107,3 +109,8 @@ def set_map_alpha(alpha):
     if alpha < 0 or alpha > 255:
         raise Exception('invalid alpha '  + str(alpha))
     _global_config.map_alpha = alpha
+
+
+def set_window_size(screen_w, screen_h):
+    _global_config.screen_w = screen_w
+    _global_config.screen_h = screen_h

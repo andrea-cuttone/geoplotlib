@@ -18,8 +18,6 @@ from geoplotlib.utils import BoundingBox, parse_raw_str
 
 
 VERT_PER_POINT = 2
-SCREEN_W = 1280 #1440
-SCREEN_H = 768 #900
 FPS = 30
 TILE_SIZE = 256
 MIN_ZOOM = 2
@@ -113,7 +111,11 @@ class UiManager:
 class GeoplotlibApp(pyglet.window.Window):
 
     def __init__(self, geoplotlib_config):
-        super(GeoplotlibApp, self).__init__(SCREEN_W, SCREEN_H, fullscreen=False, caption='geoplotlib')
+        super(GeoplotlibApp, self).__init__(geoplotlib_config.screen_w, geoplotlib_config.screen_h,
+                                            fullscreen=False, caption='geoplotlib')
+        global SCREEN_W, SCREEN_H
+        SCREEN_W = geoplotlib_config.screen_w
+        SCREEN_H = geoplotlib_config.screen_h
 
         self.geoplotlib_config = geoplotlib_config
 
