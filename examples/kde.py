@@ -1,3 +1,6 @@
+"""
+Multiple examples of kernel density estimation visualization
+"""
 import geoplotlib
 from geoplotlib.utils import read_csv, BoundingBox, DataAccessObject
 

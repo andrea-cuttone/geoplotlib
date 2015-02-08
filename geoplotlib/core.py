@@ -315,6 +315,10 @@ def _flatten_xy(x, y):
 
 
 class BatchPainter:
+    """
+    This class batches OpenGL calls. The usage pattern is to instantiate a BatchPainter,
+     perform all the drawing and finally render using batch_draw
+    """
 
     def __init__(self):
         self._batch = pyglet.graphics.Batch()
@@ -444,7 +448,6 @@ class BatchPainter:
         else:
             glDisable(GL_POINT_SMOOTH)
 
-        # TODO: ravel? http://stackoverflow.com/questions/9057379/correct-and-efficient-way-to-flatten-array-in-numpy-in-python
         vertices = np.vstack((x, y)).T.flatten()
 
         self._batch.add(len(vertices)/VERT_PER_POINT, GL_POINTS, None,
@@ -510,12 +513,11 @@ class BatchPainter:
             self.linestrip(x, y, 3, closed=False)
 
 
-    """
-    catmullrom spline
-    http://www.mvps.org/directx/articles/catmull/
-    """
     def __generate_spline(self, x, y, closed=False, steps=20):
-
+        """
+        catmullrom spline
+        http://www.mvps.org/directx/articles/catmull/
+        """
 
         if closed:
             x = x.tolist()
@@ -572,13 +574,18 @@ class Projector():
 
 
     def fit(self, bbox, max_zoom=MAX_ZOOM):
+        """
+        Fits the projector to a BoundingBox
+        :param bbox: BoundingBox
+        :param max_zoom: max zoom allowed
+        """
         for zoom in range(max_zoom, MIN_ZOOM-1, -1):
             self.zoom = zoom
             left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
             right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])
             if (top - bottom < SCREEN_H) and (right - left < SCREEN_W):
                 break
-        #self.zoom = zoom - 1
+
         west_tile, north_tile = self.deg2num(bbox.north, bbox.west, self.zoom)
         east_tile, south_tile = self.deg2num(bbox.south, bbox.east, self.zoom)
         self.xtile = west_tile - self.tiles_horizontally/2. + (east_tile - west_tile)/2
@@ -642,6 +649,12 @@ class Projector():
 
 
     def lonlat_to_screen(self, lon, lat):
+        """
+        Projects geodesic coordinates to screen
+        :param lon: longitude
+        :param lat: latitude
+        :return: x,y screen coordinates
+        """
         if type(lon) == list:
             lon = np.array(lon)
         if type(lat) == list:
@@ -657,6 +670,12 @@ class Projector():
 
 
     def screen_to_latlon(self, x, y):
+        """
+        Return the latitude and longitude corresponding to a screen point
+        :param x: screen x
+        :param y: screen y
+        :return: latitude and longitude at x,y
+        """
         xtile = 1. * x / TILE_SIZE + self.xtile
         ytile = 1. * y / TILE_SIZE + self.ytile
         return self.num2deg(xtile, ytile, self.zoom)

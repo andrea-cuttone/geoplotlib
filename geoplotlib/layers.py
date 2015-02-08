@@ -19,30 +19,31 @@ class HotspotManager():
         self.poly = []
 
 
-    @staticmethod
     # adapted from:
     # http://stackoverflow.com/questions/16625507/python-checking-if-point-is-inside-a-polygon
+    @staticmethod
     def point_in_poly(x, y, bbox, poly):
         left, top, right, bottom = bbox
         if x < left or x > right or y < top or y > bottom:
             return False
 
         n = len(poly)
-        inside = False
+        is_inside = False
 
-        p1x,p1y = poly[0]
+        x1,y1 = poly[0]
         for i in range(n+1):
-            p2x,p2y = poly[i % n]
-            if y > min(p1y,p2y):
-                if y <= max(p1y,p2y):
-                    if x <= max(p1x,p2x):
-                        if p1y != p2y:
-                            xints = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
-                        if p1x == p2x or x <= xints:
-                            inside = not inside
-            p1x,p1y = p2x,p2y
+            x2,y2 = poly[i % n]
+            if y > min(y1,y2):
+                if y <= max(y1,y2):
+                    if x <= max(x1,x2):
+                        if y1 != y2:
+                            xints = (y-y1)*(x2-x1)/(y2-y1)+x1
+                        if x1 == x2 or x <= xints:
+                            is_inside = not is_inside
+            x1,y1 = x2,y2
 
-        return inside
+        return is_inside
+
 
     def add_rect(self, x, y, w, h, value):
         self.rects.append(((x, y, w, h), value))
@@ -66,32 +67,65 @@ class HotspotManager():
 
 
 class BaseLayer():
+    """
+    Base class for layers
+    """
 
     def invalidate(self, proj):
+        """
+        This method is called each time layers need to be redrawn, i.e. on zoom.
+        Typically in this method a BatchPainter is instantiated and all the rendering is performed
+        :param proj: the current Projector object
+        """
         pass
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        """
+        This method is called at every frame, and typically executes BatchPainter.batch_draw()
+        :param proj: the current Projector object
+        :param mouse_x: mouse x
+        :param mouse_y: mouse y
+        :param ui_manager: the current UiManager
+        """
         pass
 
 
     def bbox(self):
+        """
+        Return the bounding box for this layer
+        :return:
+        """
         return BoundingBox.WORLD
 
 
     def on_key_release(self, key, modifiers):
+        """
+        Override this method for custom handling of keystrokes
+        :param key: the key that has been released
+        :param modifiers: the key modifiers
+        :return: True if the layer needs to call invalidate
+        """
         return False
 
 
 class ScatterLayer(BaseLayer):
 
-    def __init__(self, data, **kwargs):
+
+    def __init__(self, data, color=None, point_size=2, f_tooltip=None):
+        """Create a scatterplot
+
+        :param data: data access object
+        :param color: color
+        :param point_size: point size
+        :param f_tooltip: function to return a tooltip string for a point
+        """
         self.data = data
-        self.color = kwargs.get('color')
+        self.color = color
         if self.color is None:
             self.color = [255,0,0]
-        self.point_size = kwargs.get('point_size')
-        self.f_tooltip = kwargs.get('f_tooltip')
+        self.point_size = point_size
+        self.f_tooltip = f_tooltip
 
         self.hotspots = HotspotManager()
 
@@ -122,16 +156,29 @@ class ScatterLayer(BaseLayer):
 
 class HistogramLayer(BaseLayer):
 
-    def __init__(self, data, **kwargs):
+    def __init__(self, data, cmap='hot', alpha=220, colorscale='sqrt',
+                 binsize=16, show_tooltip=False, scalemin=0, scalemax=None, f_group=None):
+        """Create a 2D histogram
+
+        :param data: data access object
+        :param cmap: colormap name
+        :param alpha: color alpha
+        :param colorscale: scaling [lin, log, sqrt]
+        :param binsize: size of the hist bins
+        :param show_tooltip: if True, will show the value of bins on mouseover
+        :param scalemin: min value for displaying a bin
+        :param scalemax: max value for a bin
+        :param f_group: function to apply to samples in the same bin. Default is to count
+        :return:
+        """
         self.data = data
-        self.cmap = colors.ColorMap(kwargs.get('cmap'), alpha=kwargs.get('alpha'))
-        self.binsize = kwargs.get('binsize')
-        self.show_tooltip = kwargs.get('show_tooltip')
-        self.scalemin = kwargs.get('scalemin', 0)
-        self.scalemax = kwargs.get('scalemax', None)
-        self.colorscale = kwargs.get('colorscale')
-        self.f_group = kwargs.get('f_group', None)
-        self.binscaling = kwargs.get('binscaling', None)
+        self.cmap = colors.ColorMap(cmap, alpha=alpha)
+        self.binsize = binsize
+        self.show_tooltip = show_tooltip
+        self.scalemin = scalemin
+        self.scalemax = scalemax
+        self.colorscale = colorscale
+        self.f_group = f_group
         if self.f_group is None:
             self.f_group = lambda grp: len(grp)
 
@@ -179,16 +226,27 @@ class HistogramLayer(BaseLayer):
 
 class GraphLayer(BaseLayer):
 
-    def __init__(self, data, src_lat, src_lon, dest_lat, dest_lon, **kwargs):
+    def __init__(self, data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, color='hot'):
+        """Create a graph drawing a line between each pair of (src_lat, src_lon) and (dest_lat, dest_lon)
+
+        :param data: data access object
+        :param src_lat: field name of source latitude
+        :param src_lon: field name of source longitude
+        :param dest_lat: field name of destination latitude
+        :param dest_lon: field name of destination longitude
+        :param linewidth: line width
+        :param alpha: color alpha
+        :param color: color or colormap
+        """
         self.data = data
         self.src_lon = src_lon
         self.src_lat = src_lat
         self.dest_lon = dest_lon
         self.dest_lat = dest_lat
 
-        self.linewidth = kwargs.get('linewidth', 3.0)
-        alpha = kwargs.get('alpha', 128)
-        self.color = kwargs.get('color', [255,0,0, alpha])
+        self.linewidth = linewidth
+        alpha = alpha
+        self.color = color
         if type(self.color) == str:
             self.cmap = colors.ColorMap(self.color, alpha)
 
@@ -221,6 +279,15 @@ class GraphLayer(BaseLayer):
 class PolyLayer(BaseLayer):
 
     def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
+        """
+        Loads and draws shapefiles
+
+        :param fname: full path to the shapefile
+        :param f_tooltip: function to generate a tooltip on mouseover
+        :param color: color
+        :param linewidth: line width
+        :param shape_type: either full or bbox
+        """
         if color is None:
             color = [255, 0, 0]
         self.color = color
@@ -304,6 +371,15 @@ class ShapeLoadingThread(Thread):
 class DelaunayLayer(BaseLayer):
 
     def __init__(self, data, line_color=None, line_width=2, cmap=None, max_lenght=100):
+        """
+        Draw a delaunay triangulation of the points
+
+        :param data: data access object
+        :param line_color: line color
+        :param line_width: line width
+        :param cmap: color map
+        :param max_lenght: scaling constant for coloring the edges
+        """
         self.data = data
 
         if cmap is None and line_color is None:
@@ -381,6 +457,18 @@ class DelaunayLayer(BaseLayer):
 class VoronoiLayer(BaseLayer):
 
     def __init__(self, data, line_color=None, line_width=2, f_tooltip=None, cmap=None, max_area=1e4, alpha=220):
+        """
+        Draw the voronoi tesselation of the points from data
+
+        :param data: data access object
+        :param line_color: line color
+        :param line_width: line width
+        :param f_tooltip: function to generate a tooltip on mouseover
+        :param cmap: color map
+        :param max_area: scaling constant to determine the color of the voronoi areas
+        :param alpha: color alpha
+        :return:
+        """
         self.data = data
 
         if cmap is None and line_color is None:
@@ -485,16 +573,11 @@ class VoronoiLayer(BaseLayer):
         return new_regions, np.asarray(new_vertices)
 
 
-    # source: https://stackoverflow.com/questions/451426/how-do-i-calculate-the-surface-area-of-a-2d-polygon
+    # Area of a polygon: http://www.mathopenref.com/coordpolygonarea.html
     @staticmethod
     def _get_area(p):
         return 0.5 * abs(sum(x0*y1 - x1*y0
-                             for ((x0, y0), (x1, y1)) in VoronoiLayer._segments(p)))
-
-    # source: https://stackoverflow.com/questions/451426/how-do-i-calculate-the-surface-area-of-a-2d-polygon
-    @staticmethod
-    def _segments(p):
-        return zip(p, p[1:] + [p[0]])
+                             for ((x0, y0), (x1, y1)) in zip(p, p[1:] + [p[0]])))
 
 
     def invalidate(self, proj):
@@ -544,10 +627,18 @@ class VoronoiLayer(BaseLayer):
 
 class MarkersLayer(BaseLayer):
 
-    def __init__(self, data, marker, **kwargs):
+    def __init__(self, data, marker, f_tooltip=None, marker_preferred_size=32):
+        """
+        Draw markers
+
+        :param data: data access object
+        :param marker: full filename of the marker image
+        :param f_tooltip: function to generate a tooltip on mouseover
+        :param marker_preferred_size: size in pixel for the marker images
+        """
         self.data = data
-        self.f_tooltip = kwargs.get('f_tooltip')
-        self.marker_preferred_size = kwargs.get('marker_preferred_size', 32.)
+        self.f_tooltip = f_tooltip
+        self.marker_preferred_size = marker_preferred_size
         self.marker = pyglet.image.load(marker)
         self.marker.anchor_x = self.marker.width / 2
         self.marker.anchor_y = self.marker.height / 2
@@ -588,6 +679,21 @@ class KDELayer(BaseLayer):
 
     def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
                  cut_below=None, clip_above=None, binsize=1, cmap_step=0.1):
+        """
+        Kernel density estimation visualization
+
+        :param data: data access object
+        :param bw: kernel bandwidth (in screen coordinates)
+        :param cmap: colormap
+        :param method: if kde use KDEMultivariate from statsmodel, which provides a more accurate but much slower estimation.
+            If hist, estimates density applying gaussian smoothing on a 2D histogram, which is much faster but less accurate
+        :param scaling: colorscale, lin log or sqrt
+        :param alpha: color alpha
+        :param cut_below: densities below cut_below are not drawn
+        :param clip_above: defines the max value for the colorscale
+        :param binsize: size of the bins for hist estimator
+        :param cmap_step: discretize colors from the 0-1 range into 1/cmap_steps levels
+        """
         self.values = values
         self.bw = bw
         self.cmap = colors.ColorMap(cmap, alpha=alpha, step=cmap_step)
@@ -694,6 +800,13 @@ class KDELayer(BaseLayer):
 class ConvexHullLayer(BaseLayer):
 
     def __init__(self, data, col, fill=True, point_size=4):
+        """
+        Convex hull for a set of points
+        :param data: points
+        :param col: color
+        :param fill: whether to fill the convexhull polygon or not
+        :param point_size: size of the points on the convexhull. Points are not rendered if None
+        """
         self.data = data
         self.col = col
         self.fill = fill

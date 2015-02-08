@@ -1,3 +1,6 @@
+"""
+Example of spatial graph
+"""
 import geoplotlib
 from geoplotlib.utils import read_csv
 
@@ -9,5 +12,6 @@ geoplotlib.graph(data,
                  dest_lat='lat. arrival (decimal)',
                  dest_lon='long. arrival (decimal)',
                  color='hot_r',
-                 alpha=16)
+                 alpha=16,
+                 linewidth=2)
 geoplotlib.show()

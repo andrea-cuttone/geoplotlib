@@ -1,3 +1,6 @@
+"""
+Example of a custom layer rendering a quadtree
+"""
 import geoplotlib
 from geoplotlib.layers import BaseLayer
 from geoplotlib.core import BatchPainter

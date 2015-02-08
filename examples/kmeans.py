@@ -1,3 +1,6 @@
+"""
+Example of keyboard interaction
+"""
 from geoplotlib.colors import create_set_cmap
 import pyglet
 from sklearn.cluster import KMeans

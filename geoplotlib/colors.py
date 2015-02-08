@@ -8,7 +8,13 @@ def _convert_color_format(col, alpha):
 
 class ColorMap():
 
-    def __init__(self, cmap_name, alpha=255, step=0.2):
+    def __init__(self, cmap_name, alpha=255, step=0.1):
+        """
+        Converts continuous values into colors using matplotlib colorscales
+        :param cmap_name: colormap name
+        :param alpha: color alpha
+        :param step: discretize the colorscale into 1/step steps
+        """
         from pylab import get_cmap
         self.cmap = get_cmap(cmap_name)
         self.alpha = alpha
@@ -17,6 +23,13 @@ class ColorMap():
 
 
     def to_color(self, value, maxvalue, scale):
+        """
+        convert continuous values into colors using matplotlib colorscales
+        :param value: value to be converted
+        :param maxvalue: max value in the colorscale
+        :param scale: lin, log, sqrt
+        :return: the color corresponding to the value
+        """
         if value < 0 or maxvalue < 0:
             raise Exception('no negative values allowed')
 
@@ -50,8 +63,14 @@ class ColorMap():
         return self.mapping[value]
 
 
-# TODO: this should be a class
 def create_set_cmap(values, cmap_name, alpha=255):
+    """
+    return a dict of colors corresponding to the unique values
+    :param values: values to be mapped
+    :param cmap_name: colormap name
+    :param alpha: color alpha
+    :return: dict of colors corresponding to the unique values
+    """
     unique_values = list(set(values))
     shuffle(unique_values)
     from pylab import get_cmap
@@ -62,8 +81,17 @@ def create_set_cmap(values, cmap_name, alpha=255):
     return d
 
 
-# TODO: this should be a class or reuse matplotlib colormaps
 def colorbrewer(values, alpha=255):
+    """
+    Return a dict of colors for the unique values.
+    Colors are adapted from Harrower, Mark, and Cynthia A. Brewer.
+    "ColorBrewer. org: an online tool for selecting colour schemes for maps."
+    The Cartographic Journal 40.1 (2003): 27-37.
+
+    :param values: values
+    :param alpha: color alphs
+    :return: dict of colors for the unique values.
+    """
     basecolors = [
         [31, 120, 180],
         [178, 223, 138],

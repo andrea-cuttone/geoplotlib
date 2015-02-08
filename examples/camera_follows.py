@@ -1,3 +1,6 @@
+"""
+Example of animation and dynamic camera adjustment
+"""
 from geoplotlib.layers import BaseLayer
 from geoplotlib.core import BatchPainter
 import geoplotlib

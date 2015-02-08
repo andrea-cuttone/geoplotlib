@@ -1,3 +1,6 @@
+"""
+Example of scatterplot
+"""
 import geoplotlib
 from geoplotlib.utils import read_csv
 

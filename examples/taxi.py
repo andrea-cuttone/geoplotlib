@@ -1,3 +1,6 @@
+"""
+Example of animation
+"""
 from geoplotlib.layers import BaseLayer
 from geoplotlib.core import BatchPainter
 import geoplotlib

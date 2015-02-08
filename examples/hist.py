@@ -1,3 +1,6 @@
+"""
+Example of 2D histogram
+"""
 import geoplotlib
 from geoplotlib.utils import read_csv, BoundingBox
 

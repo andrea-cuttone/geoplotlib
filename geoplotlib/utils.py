@@ -8,6 +8,14 @@ import numpy as np
 
 
 def haversine(lon1, lat1, lon2, lat2):
+    """
+    Distance between geodesic coordinates http://www.movable-type.co.uk/scripts/latlong.html
+    :param lon1: point 1 latitude
+    :param lat1: point 1 longitude
+    :param lon2: point 1 latitude
+    :param lat2: point 2 longitude
+    :return: distance in meters between points 1 and 2
+    """
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
     dlon = lon2 - lon1
     dlat = lat2 - lat1
@@ -18,6 +26,9 @@ def haversine(lon1, lat1, lon2, lat2):
 
 
 class DataAccessObject():
+    """
+    This class wraps data into a dict-like object
+    """
 
     def __init__(self, dict):
         self.dict = dict
@@ -25,6 +36,11 @@ class DataAccessObject():
 
     @staticmethod
     def from_dataframe(df):
+        """
+        Loads data from a pandas DataFrame
+        :param df: dataframe
+        :return: a DataAccessObject
+        """
         return DataAccessObject({col: df[col].values for col in df.columns})
 
 
@@ -42,12 +58,21 @@ class DataAccessObject():
 
 
     def rename(self, mapping):
+        """
+        Rename fields
+        :param mapping: a dict in the format {'oldkey1': 'newkey1', ...}
+        """
         for old_key, new_key in mapping:
             self.dict[new_key] = self.dict[old_key]
             del self.dict[old_key]
 
 
     def where(self, mask):
+        """
+        Return a DataAccessObject with a subset of rows matching mask
+        :param mask:
+        :return:
+        """
         assert len(mask) == len(self)
         return DataAccessObject({k: self.dict[k][mask] for k in self.dict})
 
@@ -63,14 +88,25 @@ class DataAccessObject():
 
 
     def head(self, n):
+        """
+        Return a DataAccessObject containing the first n rows
+        :param n: number of rows
+        :return: DataAccessObject
+        """
         return DataAccessObject({k: self.dict[k][:n] for k in self.dict})
 
 
     def keys(self):
+        """
+        :return: the keys (field names)
+        """
         return self.dict.keys()
 
 
     def values(self):
+        """
+        :return: the values (field values)
+        """
         return self.dict.values()
 
 
@@ -86,7 +122,13 @@ class DataAccessObject():
         return len(self.dict.values()[0])
 
 
+
 def read_csv(fname):
+    """
+    Read a csv file into a DataAccessObject
+    :param fname:
+    :return:
+    """
     values = defaultdict(list)
     with open(fname) as f:
         reader = csv.DictReader(f)
@@ -107,6 +149,12 @@ def read_csv(fname):
 
 
 def epoch_to_str(epoch, fmt='%Y-%m-%d %H:%M:%S'):
+    """
+    Convert a unix timestamp into date string
+    :param epoch: unix timestamp
+    :param fmt: date format
+    :return: formatted date from timestamp
+    """
     return datetime.fromtimestamp(epoch).strftime(fmt)
 
 
@@ -124,6 +172,14 @@ def parse_raw_str(v):
 class BoundingBox():
 
     def __init__(self, north, west, south, east):
+        """
+        Represent a map boundingbox
+        :param north: northmost latitude
+        :param west: westmost longitude
+        :param south: southmost latitude
+        :param east: eastmost longitude
+        :return:
+        """
         self.north = north
         self.west = west
         self.south = south
@@ -132,6 +188,12 @@ class BoundingBox():
 
     @staticmethod
     def from_points(lons, lats):
+        """
+        Compute the BoundingBox from a set of latitudes and longitudes
+        :param lons: longitudes
+        :param lats: latitudes
+        :return: BoundingBox
+        """
         north, west = max(lats), min(lons)
         south, east = min(lats), max(lons)
         return BoundingBox(north=north, west=west, south=south, east=east)
@@ -139,6 +201,11 @@ class BoundingBox():
 
     @staticmethod
     def from_bboxes(bboxes):
+        """
+        Compute a BoundingBox enclosing all specified bboxes
+        :param bboxes: a list of BoundingBoxes
+        :return: BoundingBox
+        """
         north = max([b.north for b in bboxes])
         south = min([b.south for b in bboxes])
         west = min([b.west for b in bboxes])

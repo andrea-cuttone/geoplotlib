@@ -1,3 +1,6 @@
+"""
+Example of voronoi layer with filled area
+"""
 import geoplotlib
 from geoplotlib.utils import read_csv, BoundingBox
 

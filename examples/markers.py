@@ -1,3 +1,6 @@
+"""
+Example of rendering markers
+"""
 import geoplotlib
 from geoplotlib.utils import read_csv
 

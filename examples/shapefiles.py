@@ -1,3 +1,6 @@
+"""
+Example of rendering shapefiles
+"""
 from geoplotlib.utils import BoundingBox
 import geoplotlib
 
