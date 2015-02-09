@@ -8,17 +8,17 @@ def _convert_color_format(col, alpha):
 
 class ColorMap():
 
-    def __init__(self, cmap_name, alpha=255, step=0.1):
+    def __init__(self, cmap_name, alpha=255, levels=10):
         """
         Converts continuous values into colors using matplotlib colorscales
         :param cmap_name: colormap name
         :param alpha: color alpha
-        :param step: discretize the colorscale into 1/step steps
+        :param levels: discretize the colorscale into levels
         """
         from pylab import get_cmap
         self.cmap = get_cmap(cmap_name)
         self.alpha = alpha
-        self.step = step
+        self.levels = levels
         self.mapping = {}
 
 
@@ -57,7 +57,8 @@ class ColorMap():
             raise Exception('scale must be lin, log, sqrt or fifthroot')
 
         value = min(value,1)
-        value = round(value / self.step) * self.step
+        delta = 1. / self.levels
+        value = round(value / delta) * delta
         if value not in self.mapping:
             self.mapping[value] = _convert_color_format(self.cmap(value), self.alpha)
         return self.mapping[value]

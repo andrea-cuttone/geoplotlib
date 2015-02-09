@@ -703,6 +703,7 @@ class TileDownloaderThread(Thread):
     def run(self):
         while True:
             url, download_path = self.queue.get()
+            assert download_path.endswith('.png')
             try:
                 # print "downloading %s as %s" % (url, download_path)
                 source = urllib2.urlopen(url)
@@ -792,7 +793,8 @@ class MapLayer():
                 tile_image.blit(2*SCREEN_W, 2*SCREEN_H, 0) # blit offscreen to check if valid
                 self.tiles_cache[(zoom, xtile, ytile)] = tile_image
                 return tile_image
-            except Exception as e:
+            except Exception:
+                assert download_path.endswith('.png')
                 os.unlink(download_path)
                 return None
 

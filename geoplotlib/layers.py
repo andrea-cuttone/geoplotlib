@@ -475,7 +475,7 @@ class VoronoiLayer(BaseLayer):
             raise Exception('need either cmap or line_color')
 
         if cmap is not None:
-            cmap = colors.ColorMap(cmap, alpha=alpha, step=0.05)
+            cmap = colors.ColorMap(cmap, alpha=alpha, levels=10)
 
         self.cmap = cmap
         self.line_color = line_color
@@ -678,7 +678,7 @@ class MarkersLayer(BaseLayer):
 class KDELayer(BaseLayer):
 
     def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
-                 cut_below=None, clip_above=None, binsize=1, cmap_step=0.1):
+                 cut_below=None, clip_above=None, binsize=1, cmap_levels=10):
         """
         Kernel density estimation visualization
 
@@ -692,11 +692,11 @@ class KDELayer(BaseLayer):
         :param cut_below: densities below cut_below are not drawn
         :param clip_above: defines the max value for the colorscale
         :param binsize: size of the bins for hist estimator
-        :param cmap_step: discretize colors from the 0-1 range into 1/cmap_steps levels
+        :param cmap_levels: discretize colors into cmap_levels
         """
         self.values = values
         self.bw = bw
-        self.cmap = colors.ColorMap(cmap, alpha=alpha, step=cmap_step)
+        self.cmap = colors.ColorMap(cmap, alpha=alpha, levels=cmap_levels)
         self.method = method
         self.scaling = scaling
         self.cut_below = cut_below

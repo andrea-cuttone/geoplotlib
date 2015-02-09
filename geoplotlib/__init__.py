@@ -149,7 +149,7 @@ def convexhull(data, col, fill=True, point_size=4):
 
 
 def kde(data, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
-                 cut_below=None, clip_above=None, binsize=1, cmap_step=0.1):
+                 cut_below=None, clip_above=None, binsize=1, cmap_levels=10):
     """
     Kernel density estimation visualization
 
@@ -163,11 +163,11 @@ def kde(data, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
     :param cut_below: densities below cut_below are not drawn
     :param clip_above: defines the max value for the colorscale
     :param binsize: size of the bins for hist estimator
-    :param cmap_step: discretize colors from the 0-1 range into 1/cmap_steps levels
+    :param cmap_levels: discretize colors into cmap_levels levels
     """
     from geoplotlib.layers import KDELayer
     _global_config.layers.append(KDELayer(data, bw, cmap, method, scaling, alpha,
-                 cut_below, clip_above, binsize, cmap_step))
+                 cut_below, clip_above, binsize, cmap_levels))
 
 
 def markers(data, marker, f_tooltip=None, marker_preferred_size=32):
