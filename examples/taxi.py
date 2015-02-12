@@ -29,6 +29,9 @@ class TrailsLayer(BaseLayer):
 
         self.t += 2*60
 
+        if self.t > self.data['timestamp'].max():
+            self.t = self.data['timestamp'].min()
+
         self.painter.batch_draw()
         ui_manager.info(epoch_to_str(self.t))
 
