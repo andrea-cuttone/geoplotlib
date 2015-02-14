@@ -410,7 +410,7 @@ class DelaunayLayer(BaseLayer):
 
         self.painter = BatchPainter()
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        points = np.unique(zip(x,y))
+        points = list(set(zip(x,y)))
         dela = Delaunay(points)
 
         edges = set()
@@ -588,7 +588,7 @@ class VoronoiLayer(BaseLayer):
             raise
 
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        points = np.unique(zip(x,y))
+        points = list(set(zip(x,y)))
         vor = Voronoi(points)
 
         regions, vertices = VoronoiLayer.__voronoi_finite_polygons_2d(vor)
