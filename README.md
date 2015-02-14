@@ -1,5 +1,4 @@
 geoplotlib is a python toolbox for visualizing geographical data. 
-geoplotlib focuses on a simple API and supports hardware-accelerated graphics.
 
 # Installation
 
@@ -11,7 +10,10 @@ geoplotlib requires:
 optional requirements:
 * [matplotlib](http://matplotlib.org/) for colormaps
 * [scipy](http://www.scipy.org) for some layers
-* [shapefile]() for reading .shp files
+* [pyshp](https://github.com/GeospatialPython/pyshp) for reading .shp files
+
+to install, run:
+```python setup.py install```
 
 # A first example
 
