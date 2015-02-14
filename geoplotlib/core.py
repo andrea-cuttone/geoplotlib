@@ -154,6 +154,7 @@ class GeoplotlibApp(pyglet.window.Window):
 
         if self.show_map:
             self.map_layer.draw(self.proj)
+
             if self.geoplotlib_config.map_alpha < 255:
                 painter = BatchPainter()
                 painter.set_color([0,0,0, 255 - self.geoplotlib_config.map_alpha])
@@ -791,9 +792,10 @@ class MapLayer():
             try:
                 tile_image = pyglet.image.load(download_path)
                 tile_image.blit(2*SCREEN_W, 2*SCREEN_H, 0) # blit offscreen to check if valid
-                self.tiles_cache[(zoom, xtile, ytile)] = tile_image
-                return tile_image
-            except Exception:
+                self.tiles_cache[(zoom, xtile, ytile)] = pyglet.sprite.Sprite(tile_image)
+                return self.tiles_cache[(zoom, xtile, ytile)]
+            except Exception as exc:
+                print exc
                 assert download_path.endswith('.png')
                 os.unlink(download_path)
                 return None
@@ -804,9 +806,9 @@ class MapLayer():
             for y in range(int(proj.ytile), int(proj.ytile) + proj.tiles_vertically + 1):
                 tilesurf = self.get_tile(proj.zoom, x, y)
                 if tilesurf is not None:
-                    x_screen = int((x - proj.xtile)*TILE_SIZE)
-                    y_screen = int(SCREEN_H - (y - proj.ytile + 1)*TILE_SIZE)
                     try:
-                        tilesurf.blit(x_screen, y_screen, 0)
+                        tilesurf.x = int((x - proj.xtile)*TILE_SIZE)
+                        tilesurf.y = int(SCREEN_H - (y - proj.ytile + 1)*TILE_SIZE)
+                        tilesurf.draw()
                     except Exception as e:
                         print 'exception blitting', x, y, proj.zoom, e
