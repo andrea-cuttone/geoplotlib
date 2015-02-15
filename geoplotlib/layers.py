@@ -276,7 +276,7 @@ class GraphLayer(BaseLayer):
                                        lats=np.hstack([self.data[self.src_lat], self.data[self.dest_lat]]))
 
 
-class PolyLayer(BaseLayer):
+class ShapefileLayer(BaseLayer):
 
     def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
         """
@@ -295,7 +295,11 @@ class PolyLayer(BaseLayer):
         self.f_tooltip = f_tooltip
         self.shape_type = shape_type
 
-        import shapefile
+        try:
+            import shapefile
+        except:
+            raise Exception('ShapefileLayer requires pyshp')
+
         self.reader = shapefile.Reader(fname)
         self.worker = None
         self.queue = Queue.Queue()

@@ -104,8 +104,8 @@ def shapefiles(fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'
     :param linewidth: line width
     :param shape_type: either full or bbox
     """
-    from geoplotlib.layers import PolyLayer
-    _global_config.layers.append(PolyLayer(fname, f_tooltip, color, linewidth, shape_type))
+    from geoplotlib.layers import ShapefileLayer
+    _global_config.layers.append(ShapefileLayer(fname, f_tooltip, color, linewidth, shape_type))
 
 
 def voronoi(data, line_color=None, line_width=2, f_tooltip=None, cmap=None, max_area=1e4, alpha=220):
