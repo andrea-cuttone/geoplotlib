@@ -1,4 +1,5 @@
 import traceback
+import pyglet
 from geoplotlib.core import GeoplotlibApp
 
 
@@ -15,8 +16,9 @@ class AppConfig:
         self.tiles_provider = 'mapquest'
         self.smoothing = False
         self.map_alpha = 196
-        self.screen_w = 1280
-        self.screen_h = 800
+        screen =  pyglet.canvas.get_display().get_default_screen()
+        self.screen_w = int(screen.width * .9)
+        self.screen_h = int(screen.height * .9)
 
 
 _global_config = AppConfig()
