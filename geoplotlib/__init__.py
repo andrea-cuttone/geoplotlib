@@ -74,8 +74,9 @@ def hist(data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, show_toolti
     :return:
     """
     from geoplotlib.layers import HistogramLayer
-    _global_config.layers.append(HistogramLayer(data, cmap='hot', alpha=220, colorscale='sqrt',
-                                    binsize=16, show_tooltip=False, scalemin=0, scalemax=None, f_group=None))
+    _global_config.layers.append(HistogramLayer(data, cmap=cmap, alpha=alpha, colorscale=colorscale,
+                                    binsize=binsize, show_tooltip=show_tooltip, scalemin=scalemin, 
+                                    scalemax=scalemax, f_group=f_group))
 
 
 def graph(data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, color='hot'):
