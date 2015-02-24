@@ -16,9 +16,29 @@ to install, run:
 ```python setup.py install```
 
 # A first example
+To produce a scatterplot:
+
+```python
+data = read_csv('data/bus.csv')
+geoplotlib.scatter(data)
+geoplotlib.show()
+```
+
+![scatter](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/scatter.png)
 
 
 # Examples gallery
 
+_Heatmap (Kernel Density estimation)_
+![kde](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/kde1.png)
 
-# Tutorial
+_Shapefiles_
+![shapefiles](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/shapefiles.png)
+
+_Voronoi tessellation_
+![voronoi](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/voronoi-filled.png)
+
+_Spatial graph_
+![graph](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/graph-flights.png)
+
+All examples including source code are [here](https://github.com/andrea-cuttone/geoplotlib/tree/master/examples)
