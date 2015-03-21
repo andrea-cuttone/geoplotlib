@@ -10,6 +10,7 @@ import numpy as np
 def haversine(lon1, lat1, lon2, lat2):
     """
     Distance between geodesic coordinates http://www.movable-type.co.uk/scripts/latlong.html
+
     :param lon1: point 1 latitude
     :param lat1: point 1 longitude
     :param lon2: point 1 latitude
@@ -38,6 +39,7 @@ class DataAccessObject():
     def from_dataframe(df):
         """
         Loads data from a pandas DataFrame
+
         :param df: dataframe
         :return: a DataAccessObject
         """
@@ -60,6 +62,7 @@ class DataAccessObject():
     def rename(self, mapping):
         """
         Rename fields
+
         :param mapping: a dict in the format {'oldkey1': 'newkey1', ...}
         """
         for old_key, new_key in mapping:
@@ -69,9 +72,8 @@ class DataAccessObject():
 
     def where(self, mask):
         """
-        Return a DataAccessObject with a subset of rows matching mask
-        :param mask:
-        :return:
+        :param mask: boolean mask
+        :return: a DataAccessObject with a subset of rows matching mask
         """
         assert len(mask) == len(self)
         return DataAccessObject({k: self.dict[k][mask] for k in self.dict})
@@ -90,6 +92,7 @@ class DataAccessObject():
     def head(self, n):
         """
         Return a DataAccessObject containing the first n rows
+
         :param n: number of rows
         :return: DataAccessObject
         """
@@ -126,8 +129,8 @@ class DataAccessObject():
 def read_csv(fname):
     """
     Read a csv file into a DataAccessObject
-    :param fname:
-    :return:
+
+    :param fname: filename
     """
     values = defaultdict(list)
     with open(fname) as f:
@@ -151,6 +154,7 @@ def read_csv(fname):
 def epoch_to_str(epoch, fmt='%Y-%m-%d %H:%M:%S'):
     """
     Convert a unix timestamp into date string
+
     :param epoch: unix timestamp
     :param fmt: date format
     :return: formatted date from timestamp
@@ -174,6 +178,7 @@ class BoundingBox():
     def __init__(self, north, west, south, east):
         """
         Represent a map boundingbox
+
         :param north: northmost latitude
         :param west: westmost longitude
         :param south: southmost latitude
@@ -190,6 +195,7 @@ class BoundingBox():
     def from_points(lons, lats):
         """
         Compute the BoundingBox from a set of latitudes and longitudes
+
         :param lons: longitudes
         :param lats: latitudes
         :return: BoundingBox
@@ -203,6 +209,7 @@ class BoundingBox():
     def from_bboxes(bboxes):
         """
         Compute a BoundingBox enclosing all specified bboxes
+
         :param bboxes: a list of BoundingBoxes
         :return: BoundingBox
         """

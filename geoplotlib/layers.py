@@ -75,6 +75,7 @@ class BaseLayer():
         """
         This method is called each time layers need to be redrawn, i.e. on zoom.
         Typically in this method a BatchPainter is instantiated and all the rendering is performed
+
         :param proj: the current Projector object
         """
         pass
@@ -83,6 +84,7 @@ class BaseLayer():
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
         """
         This method is called at every frame, and typically executes BatchPainter.batch_draw()
+
         :param proj: the current Projector object
         :param mouse_x: mouse x
         :param mouse_y: mouse y
@@ -102,6 +104,7 @@ class BaseLayer():
     def on_key_release(self, key, modifiers):
         """
         Override this method for custom handling of keystrokes
+
         :param key: the key that has been released
         :param modifiers: the key modifiers
         :return: True if the layer needs to call invalidate
@@ -806,6 +809,7 @@ class ConvexHullLayer(BaseLayer):
     def __init__(self, data, col, fill=True, point_size=4):
         """
         Convex hull for a set of points
+        
         :param data: points
         :param col: color
         :param fill: whether to fill the convexhull polygon or not

@@ -142,6 +142,7 @@ def delaunay(data, line_color=None, line_width=2, cmap=None, max_lenght=100):
 def convexhull(data, col, fill=True, point_size=4):
     """
     Convex hull for a set of points
+
     :param data: points
     :param col: color
     :param fill: whether to fill the convexhull polygon or not
@@ -211,7 +212,8 @@ def tiles_provider(tiles_provider):
 def add_layer(layer):
     """
     Add a layer
-    :param layer:
+
+    :param layer: a BaseLayer object
     """
     _global_config.layers.append(layer)
 
@@ -219,6 +221,7 @@ def add_layer(layer):
 def set_bbox(bbox):
     """
     Set the map bounding box
+
     :param bbox: a BoundingBox object
     """
     _global_config.bbox = bbox
@@ -227,6 +230,7 @@ def set_bbox(bbox):
 def set_smoothing(smoothing):
     """
     Enables OpenGL lines smoothing (antialiasing)
+
     :param smoothing: smoothing enabled or disabled
     """
     _global_config.smoothing = smoothing
@@ -234,7 +238,8 @@ def set_smoothing(smoothing):
 
 def set_map_alpha(alpha):
     """
-    Alpha color of the map tiles.
+    Alpha color of the map tiles
+
     :param alpha: int between 0 and 255. 0 is completely dark, 255 is full brightness
     """
     if alpha < 0 or alpha > 255:
@@ -245,6 +250,7 @@ def set_map_alpha(alpha):
 def set_window_size(w, h):
     """
     Set the geoplotlib window size
+    
     :param w: window width
     :param h: window height
     :return:
