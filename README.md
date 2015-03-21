@@ -42,3 +42,6 @@ _Spatial graph_
 ![graph](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/graph-flights.png)
 
 All examples including source code are [here](https://github.com/andrea-cuttone/geoplotlib/tree/master/examples)
+
+# User Guide
+A detailed user guide can be found in the [wiki](https://github.com/andrea-cuttone/geoplotlib/wiki/User-Guide)
