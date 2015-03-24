@@ -1,4 +1,4 @@
-geoplotlib is a python toolbox for visualizing geographical data. 
+geoplotlib is a python toolbox for visualizing geographical data and making maps
 
 # A first example
 To produce a scatterplot:
