@@ -1,0 +1,774 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API reference &mdash; geoplotlib 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="geoplotlib 0.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="geoplotlib" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> geoplotlib</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-geoplotlib">geoplotlib module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-geoplotlib.layers">geoplotlib.layers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-geoplotlib.utils">geoplotlib.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-geoplotlib.core">geoplotlib.core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-geoplotlib.colors">geoplotlib.colors module</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">geoplotlib</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>API reference</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/api.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-geoplotlib">
+<span id="geoplotlib-module"></span><h2>geoplotlib module<a class="headerlink" href="#module-geoplotlib" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="geoplotlib.add_layer">
+<code class="descclassname">geoplotlib.</code><code class="descname">add_layer</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.add_layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a layer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>layer</strong> &#8211; a BaseLayer object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.clear">
+<code class="descclassname">geoplotlib.</code><code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all existing layers</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.convexhull">
+<code class="descclassname">geoplotlib.</code><code class="descname">convexhull</code><span class="sig-paren">(</span><em>data</em>, <em>col</em>, <em>fill=True</em>, <em>point_size=4</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.convexhull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convex hull for a set of points</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; points</li>
+<li><strong>col</strong> &#8211; color</li>
+<li><strong>fill</strong> &#8211; whether to fill the convexhull polygon or not</li>
+<li><strong>point_size</strong> &#8211; size of the points on the convexhull. Points are not rendered if None</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.delaunay">
+<code class="descclassname">geoplotlib.</code><code class="descname">delaunay</code><span class="sig-paren">(</span><em>data</em>, <em>line_color=None</em>, <em>line_width=2</em>, <em>cmap=None</em>, <em>max_lenght=100</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.delaunay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a delaunay triangulation of the points</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>line_color</strong> &#8211; line color</li>
+<li><strong>line_width</strong> &#8211; line width</li>
+<li><strong>cmap</strong> &#8211; color map</li>
+<li><strong>max_lenght</strong> &#8211; scaling constant for coloring the edges</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.graph">
+<code class="descclassname">geoplotlib.</code><code class="descname">graph</code><span class="sig-paren">(</span><em>data</em>, <em>src_lat</em>, <em>src_lon</em>, <em>dest_lat</em>, <em>dest_lon</em>, <em>linewidth=1</em>, <em>alpha=220</em>, <em>color='hot'</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a graph drawing a line between each pair of (src_lat, src_lon) and (dest_lat, dest_lon)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>src_lat</strong> &#8211; field name of source latitude</li>
+<li><strong>src_lon</strong> &#8211; field name of source longitude</li>
+<li><strong>dest_lat</strong> &#8211; field name of destination latitude</li>
+<li><strong>dest_lon</strong> &#8211; field name of destination longitude</li>
+<li><strong>linewidth</strong> &#8211; line width</li>
+<li><strong>alpha</strong> &#8211; color alpha</li>
+<li><strong>color</strong> &#8211; color or colormap</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.hist">
+<code class="descclassname">geoplotlib.</code><code class="descname">hist</code><span class="sig-paren">(</span><em>data</em>, <em>cmap='hot'</em>, <em>alpha=220</em>, <em>colorscale='sqrt'</em>, <em>binsize=16</em>, <em>show_tooltip=False</em>, <em>scalemin=0</em>, <em>scalemax=None</em>, <em>f_group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a 2D histogram</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>cmap</strong> &#8211; colormap name</li>
+<li><strong>alpha</strong> &#8211; color alpha</li>
+<li><strong>colorscale</strong> &#8211; scaling [lin, log, sqrt]</li>
+<li><strong>binsize</strong> &#8211; size of the hist bins</li>
+<li><strong>show_tooltip</strong> &#8211; if True, will show the value of bins on mouseover</li>
+<li><strong>scalemin</strong> &#8211; min value for displaying a bin</li>
+<li><strong>scalemax</strong> &#8211; max value for a bin</li>
+<li><strong>f_group</strong> &#8211; function to apply to samples in the same bin. Default is to count</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.kde">
+<code class="descclassname">geoplotlib.</code><code class="descname">kde</code><span class="sig-paren">(</span><em>data</em>, <em>bw</em>, <em>cmap='hot'</em>, <em>method='hist'</em>, <em>scaling='sqrt'</em>, <em>alpha=220</em>, <em>cut_below=None</em>, <em>clip_above=None</em>, <em>binsize=1</em>, <em>cmap_levels=10</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.kde" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel density estimation visualization</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>bw</strong> &#8211; kernel bandwidth (in screen coordinates)</li>
+<li><strong>cmap</strong> &#8211; colormap</li>
+<li><strong>method</strong> &#8211; if kde use KDEMultivariate from statsmodel, which provides a more accurate but much slower estimation.
+If hist, estimates density applying gaussian smoothing on a 2D histogram, which is much faster but less accurate</li>
+<li><strong>scaling</strong> &#8211; colorscale, lin log or sqrt</li>
+<li><strong>alpha</strong> &#8211; color alpha</li>
+<li><strong>cut_below</strong> &#8211; densities below cut_below are not drawn</li>
+<li><strong>clip_above</strong> &#8211; defines the max value for the colorscale</li>
+<li><strong>binsize</strong> &#8211; size of the bins for hist estimator</li>
+<li><strong>cmap_levels</strong> &#8211; discretize colors into cmap_levels levels</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.markers">
+<code class="descclassname">geoplotlib.</code><code class="descname">markers</code><span class="sig-paren">(</span><em>data</em>, <em>marker</em>, <em>f_tooltip=None</em>, <em>marker_preferred_size=32</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.markers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw markers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>marker</strong> &#8211; full filename of the marker image</li>
+<li><strong>f_tooltip</strong> &#8211; function to generate a tooltip on mouseover</li>
+<li><strong>marker_preferred_size</strong> &#8211; size in pixel for the marker images</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.savefig">
+<code class="descclassname">geoplotlib.</code><code class="descname">savefig</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.savefig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch geoplotlib, saves a screeshot and terminates</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.scatter">
+<code class="descclassname">geoplotlib.</code><code class="descname">scatter</code><span class="sig-paren">(</span><em>data</em>, <em>color=None</em>, <em>point_size=2</em>, <em>f_tooltip=None</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a scatterplot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>color</strong> &#8211; color</li>
+<li><strong>point_size</strong> &#8211; point size</li>
+<li><strong>f_tooltip</strong> &#8211; function to return a tooltip string for a point</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.set_bbox">
+<code class="descclassname">geoplotlib.</code><code class="descname">set_bbox</code><span class="sig-paren">(</span><em>bbox</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.set_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the map bounding box</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bbox</strong> &#8211; a BoundingBox object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.set_map_alpha">
+<code class="descclassname">geoplotlib.</code><code class="descname">set_map_alpha</code><span class="sig-paren">(</span><em>alpha</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.set_map_alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alpha color of the map tiles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alpha</strong> &#8211; int between 0 and 255. 0 is completely dark, 255 is full brightness</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.set_smoothing">
+<code class="descclassname">geoplotlib.</code><code class="descname">set_smoothing</code><span class="sig-paren">(</span><em>smoothing</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.set_smoothing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables OpenGL lines smoothing (antialiasing)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>smoothing</strong> &#8211; smoothing enabled or disabled</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.set_window_size">
+<code class="descclassname">geoplotlib.</code><code class="descname">set_window_size</code><span class="sig-paren">(</span><em>w</em>, <em>h</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.set_window_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the geoplotlib window size</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>w</strong> &#8211; window width</li>
+<li><strong>h</strong> &#8211; window height</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.shapefiles">
+<code class="descclassname">geoplotlib.</code><code class="descname">shapefiles</code><span class="sig-paren">(</span><em>fname</em>, <em>f_tooltip=None</em>, <em>color=None</em>, <em>linewidth=3</em>, <em>shape_type='full'</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.shapefiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and draws shapefiles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fname</strong> &#8211; full path to the shapefile</li>
+<li><strong>f_tooltip</strong> &#8211; function to generate a tooltip on mouseover</li>
+<li><strong>color</strong> &#8211; color</li>
+<li><strong>linewidth</strong> &#8211; line width</li>
+<li><strong>shape_type</strong> &#8211; either full or bbox</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.show">
+<code class="descclassname">geoplotlib.</code><code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch geoplotlib</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.tiles_provider">
+<code class="descclassname">geoplotlib.</code><code class="descname">tiles_provider</code><span class="sig-paren">(</span><em>tiles_provider</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.tiles_provider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the tile provider</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tiles_provider</strong> &#8211; either one of the built-in providers</td>
+</tr>
+</tbody>
+</table>
+<p>[&#8216;watercolor&#8217;, &#8216;toner&#8217;, &#8216;toner-lite&#8217;, &#8216;mapquest&#8217;, &#8216;darkmatter&#8217;,&#8217;positron&#8217;]
+or a custom provider in the form
+{&#8216;url&#8217;: lambda zoom, xtile, ytile: &#8216;someurl&#8217; % (zoom, xtile, ytile),
+&#8216;tiles_dir&#8217;: &#8216;mytiles&#8217;,
+&#8216;attribution&#8217;: &#8216;my attribution&#8217;
+})</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.voronoi">
+<code class="descclassname">geoplotlib.</code><code class="descname">voronoi</code><span class="sig-paren">(</span><em>data</em>, <em>line_color=None</em>, <em>line_width=2</em>, <em>f_tooltip=None</em>, <em>cmap=None</em>, <em>max_area=10000.0</em>, <em>alpha=220</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.voronoi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw the voronoi tesselation of the points</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; data access object</li>
+<li><strong>line_color</strong> &#8211; line color</li>
+<li><strong>line_width</strong> &#8211; line width</li>
+<li><strong>f_tooltip</strong> &#8211; function to generate a tooltip on mouseover</li>
+<li><strong>cmap</strong> &#8211; color map</li>
+<li><strong>max_area</strong> &#8211; scaling constant to determine the color of the voronoi areas</li>
+<li><strong>alpha</strong> &#8211; color alpha</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-geoplotlib.layers">
+<span id="geoplotlib-layers-module"></span><h2>geoplotlib.layers module<a class="headerlink" href="#module-geoplotlib.layers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="geoplotlib.layers.BaseLayer">
+<em class="property">class </em><code class="descclassname">geoplotlib.layers.</code><code class="descname">BaseLayer</code><a class="headerlink" href="#geoplotlib.layers.BaseLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for layers</p>
+<dl class="method">
+<dt id="geoplotlib.layers.BaseLayer.bbox">
+<code class="descname">bbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.layers.BaseLayer.bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the bounding box for this layer
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.layers.BaseLayer.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><em>proj</em>, <em>mouse_x</em>, <em>mouse_y</em>, <em>ui_manager</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.layers.BaseLayer.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called at every frame, and typically executes BatchPainter.batch_draw()</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>proj</strong> &#8211; the current Projector object</li>
+<li><strong>mouse_x</strong> &#8211; mouse x</li>
+<li><strong>mouse_y</strong> &#8211; mouse y</li>
+<li><strong>ui_manager</strong> &#8211; the current UiManager</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.layers.BaseLayer.invalidate">
+<code class="descname">invalidate</code><span class="sig-paren">(</span><em>proj</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.layers.BaseLayer.invalidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called each time layers need to be redrawn, i.e. on zoom.
+Typically in this method a BatchPainter is instantiated and all the rendering is performed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>proj</strong> &#8211; the current Projector object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.layers.BaseLayer.on_key_release">
+<code class="descname">on_key_release</code><span class="sig-paren">(</span><em>key</em>, <em>modifiers</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.layers.BaseLayer.on_key_release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this method for custom handling of keystrokes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> &#8211; the key that has been released</li>
+<li><strong>modifiers</strong> &#8211; the key modifiers</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True if the layer needs to call invalidate</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-geoplotlib.utils">
+<span id="geoplotlib-utils-module"></span><h2>geoplotlib.utils module<a class="headerlink" href="#module-geoplotlib.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="geoplotlib.utils.DataAccessObject">
+<em class="property">class </em><code class="descclassname">geoplotlib.utils.</code><code class="descname">DataAccessObject</code><span class="sig-paren">(</span><em>dict</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class wraps data into a dict-like object</p>
+<dl class="staticmethod">
+<dt id="geoplotlib.utils.DataAccessObject.from_dataframe">
+<em class="property">static </em><code class="descname">from_dataframe</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject.from_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data from a pandas DataFrame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> &#8211; dataframe</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a DataAccessObject</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.utils.DataAccessObject.head">
+<code class="descname">head</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject.head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a DataAccessObject containing the first n rows</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> &#8211; number of rows</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataAccessObject</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.utils.DataAccessObject.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject.keys" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the keys (field names)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.utils.DataAccessObject.rename">
+<code class="descname">rename</code><span class="sig-paren">(</span><em>mapping</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename fields</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mapping</strong> &#8211; a dict in the format {&#8216;oldkey1&#8217;: &#8216;newkey1&#8217;, ...}</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.utils.DataAccessObject.values">
+<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject.values" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the values (field values)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="geoplotlib.utils.DataAccessObject.where">
+<code class="descname">where</code><span class="sig-paren">(</span><em>mask</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject.where" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mask</strong> &#8211; boolean mask</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a DataAccessObject with a subset of rows matching mask</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.utils.epoch_to_str">
+<code class="descclassname">geoplotlib.utils.</code><code class="descname">epoch_to_str</code><span class="sig-paren">(</span><em>epoch</em>, <em>fmt='%Y-%m-%d %H:%M:%S'</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.epoch_to_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a unix timestamp into date string</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch</strong> &#8211; unix timestamp</li>
+<li><strong>fmt</strong> &#8211; date format</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">formatted date from timestamp</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.utils.haversine">
+<code class="descclassname">geoplotlib.utils.</code><code class="descname">haversine</code><span class="sig-paren">(</span><em>lon1</em>, <em>lat1</em>, <em>lon2</em>, <em>lat2</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.haversine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distance between geodesic coordinates <a class="reference external" href="http://www.movable-type.co.uk/scripts/latlong.html">http://www.movable-type.co.uk/scripts/latlong.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lon1</strong> &#8211; point 1 latitude</li>
+<li><strong>lat1</strong> &#8211; point 1 longitude</li>
+<li><strong>lon2</strong> &#8211; point 1 latitude</li>
+<li><strong>lat2</strong> &#8211; point 2 longitude</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">distance in meters between points 1 and 2</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.utils.read_csv">
+<code class="descclassname">geoplotlib.utils.</code><code class="descname">read_csv</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a csv file into a DataAccessObject</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> &#8211; filename</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-geoplotlib.core">
+<span id="geoplotlib-core-module"></span><h2>geoplotlib.core module<a class="headerlink" href="#module-geoplotlib.core" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="geoplotlib.core.BatchPainter">
+<em class="property">class </em><code class="descclassname">geoplotlib.core.</code><code class="descname">BatchPainter</code><a class="headerlink" href="#geoplotlib.core.BatchPainter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>This class batches OpenGL calls. The usage pattern is to instantiate a BatchPainter,</dt>
+<dd>perform all the drawing and finally render using batch_draw</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-geoplotlib.colors">
+<span id="geoplotlib-colors-module"></span><h2>geoplotlib.colors module<a class="headerlink" href="#module-geoplotlib.colors" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="geoplotlib.colors.colorbrewer">
+<code class="descclassname">geoplotlib.colors.</code><code class="descname">colorbrewer</code><span class="sig-paren">(</span><em>values</em>, <em>alpha=255</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.colors.colorbrewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dict of colors for the unique values.
+Colors are adapted from Harrower, Mark, and Cynthia A. Brewer.
+&#8220;ColorBrewer. org: an online tool for selecting colour schemes for maps.&#8221;
+The Cartographic Journal 40.1 (2003): 27-37.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> &#8211; values</li>
+<li><strong>alpha</strong> &#8211; color alphs</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict of colors for the unique values.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.colors.create_set_cmap">
+<code class="descclassname">geoplotlib.colors.</code><code class="descname">create_set_cmap</code><span class="sig-paren">(</span><em>values</em>, <em>cmap_name</em>, <em>alpha=255</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.colors.create_set_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a dict of colors corresponding to the unique values
+:param values: values to be mapped
+:param cmap_name: colormap name
+:param alpha: color alpha
+:return: dict of colors corresponding to the unique values</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="geoplotlib"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Andrea Cuttone.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
