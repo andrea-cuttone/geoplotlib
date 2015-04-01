@@ -1,15 +1,15 @@
 geoplotlib is a python toolbox for visualizing geographical data and making maps
 
 # A first example
-To produce a scatterplot:
+To produce a dot density map:
 
 ```python
 data = read_csv('data/bus.csv')
-geoplotlib.scatter(data)
+geoplotlib.dot(data)
 geoplotlib.show()
 ```
 
-![scatter](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/scatter.png)
+![dot](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/dotdensity.png)
 
 # Examples gallery
 

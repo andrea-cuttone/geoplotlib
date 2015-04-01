@@ -112,11 +112,11 @@ class BaseLayer():
         return False
 
 
-class ScatterLayer(BaseLayer):
+class DotDensityLayer(BaseLayer):
 
 
     def __init__(self, data, color=None, point_size=2, f_tooltip=None):
-        """Create a scatterplot
+        """Create a dot density map
 
         :param data: data access object
         :param color: color

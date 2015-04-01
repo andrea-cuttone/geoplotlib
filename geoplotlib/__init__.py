@@ -46,16 +46,24 @@ def savefig(fname):
     _runapp(_global_config)
 
 
-def scatter(data, color=None, point_size=2, f_tooltip=None):
-    """Create a scatterplot
+def dot(data, color=None, point_size=2, f_tooltip=None):
+    """Create a dot density map
 
     :param data: data access object
     :param color: color
     :param point_size: point size
     :param f_tooltip: function to return a tooltip string for a point
     """
-    from geoplotlib.layers import ScatterLayer
-    _global_config.layers.append(ScatterLayer(data, color=color, point_size=point_size, f_tooltip=f_tooltip))
+    from geoplotlib.layers import DotDensityLayer
+    _global_config.layers.append(DotDensityLayer(data, color=color, point_size=point_size, f_tooltip=f_tooltip))
+
+
+def scatter(data, color=None, point_size=2, f_tooltip=None):
+    """Deprecated: use dot
+    """
+    import warnings
+    warnings.warn("deprecated, use geoplotlib.dot", DeprecationWarning)
+    dot(data, color, point_size, f_tooltip)
 
 
 def hist(data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, show_tooltip=False,

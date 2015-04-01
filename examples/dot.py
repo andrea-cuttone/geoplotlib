@@ -1,10 +1,10 @@
 """
-Example of scatterplot
+Example of dot density map
 """
 import geoplotlib
 from geoplotlib.utils import read_csv
 
 
 data = read_csv('data/bus.csv')
-geoplotlib.scatter(data)
+geoplotlib.dot(data)
 geoplotlib.show()
