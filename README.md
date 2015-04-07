@@ -9,9 +9,14 @@ geoplotlib.dot(data)
 geoplotlib.show()
 ```
 
-![dot](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/dotdensity.png)
+This will launch the geoplotlib window and plot the points on OpenStreetMap tiles, also allowing zooming and panning. geoplotlib automatically handles the data loading, the map projection, downloading the map tiles and the graphics rendering with OpenGL.
+
+![demo](http://i.imgur.com/hr9GnLE.gif)
 
 # Examples gallery
+
+_Dot Density_
+![dot](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/dotdensity.png)
 
 _Heatmap (Kernel Density estimation)_
 ![kde](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/kde1.png)
