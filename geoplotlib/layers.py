@@ -412,7 +412,7 @@ class DelaunayLayer(BaseLayer):
         try:
             from scipy.spatial.qhull import Delaunay
         except ImportError:
-            print 'DelaunayLayer needs scipy >= 0.12'
+            print('DelaunayLayer needs scipy >= 0.12')
             raise
 
         self.painter = BatchPainter()
@@ -591,7 +591,7 @@ class VoronoiLayer(BaseLayer):
         try:
             from scipy.spatial.qhull import Voronoi
         except ImportError:
-            print 'VoronoiLayer needs scipy >= 0.12'
+            print('VoronoiLayer needs scipy >= 0.12')
             raise
 
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
@@ -742,8 +742,8 @@ class KDELayer(BaseLayer):
             # np.save('z.npy', z)
             # z = np.load('z.npy')
 
-            print 'smallest non-zero density:', z[z > 0][0]
-            print 'max density:', z.max()
+            print('smallest non-zero density:', z[z > 0][0])
+            print('max density:', z.max())
 
             if self.cut_below is None:
                 zmin = z[z > 0][0]
@@ -769,8 +769,8 @@ class KDELayer(BaseLayer):
             xgrid, ygrid = self._get_grid(proj)
             H, _, _ = np.histogram2d(yv, xv, bins=(ygrid, xgrid))
             H = gaussian_filter(H, sigma=self.bw)
-            print 'smallest non-zero count', H[H > 0][0]
-            print 'max count:', H.max()
+            print('smallest non-zero count', H[H > 0][0])
+            print('max count:', H.max())
 
             if self.cut_below is None:
                 Hmin = H[H > 0][0]
@@ -809,7 +809,7 @@ class ConvexHullLayer(BaseLayer):
     def __init__(self, data, col, fill=True, point_size=4):
         """
         Convex hull for a set of points
-        
+
         :param data: points
         :param col: color
         :param fill: whether to fill the convexhull polygon or not

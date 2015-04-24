@@ -292,7 +292,7 @@ class GeoplotlibApp(pyglet.window.Window):
         image = pyglet.image.ColorBufferImage(0, 0, SCREEN_W, SCREEN_H)
         image.save(fname)
         glPixelTransferf(gl.GL_ALPHA_BIAS, 0.0)
-        print fname + ' saved'
+        print(fname + ' saved')
 
 
     def on_update(self, dt):
@@ -398,7 +398,7 @@ class BatchPainter:
 
         precision = int(10*math.log(r))
 
-        vertices = []     
+        vertices = []
         for alpha in np.linspace(0, 6.28, precision):
             vertices.append(cx + r * math.cos(alpha))
             vertices.append(cy + r * math.sin(alpha))
@@ -417,10 +417,10 @@ class BatchPainter:
 
 
     def circle_filled(self, cx, cy, r):
-        vertices = [] 
+        vertices = []
         vertices.append(cx)
         vertices.append(cy)
-        
+
         precision = int(10*math.log(r))
 
         for alpha in np.linspace(0, 6.28, precision):
@@ -714,7 +714,7 @@ class TileDownloaderThread(Thread):
                 destination.write(content)
                 destination.close()
             except Exception as e:
-                print url, e
+                print(url, e)
 
 
 _DEFAULT_TILE_PROVIDES = {
@@ -795,7 +795,7 @@ class MapLayer():
                 self.tiles_cache[(zoom, xtile, ytile)] = pyglet.sprite.Sprite(tile_image)
                 return self.tiles_cache[(zoom, xtile, ytile)]
             except Exception as exc:
-                print exc
+                print(exc)
                 assert download_path.endswith('.png')
                 os.unlink(download_path)
                 return None
@@ -811,4 +811,4 @@ class MapLayer():
                         tilesurf.y = int(SCREEN_H - (y - proj.ytile + 1)*TILE_SIZE)
                         tilesurf.draw()
                     except Exception as e:
-                        print 'exception blitting', x, y, proj.zoom, e
+                        print('exception blitting', x, y, proj.zoom, e)
