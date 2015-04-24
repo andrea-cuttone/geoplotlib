@@ -350,9 +350,9 @@ class BatchPainter:
         y = _flatten_xy(y0, y1)
         vertices = _flatten_xy(x, y)
         if colors is None:
-            colors = self._color * (len(vertices)/VERT_PER_POINT)
+            colors = self._color * int(len(vertices)/VERT_PER_POINT)
 
-        self._batch.add(len(vertices)/VERT_PER_POINT, GL_LINES, None,
+        self._batch.add(int(len(vertices)/VERT_PER_POINT), GL_LINES, None,
                       ('v2f', vertices),
                       ('c4B', np.array(colors).flatten()))
 
@@ -366,10 +366,10 @@ class BatchPainter:
             indices.append(indices[-1])
             indices.append(indices[0])
 
-        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_LINES, None,
+        self._batch.add_indexed(int(len(vertices)/VERT_PER_POINT), GL_LINES, None,
                       indices,
                       ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * int(len(vertices)/VERT_PER_POINT)))
 
 
     def poly(self, x, y, width=1.0):
@@ -381,16 +381,16 @@ class BatchPainter:
             indices.append(i)
             indices.append(i+1)
 
-        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+        self._batch.add_indexed(int(len(vertices)/VERT_PER_POINT), GL_TRIANGLES, None,
                       indices,
                       ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * int(len(vertices)/VERT_PER_POINT)))
 
 
     def triangle(self, vertices):
-        self._batch.add(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+        self._batch.add(int(len(vertices)/VERT_PER_POINT), GL_TRIANGLES, None,
                       ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * int(len(vertices)/VERT_PER_POINT)))
 
 
     def circle(self, cx, cy, r, width=2.0):
@@ -410,10 +410,10 @@ class BatchPainter:
         indices.append(precision-1)
         indices.append(0)
 
-        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_LINES, None,
+        self._batch.add_indexed(int(len(vertices)/VERT_PER_POINT), GL_LINES, None,
                       indices,
                       ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * int(len(vertices)/VERT_PER_POINT)))
 
 
     def circle_filled(self, cx, cy, r):
@@ -436,10 +436,10 @@ class BatchPainter:
         indices.append(precision)
         indices.append(1)
 
-        self._batch.add_indexed(len(vertices)/VERT_PER_POINT, GL_TRIANGLES, None,
+        self._batch.add_indexed(int(len(vertices)/VERT_PER_POINT), GL_TRIANGLES, None,
                       indices,
                       ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+                      ('c4B', self._color * int(len(vertices)/VERT_PER_POINT)))
 
 
     def points(self, x, y, point_size=10, rounded=False):
@@ -451,9 +451,9 @@ class BatchPainter:
 
         vertices = np.vstack((x, y)).T.flatten()
 
-        self._batch.add(len(vertices)/VERT_PER_POINT, GL_POINTS, None,
-                      ('v2f', vertices),
-                      ('c4B', self._color * (len(vertices)/VERT_PER_POINT)))
+        self._batch.add(int(len(vertices)/VERT_PER_POINT), GL_POINTS, None,
+                        ('v2f', vertices),
+                        ('c4B', self._color * int(len(vertices)/VERT_PER_POINT)))
 
 
     def rect(self, left, top, right, bottom):
@@ -470,7 +470,7 @@ class BatchPainter:
             triangles.extend([left, top, right, top, right, bottom, right, bottom, left, top, left, bottom])
             colors.extend(c * 6)
 
-        self._batch.add(len(triangles)/VERT_PER_POINT, GL_TRIANGLES, None,
+        self._batch.add(int(len(triangles)/VERT_PER_POINT), GL_TRIANGLES, None,
                       ('v2f', triangles),
                       ('c4B', colors))
 
