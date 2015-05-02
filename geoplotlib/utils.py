@@ -233,7 +233,7 @@ class BoundingBox():
             raise Exception('No results found')
 
         south, north, west, east = map(float, jo[0]['boundingbox'])
-        print 'bbox from Nominatim:', south, north, west, east
+        print('bbox from Nominatim:', south, north, west, east)
         return BoundingBox(north=north, west=west, south=south, east=east)
 
 

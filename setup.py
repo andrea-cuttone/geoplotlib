@@ -1,6 +1,7 @@
 from setuptools import setup
 
 setup(name='geoplotlib',
+      use_2to3=True,
       packages=['geoplotlib'],
       version='0.1.0',
       description='python toolbox for geographic visualizations',
