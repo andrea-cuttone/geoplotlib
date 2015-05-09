@@ -337,8 +337,14 @@ class BatchPainter:
         elif color == 'b' or color == 'blue':
             self._color = [0,0,255,255]
         elif len(color) == 4:
+            for c in color:
+                if c < 0 or c > 255:
+                    raise Exception('color components must be between 0 and 255')
             self._color = color
         elif len(color) == 3:
+            for c in color:
+                if c < 0 or c > 255:
+                    raise Exception('color components must be between 0 and 255')
             self._color = color + [255]
         else:
             raise Exception('invalid color format')
