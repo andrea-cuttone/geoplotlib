@@ -258,16 +258,18 @@ class GraphLayer(BaseLayer):
         self.painter = BatchPainter()
         x0, y0 = proj.lonlat_to_screen(self.data[self.src_lon], self.data[self.src_lat])
         x1, y1 = proj.lonlat_to_screen(self.data[self.dest_lon], self.data[self.dest_lat])
-        manhattan = np.abs(x0-x1) + np.abs(y0-y1)
-        vmax = manhattan.max()
-        distances = np.logspace(0, log10(manhattan.max()), 20)
-        for i in range(len(distances)-1, 1, -1):
-            mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
-            if type(self.color) == list:
-                self.painter.set_color(self.color)
-            else:
+
+        if type(self.color) == list:
+            self.painter.set_color(self.color)
+            self.painter.lines(x0, y0, x1, y1, width=self.linewidth)
+        else:
+            manhattan = np.abs(x0-x1) + np.abs(y0-y1)
+            vmax = manhattan.max()
+            distances = np.logspace(0, log10(manhattan.max()), 20)
+            for i in range(len(distances)-1, 1, -1):
+                mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
                 self.painter.set_color(self.cmap.to_color(distances[i], vmax, 'log'))
-            self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], width=self.linewidth)
+                self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], width=self.linewidth)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
