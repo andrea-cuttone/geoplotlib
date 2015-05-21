@@ -1,6 +1,6 @@
 """
-Example of choroplet using geojson files.
-Based on by Mike Bostock's unemployment choroplet http://bl.ocks.org/mbostock/4060606
+Example of choropleth using geojson files.
+Based on by Mike Bostock's unemployment choropleth http://bl.ocks.org/mbostock/4060606
 """
 
 import geoplotlib

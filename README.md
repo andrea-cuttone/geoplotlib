@@ -24,8 +24,8 @@ This will launch the geoplotlib window and plot the points on OpenStreetMap tile
 [Shapefiles](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/shapefiles.py)
 ![shapefiles](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/shapefiles.png)
 
-[Choroplet and GeoJSON](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/choroplet.py)
-![choroplet](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/choroplet.png)
+[Choropleth and GeoJSON](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/choropleth.py)
+![choropleth](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/choropleth.png)
 
 [Voronoi tessellation](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/voronoi-filled.py)
 ![voronoi](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/voronoi-filled.png)
