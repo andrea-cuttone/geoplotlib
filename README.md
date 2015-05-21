@@ -15,19 +15,22 @@ This will launch the geoplotlib window and plot the points on OpenStreetMap tile
 
 # Examples gallery
 
-_Dot Density_
+[Dot Density Map](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/dot.py)
 ![dot](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/dotdensity.png)
 
-_Heatmap (Kernel Density estimation)_
+[Heatmap (Kernel Density estimation)](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/kde.py)
 ![kde](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/kde1.png)
 
-_Shapefiles_
+[Shapefiles](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/shapefiles.py)
 ![shapefiles](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/shapefiles.png)
 
-_Voronoi tessellation_
+[Choroplet and GeoJSON](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/choroplet.py)
+![choroplet](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/choroplet.png)
+
+[Voronoi tessellation](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/voronoi-filled.py)
 ![voronoi](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/voronoi-filled.png)
 
-_Spatial graph_
+[Spatial graph](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/graph-flights.py)
 ![graph](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/graph-flights.png)
 
 All examples including source code are [here](https://github.com/andrea-cuttone/geoplotlib/tree/master/examples)
