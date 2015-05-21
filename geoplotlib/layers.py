@@ -9,6 +9,8 @@ import colors
 from geoplotlib.core import BatchPainter
 from geoplotlib.utils import BoundingBox
 import Queue
+from inspect import isfunction
+import json
 
 
 class HotspotManager():
@@ -877,3 +879,64 @@ class GridLayer(BaseLayer):
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
+
+
+class GeoJSONLayer(BaseLayer):
+
+    def __init__(self, fname, color='b', linewidth=1, fill=False, f_tooltip=None):
+        self.color = color
+        self.linewidth = linewidth
+        self.fill = fill
+        self.f_tooltip = f_tooltip
+
+        with open(fname) as fin:
+            self.data = json.load(fin)
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        self.hotspots = HotspotManager()
+
+
+        for feature in self.data['features']:
+            if isfunction(self.color):
+                self.painter.set_color(self.color(feature['properties']))
+            else:
+                self.painter.set_color(self.color)
+
+            if feature['geometry']['type'] == 'Polygon':
+                for poly in feature['geometry']['coordinates']: 
+                    poly = np.array(poly)
+                    x, y = proj.lonlat_to_screen(poly[:,0], poly[:,1])
+                    if self.fill:
+                        self.painter.poly(x, y)
+                    else:
+                        self.painter.linestrip(x, y, self.linewidth, closed=True)
+
+                    if self.f_tooltip:
+                        self.hotspots.add_poly(x, y, self.f_tooltip(feature['properties']))
+
+            elif feature['geometry']['type'] == 'MultiPolygon':
+                for multipoly in feature['geometry']['coordinates']:
+                    for poly in multipoly: 
+                        poly = np.array(poly)
+                        x, y = proj.lonlat_to_screen(poly[:,0], poly[:,1])
+                        if self.fill:
+                            self.painter.poly(x, y)
+                        else:
+                            self.painter.linestrip(x, y, self.linewidth, closed=True)
+
+                        if self.f_tooltip:
+                            self.hotspots.add_poly(x, y, self.f_tooltip(feature['properties']))
+            
+            elif feature['geometry']['type'] == 'Point':
+                lon,lat = feature['geometry']['coordinates']
+                x, y = proj.lonlat_to_screen(np.array([lon]), np.array([lat]))
+                self.painter.points(x, y)
+
+
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+        picked = self.hotspots.pick(mouse_x, mouse_y)
+        if picked:
+            ui_manager.tooltip(picked)

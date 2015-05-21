@@ -242,3 +242,4 @@ BoundingBox.DK = BoundingBox(north=57.769, west=7.932, south=54.444, east=13.282
 BoundingBox.DTU = BoundingBox(north=55.7925, west=12.5092, south=55.7784, east=12.5309)
 BoundingBox.KBH = BoundingBox(north=55.8190, west=12.0369, south=55.5582, east=12.7002)
 BoundingBox.DOWNTOWN = BoundingBox(north=55.728229, west=12.420230, south=55.629118, east=12.683902)
+BoundingBox.USA = BoundingBox(north=51.338994, west=-124.349040, south=14.851581, east=-56.849040)

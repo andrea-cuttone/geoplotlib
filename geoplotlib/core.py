@@ -330,6 +330,8 @@ class BatchPainter:
     def set_color(self, color):
         if color == 'k' or color == 'black':
             self._color = [0,0,0,255]
+        elif color == 'w' or color == 'white':
+            self._color = [255,255,255,255]
         elif color == 'r' or color == 'red':
             self._color = [255,0,0,255]
         elif color == 'g' or color == 'green':

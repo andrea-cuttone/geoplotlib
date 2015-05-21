@@ -3,5 +3,7 @@ taxi.csv: subset of data from Geolife http://research.microsoft.com/en-us/downlo
 s-tog.csv, metro.csv and bus.csv: http://geo.oiorest.dk/holdepladser.json
 cellid_dk.csv: danish celltowers from opencellid.org
 dk_kommune: http://geocommons.com/overlays/276034
+gz_2010_us_050_00_20m.json: http://eric.clst.org/Stuff/USGeoJSON
+unemployment.json: adapted from http://bl.ocks.org/mbostock/4060606
 
 the S-tog and København Metro logos are owner by their respective owners

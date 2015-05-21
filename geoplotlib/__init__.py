@@ -195,6 +195,20 @@ def markers(data, marker, f_tooltip=None, marker_preferred_size=32):
     _global_config.layers.append(MarkersLayer(data, marker, f_tooltip, marker_preferred_size))
 
 
+def geojson(filename, color='b', linewidth=1, fill=False, f_tooltip=None):
+    """
+    Draw features described in geojson format (http://geojson.org/)
+
+    :param filename: filename of the geojson file
+    :param color: color for the shapes. If callable, it will be invoked for each feature, passing the properties element
+    :param linewidth: line width
+    :param fill: if fill=True the feature polygon is filled, otherwise just the border is rendered
+    :param f_tooltip: function to generate a tooltip on mouseover. It will be invoked for each feature, passing the properties element
+    """
+    from geoplotlib.layers import GeoJSONLayer
+    _global_config.layers.append(GeoJSONLayer(filename, color=color, linewidth=linewidth, fill=fill, f_tooltip=f_tooltip))
+
+
 def clear():
     """
     Remove all existing layers
