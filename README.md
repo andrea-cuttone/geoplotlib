@@ -33,7 +33,7 @@ This will launch the geoplotlib window and plot the points on OpenStreetMap tile
 [Spatial graph](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/graph-flights.py)
 ![graph](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/graph-flights.png)
 
-All examples including source code are [here](https://github.com/andrea-cuttone/geoplotlib/tree/master/examples)
+All examples source code is [here](https://github.com/andrea-cuttone/geoplotlib/tree/master/examples)
 
 # Installation
 
@@ -47,9 +47,13 @@ optional requirements:
 * [scipy](http://www.scipy.org) for some layers
 * [pyshp](https://github.com/GeospatialPython/pyshp) for reading .shp files
 
-to install, run:
+to install from source run :
 
 ```python setup.py install```
+
+or with pip
+
+```pip install geoplotlib```
 
 # User Guide
 A detailed user guide can be found in the [wiki](https://github.com/andrea-cuttone/geoplotlib/wiki/User-Guide)
