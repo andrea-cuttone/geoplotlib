@@ -39,7 +39,7 @@ All examples source code is [here](https://github.com/andrea-cuttone/geoplotlib/
 
 geoplotlib requires:
 * [numpy](http://www.numpy.org/)
-* [pyglet](http://www.pyglet.org/)
+* [pyglet 1.2.x](http://www.pyglet.org/download.html)
 	* **note:** in order for pyglet to work with ipython on Mac, [this workaround](https://code.google.com/p/pyglet/issues/detail?id=728) is needed. [Here](https://code.google.com/r/andreacuttone-pyglet-multipleruns/) you can find a fork of the pyglet dev branch with the workaround applied
 
 optional requirements:
