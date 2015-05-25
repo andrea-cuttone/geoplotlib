@@ -883,14 +883,19 @@ class GridLayer(BaseLayer):
 
 class GeoJSONLayer(BaseLayer):
 
-    def __init__(self, fname, color='b', linewidth=1, fill=False, f_tooltip=None):
+    def __init__(self, geojson_or_fname, color='b', linewidth=1, fill=False, f_tooltip=None):
         self.color = color
         self.linewidth = linewidth
         self.fill = fill
         self.f_tooltip = f_tooltip
 
-        with open(fname) as fin:
-            self.data = json.load(fin)
+        if type(geojson_or_fname) == str:
+            with open(fname) as fin:
+                self.data = json.load(fin)
+        elif type(geojson_or_fname) == dict:
+            self.data = geojson_or_fname
+        else:
+            raise Exception('must provide either dict or filename')
 
 
     def invalidate(self, proj):
