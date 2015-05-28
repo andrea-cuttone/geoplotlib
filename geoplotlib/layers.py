@@ -890,7 +890,7 @@ class GeoJSONLayer(BaseLayer):
         self.f_tooltip = f_tooltip
 
         if type(geojson_or_fname) == str:
-            with open(fname) as fin:
+            with open(geojson_or_fname) as fin:
                 self.data = json.load(fin)
         elif type(geojson_or_fname) == dict:
             self.data = geojson_or_fname
