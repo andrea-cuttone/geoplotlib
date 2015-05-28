@@ -64,7 +64,6 @@ def inline(width=900):
     savefig(fname)
 
     if os.path.isfile(fname + '.png'):
-        clear_output()
         with open(fname + '.png', 'rb') as fin:
             base64 = urllib.quote(fin.read().encode("base64"))
 

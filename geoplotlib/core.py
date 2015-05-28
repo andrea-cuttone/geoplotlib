@@ -257,7 +257,9 @@ class GeoplotlibApp(pyglet.window.Window):
 
     def on_key_release(self, symbol, modifiers):
         if symbol == pyglet.window.key.P:
-            GeoplotlibApp.screenshot('%d.png' % (time.time()*1000))
+            fname = '%d.png' % (time.time()*1000)
+            GeoplotlibApp.screenshot(fname)
+            print(fname + ' saved')
         elif symbol == pyglet.window.key.M:
             self.show_map = not self.show_map
         elif symbol == pyglet.window.key.L:
@@ -292,7 +294,6 @@ class GeoplotlibApp(pyglet.window.Window):
         image = pyglet.image.ColorBufferImage(0, 0, SCREEN_W, SCREEN_H)
         image.save(fname)
         glPixelTransferf(gl.GL_ALPHA_BIAS, 0.0)
-        print(fname + ' saved')
 
 
     def on_update(self, dt):
