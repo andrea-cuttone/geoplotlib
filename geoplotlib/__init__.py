@@ -46,6 +46,34 @@ def savefig(fname):
     _runapp(_global_config)
 
 
+def inline(width=900):
+    """display the map inline in ipython
+    :param width: image width for the browser
+    """
+    from IPython.display import Image, HTML, display, clear_output
+    import random
+    import string
+    import urllib
+    import os
+
+    while True:
+        fname = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(32))
+        if not os.path.isfile(fname + '.png'):
+            break
+
+    savefig(fname)
+
+    if os.path.isfile(fname + '.png'):
+        clear_output()
+        with open(fname + '.png', 'rb') as fin:
+            base64 = urllib.quote(fin.read().encode("base64"))
+
+        image_html = "<img style='width: %dpx; margin: 0px; float: left; border: 1px solid black;' src='data:image/png;base64,%s' />" % (width, base64)
+        
+        display(HTML(image_html))
+        os.remove(fname + '.png')
+
+
 def dot(data, color=None, point_size=2, f_tooltip=None):
     """Create a dot density map
 
