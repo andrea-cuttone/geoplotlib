@@ -67,6 +67,7 @@ class ColorMap():
 def create_set_cmap(values, cmap_name, alpha=255):
     """
     return a dict of colors corresponding to the unique values
+    
     :param values: values to be mapped
     :param cmap_name: colormap name
     :param alpha: color alpha

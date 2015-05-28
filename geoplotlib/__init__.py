@@ -48,6 +48,7 @@ def savefig(fname):
 
 def inline(width=900):
     """display the map inline in ipython
+
     :param width: image width for the browser
     """
     from IPython.display import Image, HTML, display, clear_output
@@ -106,7 +107,6 @@ def hist(data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, show_toolti
     :param scalemin: min value for displaying a bin
     :param scalemax: max value for a bin
     :param f_group: function to apply to samples in the same bin. Default is to count
-    :return:
     """
     from geoplotlib.layers import HistogramLayer
     _global_config.layers.append(HistogramLayer(data, cmap=cmap, alpha=alpha, colorscale=colorscale,
@@ -302,7 +302,6 @@ def set_window_size(w, h):
     
     :param w: window width
     :param h: window height
-    :return:
     """
     _global_config.screen_w = w
     _global_config.screen_h = h

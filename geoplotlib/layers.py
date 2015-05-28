@@ -98,7 +98,6 @@ class BaseLayer():
     def bbox(self):
         """
         Return the bounding box for this layer
-        :return:
         """
         return BoundingBox.WORLD
 
