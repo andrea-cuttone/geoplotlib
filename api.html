@@ -244,7 +244,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>data</strong> &#8211; data access object</li>
 <li><strong>cmap</strong> &#8211; colormap name</li>
 <li><strong>alpha</strong> &#8211; color alpha</li>
@@ -257,9 +257,6 @@
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
 </tbody>
 </table>
 </dd></dl>
@@ -267,8 +264,15 @@
 <dl class="function">
 <dt id="geoplotlib.inline">
 <code class="descclassname">geoplotlib.</code><code class="descname">inline</code><span class="sig-paren">(</span><em>width=900</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.inline" title="Permalink to this definition">¶</a></dt>
-<dd><p>display the map inline in ipython
-:param width: image width for the browser</p>
+<dd><p>display the map inline in ipython</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>width</strong> &#8211; image width for the browser</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -380,13 +384,10 @@ If hist, estimates density applying gaussian smoothing on a 2D histogram, which 
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>w</strong> &#8211; window width</li>
 <li><strong>h</strong> &#8211; window height</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
 </td>
 </tr>
 </tbody>
@@ -473,8 +474,7 @@ or a custom provider in the form
 <dl class="method">
 <dt id="geoplotlib.layers.BaseLayer.bbox">
 <code class="descname">bbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.layers.BaseLayer.bbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the bounding box for this layer
-:return:</p>
+<dd><p>Return the bounding box for this layer</p>
 </dd></dl>
 
 <dl class="method">
@@ -731,11 +731,23 @@ The Cartographic Journal 40.1 (2003): 27-37.</p>
 <dl class="function">
 <dt id="geoplotlib.colors.create_set_cmap">
 <code class="descclassname">geoplotlib.colors.</code><code class="descname">create_set_cmap</code><span class="sig-paren">(</span><em>values</em>, <em>cmap_name</em>, <em>alpha=255</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.colors.create_set_cmap" title="Permalink to this definition">¶</a></dt>
-<dd><p>return a dict of colors corresponding to the unique values
-:param values: values to be mapped
-:param cmap_name: colormap name
-:param alpha: color alpha
-:return: dict of colors corresponding to the unique values</p>
+<dd><p>return a dict of colors corresponding to the unique values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> &#8211; values to be mapped</li>
+<li><strong>cmap_name</strong> &#8211; colormap name</li>
+<li><strong>alpha</strong> &#8211; color alpha</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict of colors corresponding to the unique values</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
