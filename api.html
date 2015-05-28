@@ -192,6 +192,27 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="geoplotlib.geojson">
+<code class="descclassname">geoplotlib.</code><code class="descname">geojson</code><span class="sig-paren">(</span><em>filename</em>, <em>color='b'</em>, <em>linewidth=1</em>, <em>fill=False</em>, <em>f_tooltip=None</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.geojson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw features described in geojson format (<a class="reference external" href="http://geojson.org/">http://geojson.org/</a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> &#8211; filename of the geojson file</li>
+<li><strong>color</strong> &#8211; color for the shapes. If callable, it will be invoked for each feature, passing the properties element</li>
+<li><strong>linewidth</strong> &#8211; line width</li>
+<li><strong>fill</strong> &#8211; if fill=True the feature polygon is filled, otherwise just the border is rendered</li>
+<li><strong>f_tooltip</strong> &#8211; function to generate a tooltip on mouseover. It will be invoked for each feature, passing the properties element</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="geoplotlib.graph">
 <code class="descclassname">geoplotlib.</code><code class="descname">graph</code><span class="sig-paren">(</span><em>data</em>, <em>src_lat</em>, <em>src_lon</em>, <em>dest_lat</em>, <em>dest_lon</em>, <em>linewidth=1</em>, <em>alpha=220</em>, <em>color='hot'</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.graph" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a graph drawing a line between each pair of (src_lat, src_lon) and (dest_lat, dest_lon)</p>
@@ -241,6 +262,13 @@
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="geoplotlib.inline">
+<code class="descclassname">geoplotlib.</code><code class="descname">inline</code><span class="sig-paren">(</span><em>width=900</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.inline" title="Permalink to this definition">¶</a></dt>
+<dd><p>display the map inline in ipython
+:param width: image width for the browser</p>
 </dd></dl>
 
 <dl class="function">
@@ -512,7 +540,7 @@ Typically in this method a BatchPainter is instantiated and all the rendering is
 <span id="geoplotlib-utils-module"></span><h2>geoplotlib.utils module<a class="headerlink" href="#module-geoplotlib.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="geoplotlib.utils.DataAccessObject">
-<em class="property">class </em><code class="descclassname">geoplotlib.utils.</code><code class="descname">DataAccessObject</code><span class="sig-paren">(</span><em>dict</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">geoplotlib.utils.</code><code class="descname">DataAccessObject</code><span class="sig-paren">(</span><em>dict_or_df</em><span class="sig-paren">)</span><a class="headerlink" href="#geoplotlib.utils.DataAccessObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class wraps data into a dict-like object</p>
 <dl class="staticmethod">
 <dt id="geoplotlib.utils.DataAccessObject.from_dataframe">
