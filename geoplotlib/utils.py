@@ -31,8 +31,18 @@ class DataAccessObject():
     This class wraps data into a dict-like object
     """
 
-    def __init__(self, dict):
-        self.dict = dict
+    def __init__(self, dict_or_df):
+        """
+        Create a DataAccessObject either from a dictionary or a pandas.DataFrame
+        """
+        if type(dict_or_df) == dict:
+            self.dict = dict_or_df
+        else:
+            from pandas import DataFrame
+            if type(dict_or_df) == DataFrame:
+                self.dict = {col: dict_or_df[col].values for col in dict_or_df.columns}
+            else:
+                raise Exception('dict_or_df must be either a dictionary or a pandas.DataFrame')
 
 
     @staticmethod
@@ -43,7 +53,9 @@ class DataAccessObject():
         :param df: dataframe
         :return: a DataAccessObject
         """
-        return DataAccessObject({col: df[col].values for col in df.columns})
+        import warnings
+        warnings.warn('use ctor directly instead', DeprecationWarning)
+        return DataAccessObject(df)
 
 
     def __getitem__(self, key):
