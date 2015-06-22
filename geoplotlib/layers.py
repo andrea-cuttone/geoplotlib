@@ -896,11 +896,37 @@ class GeoJSONLayer(BaseLayer):
         else:
             raise Exception('must provide either dict or filename')
 
+        self.boundingbox = None
+        
+        for feature in self.data['features']:
+            if feature['geometry']['type'] == 'Polygon':
+                for poly in feature['geometry']['coordinates']: 
+                    poly = np.array(poly)
+                    self.__update_bbox(poly[:,0], poly[:,1])
+            elif feature['geometry']['type'] == 'MultiPolygon':
+                for multipoly in feature['geometry']['coordinates']:
+                    for poly in multipoly: 
+                        poly = np.array(poly)
+                        self.__update_bbox(poly[:,0], poly[:,1])
+            elif feature['geometry']['type'] == 'Point':
+                lon,lat = feature['geometry']['coordinates']
+                self.__update_bbox(np.array([lon]), np.array([lat]))
+
+
+    def __update_bbox(self, lon, lat):
+        if self.boundingbox is None:
+            self.boundingbox = BoundingBox(north=lat.max(), south=lat.min(), west=lon.min(), east=lon.max())
+        else:
+            self.boundingbox = BoundingBox(
+                                    north=max(self.boundingbox.north, lat.max()),
+                                    south=min(self.boundingbox.south, lat.min()),
+                                    west=min(self.boundingbox.west, lon.min()),
+                                    east=max(self.boundingbox.east, lon.max()))
+
 
     def invalidate(self, proj):
         self.painter = BatchPainter()
         self.hotspots = HotspotManager()
-
 
         for feature in self.data['features']:
             if isfunction(self.color):
@@ -944,3 +970,10 @@ class GeoJSONLayer(BaseLayer):
         picked = self.hotspots.pick(mouse_x, mouse_y)
         if picked:
             ui_manager.tooltip(picked)
+
+
+    def bbox(self):
+        if self.boundingbox:
+            return self.boundingbox
+        else:
+            return BoundingBox.WORLD
