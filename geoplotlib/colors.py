@@ -22,41 +22,39 @@ class ColorMap():
         self.mapping = {}
 
 
-    def to_color(self, value, maxvalue, scale):
+    def to_color(self, value, maxvalue, scale, minvalue=0.0):
         """
         convert continuous values into colors using matplotlib colorscales
         :param value: value to be converted
         :param maxvalue: max value in the colorscale
         :param scale: lin, log, sqrt
+        :param minvalue: minimum of the input values in linear scale (default is 0)
         :return: the color corresponding to the value
         """
-        if value < 0 or maxvalue < 0:
-            raise Exception('no negative values allowed')
-
+        
         if scale == 'lin':
-            if maxvalue == 0:
-                value = 0
+            if minvalue >= maxvalue:
+                raise Exception('minvalue must be less than maxvalue')
             else:
-                value = value / maxvalue
+                value = 1.*(value-minvalue) / (maxvalue-minvalue)
         elif scale == 'log':
             if value < 1 or maxvalue <= 1:
-                raise Exception('values must be >= 1')
+                raise Exception('value and maxvalue must be >= 1')
             else:
                 value = math.log(value) / math.log(maxvalue)
         elif scale == 'sqrt':
-            if maxvalue == 0:
-                value = 0
+            if value < 0 or maxvalue <= 0:
+                raise Exception('value and maxvalue must be greater than 0')
             else:
                 value = math.sqrt(value) / math.sqrt(maxvalue)
-        elif scale == 'fifthroot':
-            if maxvalue == 0:
-                value = 0
-            else:
-                value = value**0.2 / maxvalue**0.2
         else:
-            raise Exception('scale must be lin, log, sqrt or fifthroot')
+            raise Exception('scale must be "lin", "log", or "sqrt"')
 
-        value = min(value,1)
+        if value < 0:
+            value = 0
+        elif value > 1:
+            value = 1
+            
         delta = 1. / self.levels
         value = round(value / delta) * delta
         if value not in self.mapping:
