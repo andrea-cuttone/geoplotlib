@@ -192,6 +192,7 @@ class GeoplotlibApp(pyglet.window.Window):
             glPopMatrix()
 
             #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
+            #self.ui_manager.status('%.6f %.6f' % self.proj.screen_to_latlon(self.mouse_x, SCREEN_H - self.mouse_y))
 
         if self.invalidate_delay == 2:
             self.ui_manager.status('rendering...')
@@ -207,7 +208,6 @@ class GeoplotlibApp(pyglet.window.Window):
 
         if self.geoplotlib_config.savefig is not None:
             GeoplotlibApp.screenshot(self.geoplotlib_config.savefig + '.png')
-            self.close()
             pyglet.app.exit()
 
 
