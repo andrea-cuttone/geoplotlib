@@ -598,18 +598,17 @@ class VoronoiLayer(BaseLayer):
             raise
 
         x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
-        points = list(set(zip(x,y)))
+        points = zip(x,y)
         vor = Voronoi(points)
 
         regions, vertices = VoronoiLayer.__voronoi_finite_polygons_2d(vor)
-
+        
         self.hotspots = HotspotManager()
         self.painter = BatchPainter()
 
-
         for idx, region in enumerate(regions):
             polygon = vertices[region]
-
+            
             if self.line_color:
                 self.painter.set_color(self.line_color)
                 self.painter.linestrip(polygon[:,0], polygon[:,1], width=self.line_width, closed=True)
