@@ -1,6 +1,7 @@
 import traceback
 import pyglet
 from geoplotlib.core import GeoplotlibApp
+from core import FONT_NAME
 
 
 class AppConfig:
@@ -234,6 +235,24 @@ def geojson(filename, color='b', linewidth=1, fill=False, f_tooltip=None):
     """
     from geoplotlib.layers import GeoJSONLayer
     _global_config.layers.append(GeoJSONLayer(filename, color=color, linewidth=linewidth, fill=fill, f_tooltip=f_tooltip))
+
+
+def labels(data, label_column, color=None, font_name=FONT_NAME, 
+           font_size=14, anchor_x='left', anchor_y='top'):
+    """
+    Draw a text label for each sample
+
+    :param data: data access object
+    :param label_column: column in the data access object where the labels text is stored
+    :param color: color
+    :param font_name: font name
+    :param font_size: font size
+    :param anchor_x: anchor x
+    :param anchor_y: anchor y
+    """
+    from geoplotlib.layers import LabelsLayer
+    _global_config.layers.append(LabelsLayer(data, label_column, color, font_name, 
+           font_size, anchor_x, anchor_y))
 
 
 def clear():

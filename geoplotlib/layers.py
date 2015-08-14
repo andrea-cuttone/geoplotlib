@@ -11,6 +11,7 @@ from geoplotlib.utils import BoundingBox
 import Queue
 from inspect import isfunction
 import json
+from core import FONT_NAME
 
 
 class HotspotManager():
@@ -976,3 +977,47 @@ class GeoJSONLayer(BaseLayer):
             return self.boundingbox
         else:
             return BoundingBox.WORLD
+
+
+class LabelsLayer(BaseLayer):
+
+
+    def __init__(self, data, label_column, color=None, font_name=FONT_NAME, font_size=14, anchor_x='left', anchor_y='top'):
+        """Create a layer with a text label for each sample
+
+        :param data: data access object
+        :param label_column: column in the data access object where the labels text is stored
+        :param color: color
+        :param font_name: font name
+        :param font_size: font size
+        :param anchor_x: anchor x
+        :param anchor_y: anchor y
+        """
+        self.data = data
+        self.label_column = label_column
+        self.color = color
+        self.font_name = font_name
+        self.font_size = font_size
+        self.anchor_x = anchor_x
+        self.anchor_y = anchor_y
+        if self.color is None:
+            self.color = [255,0,0]
+
+
+    def invalidate(self, proj):
+        self.painter = BatchPainter()
+        x, y = proj.lonlat_to_screen(self.data['lon'], self.data['lat'])
+        self.painter.set_color(self.color)
+        self.painter.labels(x, y, self.data[self.label_column], 
+                                    font_name=self.font_name,
+                                    font_size=self.font_size,
+                                    anchor_x=self.anchor_x, 
+                                    anchor_y=self.anchor_y)
+
+
+    def draw(self, proj, mouse_x, mouse_y, ui_manager):
+        self.painter.batch_draw()
+        
+
+    def bbox(self):
+        return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])

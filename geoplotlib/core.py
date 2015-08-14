@@ -326,6 +326,7 @@ class BatchPainter:
         self._batch = pyglet.graphics.Batch()
         self._color = [0, 0, 255, 255]
         self._sprites = []
+        self._labels = []
 
 
     def set_color(self, color):
@@ -492,6 +493,19 @@ class BatchPainter:
             sprite.y = y[i]
             sprite.scale = scale
             self._sprites.append(sprite)
+
+
+    def labels(self, x, y, texts, font_name=FONT_NAME, font_size=14, anchor_x='left', anchor_y='top'):
+        for i in range(len(x)):
+            lab = pyglet.text.Label(parse_raw_str(texts if type(texts) == str else texts[i]),
+                                    batch=self._batch,
+                                    color=self._color,
+                                    font_name=font_name,
+                                    font_size=font_size,
+                                    x=x[i], y=y[i],
+                                    anchor_x=anchor_x, 
+                                    anchor_y=anchor_y)
+            self._labels.append(lab)
 
 
     def convexhull(self, x, y, fill=False, smooth=False):
