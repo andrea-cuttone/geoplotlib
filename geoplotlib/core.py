@@ -740,30 +740,32 @@ class TileDownloaderThread(Thread):
                 print(url, e)
 
 
+_GEOPLOTLIB_ATTRIBUTION = u'made with geoplotlib | '
+
 _DEFAULT_TILE_PROVIDES = {
     'watercolor': { 'url': lambda zoom, xtile, ytile:
                             'http://%s.tile.stamen.com/watercolor/%d/%d/%d.png' % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
-                    'attribution': 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+                    'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
     },
     'toner': { 'url': lambda zoom, xtile, ytile:
                         "http://%s.tile.stamen.com/toner/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
-               'attribution': 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+               'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
     },
     'toner-lite': { 'url': lambda zoom, xtile, ytile:
                             "http://%s.tile.stamen.com/toner-lite/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
-                    'attribution': 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+                    'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
     },
     'mapquest': { 'url': lambda zoom, xtile, ytile:
                             "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile),
-                  'attribution': 'Tiles Courtesy of MapQuest, Data by OpenStreetMap, under ODbL.'
+                  'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Tiles Courtesy of MapQuest, Data by OpenStreetMap, under ODbL.'
     },
     'darkmatter': { 'url': lambda zoom, xtile, ytile:
                             'http://%s.basemaps.cartocdn.com/dark_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile),
-                    'attribution': u'© OpenStreetMap contributors © CartoDB'
+                    'attribution': _GEOPLOTLIB_ATTRIBUTION + u'© OpenStreetMap contributors © CartoDB'
     },
     'positron': { 'url': lambda zoom, xtile, ytile:
                             'http://%s.basemaps.cartocdn.com/light_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile),
-                    'attribution': u'© OpenStreetMap contributors © CartoDB'
+                    'attribution': _GEOPLOTLIB_ATTRIBUTION + u'© OpenStreetMap contributors © CartoDB'
     }
 
 }
