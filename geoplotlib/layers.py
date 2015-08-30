@@ -771,6 +771,11 @@ class KDELayer(BaseLayer):
 
             xgrid, ygrid = self._get_grid(proj)
             H, _, _ = np.histogram2d(yv, xv, bins=(ygrid, xgrid))
+            
+            if H.sum() == 0:
+                print('no data in current view')
+                return
+
             H = gaussian_filter(H, sigma=self.bw)
             print('smallest non-zero count', H[H > 0][0])
             print('max count:', H.max())
