@@ -16,7 +16,7 @@ class AppConfig:
         self.savefig = None
         self.tiles_provider = 'mapquest'
         self.smoothing = False
-        self.map_alpha = 196
+        self.map_alpha = 255
         screen =  pyglet.canvas.get_display().get_default_screen()
         self.screen_w = int(screen.width * .9)
         self.screen_h = int(screen.height * .9)
