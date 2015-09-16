@@ -933,6 +933,9 @@ class GeoJSONLayer(BaseLayer):
             elif feature['geometry']['type'] == 'Point':
                 lon,lat = feature['geometry']['coordinates']
                 self.__update_bbox(np.array([lon]), np.array([lat]))
+            elif feature['geometry']['type'] == 'LineString':
+                line = np.array(feature['geometry']['coordinates'])
+                self.__update_bbox(line[:,0], line[:,1])
 
 
     def __update_bbox(self, lon, lat):
@@ -985,6 +988,12 @@ class GeoJSONLayer(BaseLayer):
                 lon,lat = feature['geometry']['coordinates']
                 x, y = proj.lonlat_to_screen(np.array([lon]), np.array([lat]))
                 self.painter.points(x, y)
+            elif feature['geometry']['type'] == 'LineString':
+                line = np.array(feature['geometry']['coordinates'])
+                x, y = proj.lonlat_to_screen(line[:,0], line[:,1])
+                self.painter.linestrip(x, y, self.linewidth, closed=False)
+            else:
+                print('unknow geometry %s' % feature['geometry']['type'])
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
