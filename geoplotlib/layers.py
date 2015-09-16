@@ -848,11 +848,23 @@ class ConvexHullLayer(BaseLayer):
 
 class GridLayer(BaseLayer):
 
-    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None):
+    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10):
+        """
+        Values over a uniform grid
+        
+        :param lon_edges: longitude edges
+        :param lat_edges: latitude edges
+        :param values: matrix representing values on the grid 
+        :param cmap: colormap name
+        :param alpha: color alpha
+        :param vmin: minimum value for the colormap
+        :param vmax: maximum value for the colormap
+        :param levels: number of levels for the colormap
+        """
         self.lon_edges = lon_edges
         self.lat_edges = lat_edges
         self.values = values
-        self.cmap = colors.ColorMap(cmap, alpha=alpha)
+        self.cmap = colors.ColorMap(cmap, alpha=alpha, levels=levels)
 
         if vmin:
             self.vmin = vmin
@@ -862,7 +874,7 @@ class GridLayer(BaseLayer):
         if vmax:
             self.vmax = vmax
         else:
-            self.vmax = self.values.max()
+            self.vmax = self.values[~np.isnan(self.values)].max()
 
 
     def invalidate(self, proj):
@@ -883,6 +895,11 @@ class GridLayer(BaseLayer):
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
+
+
+    def bbox(self):
+        return BoundingBox(north=self.lat_edges[-1], south=self.lat_edges[0], 
+                           west=self.lon_edges[0], east=self.lon_edges[-1])
 
 
 class GeoJSONLayer(BaseLayer):

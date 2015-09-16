@@ -255,6 +255,24 @@ def labels(data, label_column, color=None, font_name=FONT_NAME,
            font_size, anchor_x, anchor_y))
 
 
+def grid(lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10):
+    """
+        Values over a uniform grid
+        
+        :param lon_edges: longitude edges
+        :param lat_edges: latitude edges
+        :param values: matrix representing values on the grid 
+        :param cmap: colormap name
+        :param alpha: color alpha
+        :param vmin: minimum value for the colormap
+        :param vmax: maximum value for the colormap
+        :param levels: number of levels for the colormap
+        """
+    from geoplotlib.layers import GridLayer
+    _global_config.layers.append(
+        GridLayer(lon_edges, lat_edges, values, cmap, alpha, vmin, vmax, levels))
+
+
 def clear():
     """
     Remove all existing layers
