@@ -132,6 +132,7 @@ class GeoplotlibApp(pyglet.window.Window):
         self.mouse_x = self.mouse_y = 0
         self.show_map = True
         self.show_layers = True
+        self.show_coordinates = False
 
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
@@ -192,7 +193,8 @@ class GeoplotlibApp(pyglet.window.Window):
             glPopMatrix()
 
             #self.ui_manager.status('T: %.1f, FPS:%d' % (self.ticks / 1000., pyglet.clock.get_fps()))
-            #self.ui_manager.status('%.6f %.6f' % self.proj.screen_to_latlon(self.mouse_x, SCREEN_H - self.mouse_y))
+            if self.show_coordinates:
+                self.ui_manager.status('%.6f %.6f' % self.proj.screen_to_latlon(self.mouse_x, SCREEN_H - self.mouse_y))
 
         if self.invalidate_delay == 2:
             self.ui_manager.status('rendering...')
@@ -281,6 +283,10 @@ class GeoplotlibApp(pyglet.window.Window):
             self.proj.pan(0, +KEYBOARD_PAN)
         elif symbol == pyglet.window.key.S:
             self.proj.pan(0, -KEYBOARD_PAN)
+        elif symbol == pyglet.window.key.B:
+            print(self.proj.bbox())
+        elif symbol == pyglet.window.key.C:
+            self.show_coordinates = not self.show_coordinates
         else:
             for l in self.geoplotlib_config.layers:
                 need_invalidate = l.on_key_release(symbol, modifiers)
