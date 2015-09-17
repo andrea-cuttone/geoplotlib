@@ -593,8 +593,8 @@ class BatchPainter:
 class Projector():
 
     def __init__(self):
-        self.tiles_horizontally = int(math.ceil(1.*SCREEN_W / TILE_SIZE))
-        self.tiles_vertically = int(math.ceil(1.*SCREEN_H / TILE_SIZE))
+        self.tiles_horizontally = 1.*SCREEN_W / TILE_SIZE
+        self.tiles_vertically = 1.*SCREEN_H / TILE_SIZE
         self.fit(BoundingBox.WORLD)
 
 
@@ -609,11 +609,14 @@ class Projector():
         :param bbox: BoundingBox
         :param max_zoom: max zoom allowed
         """
+
+        BUFFER_FACTOR = 1.1
+        
         for zoom in range(max_zoom, MIN_ZOOM-1, -1):
             self.zoom = zoom
             left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
             right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])
-            if (top - bottom < SCREEN_H) and (right - left < SCREEN_W):
+            if (top - bottom < SCREEN_H*BUFFER_FACTOR) and (right - left < SCREEN_W*BUFFER_FACTOR):
                 break
 
         west_tile, north_tile = self.deg2num(bbox.north, bbox.west, self.zoom)
@@ -645,7 +648,6 @@ class Projector():
         north, west = self.num2deg(self.xtile, self.ytile, self.zoom)
         south, east = self.num2deg(self.xtile + self.tiles_horizontally, self.ytile + self.tiles_vertically, self.zoom)
         return BoundingBox(north=north, west=west, south=south, east=east)
-        #print 'moving to', self.nw, self.zoom
 
 
     def pan(self, deltax, deltay):
@@ -833,8 +835,8 @@ class MapLayer():
 
 
     def draw(self, proj):
-        for x in range(int(proj.xtile), int(proj.xtile) + proj.tiles_horizontally + 1):
-            for y in range(int(proj.ytile), int(proj.ytile) + proj.tiles_vertically + 1):
+        for x in range(int(proj.xtile), int(proj.xtile + proj.tiles_horizontally + 1)):
+            for y in range(int(proj.ytile), int(proj.ytile + proj.tiles_vertically + 1)):
                 tilesurf = self.get_tile(proj.zoom, x, y)
                 if tilesurf is not None:
                     try:
