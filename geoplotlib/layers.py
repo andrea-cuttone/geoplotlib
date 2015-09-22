@@ -848,7 +848,7 @@ class ConvexHullLayer(BaseLayer):
 
 class GridLayer(BaseLayer):
 
-    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10):
+    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10, colormap_scale='lin', show_colorbar=True):
         """
         Values over a uniform grid
         
@@ -860,11 +860,15 @@ class GridLayer(BaseLayer):
         :param vmin: minimum value for the colormap
         :param vmax: maximum value for the colormap
         :param levels: number of levels for the colormap
+        :param colormap_scale: colormap scale
+        :param show_colorbar: show the colorbar in the UI
         """
         self.lon_edges = lon_edges
         self.lat_edges = lat_edges
         self.values = values
         self.cmap = colors.ColorMap(cmap, alpha=alpha, levels=levels)
+        self.colormap_scale = colormap_scale
+        self.show_colorbar = show_colorbar
 
         if vmin:
             self.vmin = vmin
@@ -888,13 +892,15 @@ class GridLayer(BaseLayer):
                 d = self.values[iy, ix]
                 if d > self.vmin:
                     rects.append((xv[ix], yv[iy], xv[ix+1], yv[iy+1]))
-                    cols.append(self.cmap.to_color(d, self.vmax, 'lin'))
+                    cols.append(self.cmap.to_color(d, self.vmax, self.colormap_scale))
 
         self.painter.batch_rects(rects, cols)
 
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
+        if self.show_colorbar:
+            ui_manager.add_colorbar(self.cmap, self.vmax, self.colormap_scale)
 
 
     def bbox(self):

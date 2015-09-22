@@ -255,9 +255,9 @@ def labels(data, label_column, color=None, font_name=FONT_NAME,
            font_size, anchor_x, anchor_y))
 
 
-def grid(lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10):
+def grid(lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10, colormap_scale='lin', show_colorbar=True):
     """
-        Values over a uniform grid
+        Values on a uniform grid
         
         :param lon_edges: longitude edges
         :param lat_edges: latitude edges
@@ -267,10 +267,12 @@ def grid(lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, le
         :param vmin: minimum value for the colormap
         :param vmax: maximum value for the colormap
         :param levels: number of levels for the colormap
+        :param colormap_scale: colormap scale
+        :param show_colorbar: show the colorbar in the UI
         """
     from geoplotlib.layers import GridLayer
     _global_config.layers.append(
-        GridLayer(lon_edges, lat_edges, values, cmap, alpha, vmin, vmax, levels))
+        GridLayer(lon_edges, lat_edges, values, cmap, alpha, vmin, vmax, levels, colormap_scale, show_colorbar))
 
 
 def clear():

@@ -26,9 +26,42 @@ KEYBOARD_PAN = 0.2
 TOTAL_INVALIDATE_DELAY = 50
 FONT_COLOR = (0,0,0,255)
 FONT_NAME = 'Helvetica'
-
+FONT_SCALING = 1./100
 
 class UiManager:
+
+    class Colorbar():
+
+        def __init__(self, cmap, vmax, colormap_scale, size=.5):
+            self.cmap = cmap
+            self.vmax = vmax
+            self.colormap_scale = colormap_scale
+            self.size = size
+
+
+        def draw(self, painter):
+            total_h = SCREEN_H*self.size
+            step = total_h / self.cmap.levels
+            bar_w = SCREEN_W/25
+
+            lab = pyglet.text.Label('',
+                               color=FONT_COLOR,
+                               font_name=FONT_NAME,
+                               font_size=int(SCREEN_W*FONT_SCALING),
+                               x=SCREEN_W, y=SCREEN_H,
+                               anchor_x='right', anchor_y='center')
+
+            for i in range(self.cmap.levels+1):
+                if i < self.cmap.levels:
+                    col = self.cmap.to_color(self.vmax * i / self.cmap.levels, self.vmax, 'lin')
+                    painter.set_color(col[:-1])
+                    painter.rect(SCREEN_W-2*bar_w/2, SCREEN_H-total_h*1.5+step*i, 
+                                 SCREEN_W-bar_w/2, SCREEN_H-total_h*1.5+step*(i+1))
+                lab.x = SCREEN_W-2*bar_w/2*1.1
+                lab.y = SCREEN_H-total_h*1.5+step*i
+                lab.text = str(int(1. * self.vmax * i / self.cmap.levels))
+                lab.draw()
+
 
     def __init__(self):
         self.font_size = 16
@@ -56,6 +89,9 @@ class UiManager:
                                        font_size=self.font_size,
                                        x=SCREEN_W, y=SCREEN_H,
                                        anchor_x='right', anchor_y='top')
+
+        self.colorbar = None
+
 
     def tooltip(self, text):
         self.labels['tooltip'].text = parse_raw_str(text)
@@ -93,6 +129,10 @@ class UiManager:
 
     def draw(self, mouse_x, mouse_y):
         painter = BatchPainter()
+
+        if self.colorbar:
+            self.colorbar.draw(painter)
+
         painter.set_color([255,255,255])
         self.labels['tooltip'].x = mouse_x
         self.labels['tooltip'].y = mouse_y
@@ -106,6 +146,10 @@ class UiManager:
     def clear(self):
         for l in self.labels.values():
             l.text = ''
+
+
+    def add_colorbar(self, cmap, vmax, colormap_scale):
+        self.colorbar = UiManager.Colorbar(cmap, vmax, colormap_scale)
 
 
 class GeoplotlibApp(pyglet.window.Window):
