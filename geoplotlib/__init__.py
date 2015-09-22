@@ -96,7 +96,7 @@ def scatter(data, color=None, point_size=2, f_tooltip=None):
 
 
 def hist(data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, show_tooltip=False,
-         scalemin=0, scalemax=None, f_group=None):
+         scalemin=0, scalemax=None, f_group=None, show_colorbar=True):
     """Create a 2D histogram
 
     :param data: data access object
@@ -108,11 +108,12 @@ def hist(data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, show_toolti
     :param scalemin: min value for displaying a bin
     :param scalemax: max value for a bin
     :param f_group: function to apply to samples in the same bin. Default is to count
+    :param show_colorbar: show colorbar
     """
     from geoplotlib.layers import HistogramLayer
     _global_config.layers.append(HistogramLayer(data, cmap=cmap, alpha=alpha, colorscale=colorscale,
                                     binsize=binsize, show_tooltip=show_tooltip, scalemin=scalemin, 
-                                    scalemax=scalemax, f_group=f_group))
+                                    scalemax=scalemax, f_group=f_group, show_colorbar=show_colorbar))
 
 
 def graph(data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, color='hot'):
@@ -189,7 +190,7 @@ def convexhull(data, col, fill=True, point_size=4):
 
 
 def kde(data, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
-                 cut_below=None, clip_above=None, binsize=1, cmap_levels=10):
+                 cut_below=None, clip_above=None, binsize=1, cmap_levels=10, show_colorbar=False):
     """
     Kernel density estimation visualization
 
@@ -204,10 +205,11 @@ def kde(data, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
     :param clip_above: defines the max value for the colorscale
     :param binsize: size of the bins for hist estimator
     :param cmap_levels: discretize colors into cmap_levels levels
+    :param show_colorbar: show colorbar
     """
     from geoplotlib.layers import KDELayer
     _global_config.layers.append(KDELayer(data, bw, cmap, method, scaling, alpha,
-                 cut_below, clip_above, binsize, cmap_levels))
+                 cut_below, clip_above, binsize, cmap_levels, show_colorbar))
 
 
 def markers(data, marker, f_tooltip=None, marker_preferred_size=32):

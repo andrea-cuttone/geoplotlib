@@ -62,7 +62,10 @@ class UiManager:
                                  SCREEN_W-bar_w/2, SCREEN_H-total_h*1.5+step*(i+1))
                 lab.x = SCREEN_W-2*bar_w/2*1.1
                 lab.y = SCREEN_H-total_h*1.5+step*i
-                lab.text = str(int(edges[i]))
+                if self.colormap_scale == 'log':
+                    lab.text = '%.2E' % edges[i]
+                else:
+                    lab.text = '%.1f' % edges[i]
                 lab.draw()
 
 

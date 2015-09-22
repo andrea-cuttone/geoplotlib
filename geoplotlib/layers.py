@@ -161,8 +161,8 @@ class DotDensityLayer(BaseLayer):
 
 class HistogramLayer(BaseLayer):
 
-    def __init__(self, data, cmap='hot', alpha=220, colorscale='sqrt',
-                 binsize=16, show_tooltip=False, scalemin=0, scalemax=None, f_group=None):
+    def __init__(self, data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, 
+                 show_tooltip=False, scalemin=0, scalemax=None, f_group=None, show_colorbar=True):
         """Create a 2D histogram
 
         :param data: data access object
@@ -174,6 +174,7 @@ class HistogramLayer(BaseLayer):
         :param scalemin: min value for displaying a bin
         :param scalemax: max value for a bin
         :param f_group: function to apply to samples in the same bin. Default is to count
+        :param show_colorbar: show colorbar
         :return:
         """
         self.data = data
@@ -186,6 +187,7 @@ class HistogramLayer(BaseLayer):
         self.f_group = f_group
         if self.f_group is None:
             self.f_group = lambda grp: len(grp)
+        self.show_colorbar = show_colorbar
 
 
     def invalidate(self, proj):
@@ -202,14 +204,14 @@ class HistogramLayer(BaseLayer):
         self.hotspot = HotspotManager()
 
         if self.scalemax:
-            vmax = self.scalemax
+            self.vmax = self.scalemax
         else:
-            vmax = max(results.values()) if len(results) > 0 else 0
+            self.vmax = max(results.values()) if len(results) > 0 else 0
 
-        if vmax >= 1:
+        if self.vmax >= 1:
             for (ix, iy), value in results.items():
                 if value > self.scalemin:
-                    self.painter.set_color(self.cmap.to_color(value, vmax, self.colorscale))
+                    self.painter.set_color(self.cmap.to_color(value, self.vmax, self.colorscale))
                     l = self.binsize
                     rx = ix * self.binsize
                     ry = iy * self.binsize
@@ -224,6 +226,9 @@ class HistogramLayer(BaseLayer):
         picked = self.hotspot.pick(mouse_x, mouse_y)
         if picked:
             ui_manager.tooltip(picked)
+        if self.show_colorbar:
+            ui_manager.add_colorbar(self.cmap, self.vmax, self.colorscale)
+
 
     def bbox(self):
         return BoundingBox.from_points(lons=self.data['lon'], lats=self.data['lat'])
@@ -688,7 +693,7 @@ class MarkersLayer(BaseLayer):
 class KDELayer(BaseLayer):
 
     def __init__(self, values, bw, cmap='hot', method='hist', scaling='sqrt', alpha=220,
-                 cut_below=None, clip_above=None, binsize=1, cmap_levels=10):
+                 cut_below=None, clip_above=None, binsize=1, cmap_levels=10, show_colorbar=False):
         """
         Kernel density estimation visualization
 
@@ -703,6 +708,7 @@ class KDELayer(BaseLayer):
         :param clip_above: defines the max value for the colorscale
         :param binsize: size of the bins for hist estimator
         :param cmap_levels: discretize colors into cmap_levels
+        :param show_colorbar: show colorbar
         """
         self.values = values
         self.bw = bw
@@ -712,6 +718,7 @@ class KDELayer(BaseLayer):
         self.cut_below = cut_below
         self.clip_above = clip_above
         self.binsize = binsize
+        self.show_colorbar = show_colorbar
 
 
     def _get_grid(self, proj):
@@ -786,9 +793,9 @@ class KDELayer(BaseLayer):
                 Hmin = self.cut_below
 
             if self.clip_above is None:
-                Hmax = H.max()
+                self.Hmax = H.max()
             else:
-                Hmax = self.clip_above
+                self.Hmax = self.clip_above
 
             if self.scaling == 'ranking':
                 from statsmodels.distributions.empirical_distribution import ECDF
@@ -801,7 +808,7 @@ class KDELayer(BaseLayer):
                         if self.scaling == 'ranking':
                             rects_colors.append(self.cmap.to_color(ecdf(H[iy, ix]) - ecdf(Hmin), 1 - ecdf(Hmin), 'lin'))
                         else:
-                            rects_colors.append(self.cmap.to_color(H[iy, ix], Hmax, self.scaling))
+                            rects_colors.append(self.cmap.to_color(H[iy, ix], self.Hmax, self.scaling))
         else:
             raise Exception('method not supported')
 
@@ -810,6 +817,8 @@ class KDELayer(BaseLayer):
 
     def draw(self, proj, mouse_x, mouse_y, ui_manager):
         self.painter.batch_draw()
+        if self.show_colorbar:
+            ui_manager.add_colorbar(self.cmap, self.Hmax, self.scaling)
 
 
 class ConvexHullLayer(BaseLayer):
@@ -848,7 +857,8 @@ class ConvexHullLayer(BaseLayer):
 
 class GridLayer(BaseLayer):
 
-    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10, colormap_scale='lin', show_colorbar=True):
+    def __init__(self, lon_edges, lat_edges, values, cmap, alpha=255, vmin=None, vmax=None, levels=10, 
+            colormap_scale='lin', show_colorbar=True):
         """
         Values over a uniform grid
         
