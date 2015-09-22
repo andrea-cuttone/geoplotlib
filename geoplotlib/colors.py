@@ -54,9 +54,9 @@ class ColorMap():
             value = 0
         elif value > 1:
             value = 1
-            
-        delta = 1. / self.levels
-        value = round(value / delta) * delta
+
+        value = int(1.*self.levels*value)*1./(self.levels-1)
+
         if value not in self.mapping:
             self.mapping[value] = _convert_color_format(self.cmap(value), self.alpha)
         return self.mapping[value]
