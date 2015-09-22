@@ -28,14 +28,16 @@ FONT_COLOR = (0,0,0,255)
 FONT_NAME = 'Helvetica'
 FONT_SCALING = 1./100
 
+
 class UiManager:
 
     class Colorbar():
 
-        def __init__(self, cmap, vmax, colormap_scale, size=.5):
+        def __init__(self, cmap, vmax, colormap_scale, font_size, size=.5):
             self.cmap = cmap
             self.vmax = vmax
             self.colormap_scale = colormap_scale
+            self.font_size = font_size
             self.size = size
 
 
@@ -47,7 +49,7 @@ class UiManager:
             lab = pyglet.text.Label('',
                                color=FONT_COLOR,
                                font_name=FONT_NAME,
-                               font_size=int(SCREEN_W*FONT_SCALING),
+                               font_size=int(.8*self.font_size),
                                x=SCREEN_W, y=SCREEN_H,
                                anchor_x='right', anchor_y='center')
 
@@ -65,9 +67,8 @@ class UiManager:
 
 
     def __init__(self):
-        self.font_size = 16
+        self.font_size = int(SCREEN_W*FONT_SCALING)
         self.padding = 2
-
         self.labels = {}
 
         self.labels['status'] = pyglet.text.Label('',
@@ -150,7 +151,7 @@ class UiManager:
 
 
     def add_colorbar(self, cmap, vmax, colormap_scale):
-        self.colorbar = UiManager.Colorbar(cmap, vmax, colormap_scale)
+        self.colorbar = UiManager.Colorbar(cmap, vmax, colormap_scale, self.font_size)
 
 
 class GeoplotlibApp(pyglet.window.Window):
@@ -247,8 +248,8 @@ class GeoplotlibApp(pyglet.window.Window):
         attribution = pyglet.text.Label(self.map_layer.attribution,
                                        color=FONT_COLOR,
                                        font_name=FONT_NAME,
-                                       font_size=10,
-                                       x=SCREEN_W, y=16,
+                                       font_size=int(.8*SCREEN_W*FONT_SCALING),
+                                       x=SCREEN_W, y=int(1.5*SCREEN_W*FONT_SCALING),
                                        anchor_x='right', anchor_y='top')
         attribution.draw()
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)

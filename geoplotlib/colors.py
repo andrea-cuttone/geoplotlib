@@ -68,7 +68,6 @@ class ColorMap():
         
         for i in range(self.levels+1):
             z = 1. * i / self.levels
-            print maxvalue, z
             if scale == 'lin':
                 edges.append(maxvalue * z)
             elif scale == 'log':
