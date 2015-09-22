@@ -62,6 +62,34 @@ class ColorMap():
         return self.mapping[value]
 
 
+    def get_boundaries(self, maxvalue, scale):
+        edges = []
+        colors = []
+        
+        for i in range(self.levels+1):
+            z = 1. * i / self.levels
+            print maxvalue, z
+            if scale == 'lin':
+                edges.append(maxvalue * z)
+            elif scale == 'log':
+                # log(v)/log(maxvalue) = z
+                # log(v) = log(maxvalue)*z
+                # v = e^(log(maxvalue)*z)
+                edges.append(math.exp(math.log(maxvalue)*z))
+            elif scale == 'sqrt':
+                # sqrt(v)/sqrt(maxvalue) = z
+                # v/maxvalue = z^2
+                # v = maxvalue * z^2
+                edges.append(maxvalue * z**2)
+            else:
+                raise Exception('scale must be "lin", "log", or "sqrt"') 
+
+        for e in edges[:-1]:
+            colors.append(self.to_color(e, maxvalue, scale))
+
+        return edges, colors
+
+
 def create_set_cmap(values, cmap_name, alpha=255):
     """
     return a dict of colors corresponding to the unique values

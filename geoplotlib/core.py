@@ -51,15 +51,16 @@ class UiManager:
                                x=SCREEN_W, y=SCREEN_H,
                                anchor_x='right', anchor_y='center')
 
+            edges, colors = self.cmap.get_boundaries(self.vmax, self.colormap_scale)
+
             for i in range(self.cmap.levels+1):
                 if i < self.cmap.levels:
-                    col = self.cmap.to_color(self.vmax * i / self.cmap.levels, self.vmax, 'lin')
-                    painter.set_color(col[:-1])
+                    painter.set_color(colors[i][:-1])
                     painter.rect(SCREEN_W-2*bar_w/2, SCREEN_H-total_h*1.5+step*i, 
                                  SCREEN_W-bar_w/2, SCREEN_H-total_h*1.5+step*(i+1))
                 lab.x = SCREEN_W-2*bar_w/2*1.1
                 lab.y = SCREEN_H-total_h*1.5+step*i
-                lab.text = str(int(1. * self.vmax * i / self.cmap.levels))
+                lab.text = str(int(edges[i]))
                 lab.draw()
 
 
