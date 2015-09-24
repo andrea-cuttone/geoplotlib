@@ -252,7 +252,8 @@ class GeoplotlibApp(pyglet.window.Window):
                                        color=FONT_COLOR,
                                        font_name=FONT_NAME,
                                        font_size=int(.8*SCREEN_W*FONT_SCALING),
-                                       x=SCREEN_W, y=int(1.5*SCREEN_W*FONT_SCALING),
+                                       x=SCREEN_W-int(.2*SCREEN_W*FONT_SCALING), 
+                                       y=int(1.2*SCREEN_W*FONT_SCALING),
                                        anchor_x='right', anchor_y='top')
         attribution.draw()
         self.ui_manager.draw(self.mouse_x, SCREEN_H - self.mouse_y)
