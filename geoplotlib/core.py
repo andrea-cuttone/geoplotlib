@@ -65,7 +65,7 @@ class UiManager:
                 if self.colormap_scale == 'log':
                     lab.text = '%.2E' % edges[i]
                 else:
-                    lab.text = '%.1f' % edges[i]
+                    lab.text = '%d' % edges[i]
                 lab.draw()
 
 
@@ -358,9 +358,10 @@ class GeoplotlibApp(pyglet.window.Window):
     def start(self):
         #pyglet.options['debug_gl'] = False
         if self.geoplotlib_config.bbox is not None:
-            self.proj.fit(self.geoplotlib_config.bbox)
+            self.proj.fit(self.geoplotlib_config.bbox, force_zoom=self.geoplotlib_config.requested_zoom)
         elif len(self.geoplotlib_config.layers) > 0:
-            self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self.geoplotlib_config.layers]))
+            self.proj.fit(BoundingBox.from_bboxes([l.bbox() for l in self.geoplotlib_config.layers]),
+                          force_zoom=self.geoplotlib_config.requested_zoom)
         for l in self.geoplotlib_config.layers:
             l.invalidate(self.proj)
 
@@ -652,21 +653,25 @@ class Projector():
         self.xtile, self.ytile = self.deg2num(north, west, zoom)
 
 
-    def fit(self, bbox, max_zoom=MAX_ZOOM):
+    def fit(self, bbox, max_zoom=MAX_ZOOM, force_zoom=None):
         """
         Fits the projector to a BoundingBox
         :param bbox: BoundingBox
         :param max_zoom: max zoom allowed
+        :param force_zoom: force this specific zoom value even if the whole bbox does not completely fit
         """
 
         BUFFER_FACTOR = 1.1
         
-        for zoom in range(max_zoom, MIN_ZOOM-1, -1):
-            self.zoom = zoom
-            left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
-            right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])
-            if (top - bottom < SCREEN_H*BUFFER_FACTOR) and (right - left < SCREEN_W*BUFFER_FACTOR):
-                break
+        if force_zoom is not None:
+            self.zoom = force_zoom
+        else:
+            for zoom in range(max_zoom, MIN_ZOOM-1, -1):
+                self.zoom = zoom
+                left, top = self.lonlat_to_screen([bbox.west], [bbox.north])
+                right, bottom = self.lonlat_to_screen([bbox.east], [bbox.south])
+                if (top - bottom < SCREEN_H*BUFFER_FACTOR) and (right - left < SCREEN_W*BUFFER_FACTOR):
+                    break
 
         west_tile, north_tile = self.deg2num(bbox.north, bbox.west, self.zoom)
         east_tile, south_tile = self.deg2num(bbox.south, bbox.east, self.zoom)

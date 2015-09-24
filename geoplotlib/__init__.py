@@ -20,6 +20,7 @@ class AppConfig:
         screen =  pyglet.canvas.get_display().get_default_screen()
         self.screen_w = int(screen.width * .9)
         self.screen_h = int(screen.height * .9)
+        self.requested_zoom = None
 
 
 _global_config = AppConfig()
@@ -346,3 +347,7 @@ def set_window_size(w, h):
     """
     _global_config.screen_w = w
     _global_config.screen_h = h
+
+
+def request_zoom(zoom):
+    _global_config.requested_zoom = zoom
