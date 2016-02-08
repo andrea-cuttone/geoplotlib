@@ -47,11 +47,11 @@ optional requirements:
 * [scipy](http://www.scipy.org) for some layers
 * [pyshp](https://github.com/GeospatialPython/pyshp) for reading .shp files
 
-to install from source run :
+to install from source run:
 
 ```python setup.py install```
 
-or with pip
+or with pip:
 
 ```pip install geoplotlib```
 
