@@ -39,8 +39,8 @@ All examples source code is [here](https://github.com/andrea-cuttone/geoplotlib/
 
 geoplotlib requires:
 * [numpy](http://www.numpy.org/)
-* [pyglet 1.2.x](http://www.pyglet.org/download.html)
-	* **note:** in order for pyglet to work with ipython on Mac, [this workaround](https://code.google.com/p/pyglet/issues/detail?id=728) is needed. [Here](https://code.google.com/r/andreacuttone-pyglet-multipleruns/) you can find a fork of the pyglet dev branch with the workaround applied
+* [pyglet 1.2.4](http://www.pyglet.org/download.html)
+	* **note:** in order for pyglet to work with ipython on Mac, version 1.2.4 or newer is needed
 
 optional requirements:
 * [matplotlib](http://matplotlib.org/) for colormaps
