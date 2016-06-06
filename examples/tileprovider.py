@@ -2,7 +2,6 @@
 Example of setting a custom tile provider
 """
 import geoplotlib
-from geoplotlib.utils import read_csv
 
 
 geoplotlib.tiles_provider({
