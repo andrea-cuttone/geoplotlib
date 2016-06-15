@@ -805,7 +805,7 @@ class TileDownloaderThread(Thread):
 
 _GEOPLOTLIB_ATTRIBUTION = u'made with geoplotlib | '
 
-_DEFAULT_TILE_PROVIDES = {
+_DEFAULT_TILE_PROVIDERS = {
     'watercolor': { 'url': lambda zoom, xtile, ytile:
                             'http://%s.tile.stamen.com/watercolor/%d/%d/%d.png' % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
                     'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
@@ -837,10 +837,10 @@ class MapLayer():
 
     def __init__(self, tiles_provider, skipdl=False):
         if type(tiles_provider) == str:
-            if tiles_provider in _DEFAULT_TILE_PROVIDES:
+            if tiles_provider in _DEFAULT_TILE_PROVIDERS:
                 self.tiles_dir = tiles_provider
-                self.url_generator = _DEFAULT_TILE_PROVIDES[tiles_provider]['url']
-                self.attribution = _DEFAULT_TILE_PROVIDES[tiles_provider]['attribution']
+                self.url_generator = _DEFAULT_TILE_PROVIDERS[tiles_provider]['url']
+                self.attribution = _DEFAULT_TILE_PROVIDERS[tiles_provider]['attribution']
             else:
                 raise Exception('unknown style ' + tiles_provider)
         else:
