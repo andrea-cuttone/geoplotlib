@@ -1,7 +1,7 @@
 geoplotlib is a python toolbox for visualizing geographical data and making maps
 
 # A first example
-To produce a dot density map:
+To produce a dot map:
 
 ```python
 data = read_csv('data/bus.csv')
@@ -11,14 +11,18 @@ geoplotlib.show()
 
 This will launch the geoplotlib window and plot the points on OpenStreetMap tiles, also allowing zooming and panning. geoplotlib automatically handles the data loading, the map projection, downloading the map tiles and the graphics rendering with OpenGL.
 
-![demo](http://i.imgur.com/hr9GnLE.gif)
+Click on the image to see a short youtube video demo:
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=OTbMCP7vZ_o
+" target="_blank"><img src="http://i.imgur.com/w3rBv3U.png" 
+alt="" border="10" /></a>
 
 # Examples gallery
 
-[Dot Density Map](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/dot.py)
+[Dot Map](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/dot.py)
 ![dot](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/dotdensity.png)
 
-[Heatmap (Kernel Density estimation)](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/kde.py)
+[Heatmap](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/kde.py)
 ![kde](https://raw.githubusercontent.com/andrea-cuttone/geoplotlib/master/examples/screenshots/kde1.png)
 
 [Shapefiles](https://github.com/andrea-cuttone/geoplotlib/blob/master/examples/shapefiles.py)
