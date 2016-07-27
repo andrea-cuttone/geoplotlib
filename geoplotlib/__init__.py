@@ -14,7 +14,7 @@ class AppConfig:
         self.layers = []
         self.bbox = None
         self.savefig = None
-        self.tiles_provider = 'mapquest'
+        self.tiles_provider = 'positron'
         self.smoothing = False
         self.map_alpha = 255
         screen =  pyglet.canvas.get_display().get_default_screen()

@@ -818,10 +818,6 @@ _DEFAULT_TILE_PROVIDERS = {
                             "http://%s.tile.stamen.com/toner-lite/%d/%d/%d.png" % (random.choice(['a', 'b', 'c', 'd']), zoom, xtile, ytile),
                     'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
     },
-    'mapquest': { 'url': lambda zoom, xtile, ytile:
-                            "http://otile%d.mqcdn.com/tiles/1.0.0/osm/%d/%d/%d.png" % (random.randint(1, 4), zoom, xtile, ytile),
-                  'attribution': _GEOPLOTLIB_ATTRIBUTION + 'Tiles Courtesy of MapQuest, Data by OpenStreetMap, under ODbL.'
-    },
     'darkmatter': { 'url': lambda zoom, xtile, ytile:
                             'http://%s.basemaps.cartocdn.com/dark_all/%d/%d/%d.png' % (random.choice(['a', 'b', 'c']), zoom, xtile, ytile),
                     'attribution': _GEOPLOTLIB_ATTRIBUTION + u'© OpenStreetMap contributors © CartoDB'
