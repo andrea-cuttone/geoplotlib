@@ -117,7 +117,8 @@ def hist(data, cmap='hot', alpha=220, colorscale='sqrt', binsize=16, show_toolti
                                     scalemax=scalemax, f_group=f_group, show_colorbar=show_colorbar))
 
 
-def graph(data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, color='hot'):
+def graph(data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, color='hot',
+          levels=10, color_by = None, seg_scale='log'):
     """Create a graph drawing a line between each pair of (src_lat, src_lon) and (dest_lat, dest_lon)
 
     :param data: data access object
@@ -128,9 +129,14 @@ def graph(data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, co
     :param linewidth: line width
     :param alpha: color alpha
     :param color: color or colormap
+    :param levels: coloring levels
+    :param color_by: attribute name for color, default using node distance
+    :param seg_scale: coloring data segamentation sacle, 'log' or 'lin',
+        'lin' only used if not by distance
     """
     from geoplotlib.layers import GraphLayer
-    _global_config.layers.append(GraphLayer(data, src_lat, src_lon, dest_lat, dest_lon, linewidth, alpha, color))
+    _global_config.layers.append(GraphLayer(data, src_lat, src_lon, dest_lat, dest_lon, linewidth, alpha,
+                                            color,levels, color_by, seg_scale))
 
 
 def shapefiles(fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
