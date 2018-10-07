@@ -69,7 +69,7 @@ class QuadsLayer(BaseLayer):
             else:
                 done.append(qt)
         
-        print len(queue), len(done)
+        print(len(queue), len(done))
 
         if self.cmap is not None:
             for qt in done:
