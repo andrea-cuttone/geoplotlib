@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Queue import Queue
+from queue import Queue
 from threading import Thread
 from pyglet.window import mouse
 import time
@@ -58,7 +58,7 @@ class UiManager:
             for i in range(self.cmap.levels+1):
                 if i < self.cmap.levels:
                     painter.set_color(colors[i][:-1])
-                    painter.rect(SCREEN_W-2*bar_w/2, SCREEN_H-total_h*1.5+step*i, 
+                    painter.rect(SCREEN_W-2*bar_w/2, SCREEN_H-total_h*1.5+step*i,
                                  SCREEN_W-bar_w/2, SCREEN_H-total_h*1.5+step*(i+1))
                 lab.x = SCREEN_W-2*bar_w/2*1.1
                 lab.y = SCREEN_H-total_h*1.5+step*i
@@ -252,7 +252,7 @@ class GeoplotlibApp(pyglet.window.Window):
                                        color=FONT_COLOR,
                                        font_name=FONT_NAME,
                                        font_size=int(.8*SCREEN_W*FONT_SCALING),
-                                       x=SCREEN_W-int(.2*SCREEN_W*FONT_SCALING), 
+                                       x=SCREEN_W-int(.2*SCREEN_W*FONT_SCALING),
                                        y=int(1.2*SCREEN_W*FONT_SCALING),
                                        anchor_x='right', anchor_y='top')
         attribution.draw()
@@ -560,7 +560,7 @@ class BatchPainter:
                                     font_name=font_name,
                                     font_size=font_size,
                                     x=x[i], y=y[i],
-                                    anchor_x=anchor_x, 
+                                    anchor_x=anchor_x,
                                     anchor_y=anchor_y)
             self._labels.append(lab)
 
@@ -663,7 +663,7 @@ class Projector():
         """
 
         BUFFER_FACTOR = 1.1
-        
+
         if force_zoom is not None:
             self.zoom = force_zoom
         else:
