@@ -937,7 +937,7 @@ class GeoJSONLayer(BaseLayer):
         self.boundingbox = None
         
         for feature in self.data['features']:
-            if not feature['geometry']:
+            if feature['geometry'] is None:
                 print('feature without geometry data: %s' % feature['properties']['NAME'])
                 continue
                 
