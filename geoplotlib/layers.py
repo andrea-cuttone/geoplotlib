@@ -937,6 +937,10 @@ class GeoJSONLayer(BaseLayer):
         self.boundingbox = None
         
         for feature in self.data['features']:
+            if not feature['geometry']:
+                print('feature without geometry data: %s' % feature['properties']['NAME'])
+                continue
+                
             if feature['geometry']['type'] == 'Polygon':
                 for poly in feature['geometry']['coordinates']: 
                     poly = np.array(poly)
