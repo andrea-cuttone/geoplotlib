@@ -8,5 +8,5 @@ setup(name='geoplotlib',
       author='Andrea Cuttone',
       author_email='andreacuttone@gmail.com',
       url='https://github.com/andrea-cuttone/geoplotlib',
-      install_requires=['numpy>=1.12','pyglet>=1.2.4','scipy>=1.1.0', 'matplotlib>=3.0.2']
+      install_requires=['numpy>=1.12','pyglet>=1.2.4']
 )
