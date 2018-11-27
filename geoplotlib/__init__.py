@@ -1,3 +1,4 @@
+import base64
 import traceback
 import pyglet
 from geoplotlib.core import GeoplotlibApp
@@ -68,10 +69,11 @@ def inline(width=900):
 
     if os.path.isfile(fname + '.png'):
         with open(fname + '.png', 'rb') as fin:
-            base64 = urllib.quote(fin.read().encode("base64"))
+            encoded = base64.b64encode(fin.read())
+            b64 = urllib.parse.quote(encoded)
 
-        image_html = "<img style='width: %dpx; margin: 0px; float: left; border: 1px solid black;' src='data:image/png;base64,%s' />" % (width, base64)
-        
+        image_html = "<img style='width: %dpx; margin: 0px; float: left; border: 1px solid black;' src='data:image/png;base64,%s' />" % (width, b64)
+
         display(HTML(image_html))
         os.remove(fname + '.png')
 
