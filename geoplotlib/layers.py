@@ -5,13 +5,13 @@ import threading
 import math
 import pyglet
 import numpy as np
-import colors
-from geoplotlib.core import BatchPainter
+import geoplotlib.colors as colors
+from geoplotlib.core import BatchPainter,FONT_NAME
 from geoplotlib.utils import BoundingBox
 import Queue
 from inspect import isfunction
 import json
-from core import FONT_NAME
+
 
 
 class HotspotManager():
@@ -236,7 +236,9 @@ class HistogramLayer(BaseLayer):
 
 class GraphLayer(BaseLayer):
 
-    def __init__(self, data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, color='hot'):
+    def __init__(self, data, src_lat, src_lon, dest_lat, dest_lon,
+                 linewidth=1, alpha=220, color='hot',levels=10,
+                 color_by = None, seg_scale='log'):
         """Create a graph drawing a line between each pair of (src_lat, src_lon) and (dest_lat, dest_lon)
 
         :param data: data access object
@@ -247,6 +249,10 @@ class GraphLayer(BaseLayer):
         :param linewidth: line width
         :param alpha: color alpha
         :param color: color or colormap
+        :param levels: coloring levels
+        :param color_by: attribute name for color, default using node distance
+        :param seg_scale: coloring data segamentation sacle, 'log' or 'lin',
+            'lin' only used if not by distance
         """
         self.data = data
         self.src_lon = src_lon
@@ -258,7 +264,11 @@ class GraphLayer(BaseLayer):
         alpha = alpha
         self.color = color
         if type(self.color) == str:
-            self.cmap = colors.ColorMap(self.color, alpha)
+            self.cmap = colors.ColorMap(self.color, alpha, levels = levels)
+
+        if color_by is None:
+            self.color_by = 'distance'
+        self.seg_scale = seg_scale
 
 
     def invalidate(self, proj):
@@ -270,12 +280,24 @@ class GraphLayer(BaseLayer):
             self.painter.set_color(self.color)
             self.painter.lines(x0, y0, x1, y1, width=self.linewidth)
         else:
-            manhattan = np.abs(x0-x1) + np.abs(y0-y1)
-            vmax = manhattan.max()
-            distances = np.logspace(0, log10(manhattan.max()), 20)
-            for i in range(len(distances)-1, 1, -1):
-                mask = (manhattan > distances[i-1]) & (manhattan <= distances[i])
-                self.painter.set_color(self.cmap.to_color(distances[i], vmax, 'log'))
+            if self.color_by == 'distance':
+                manhattan = np.abs(x0-x1) + np.abs(y0-y1)
+                vmax = manhattan.max()
+                segmentations = np.logspace(0, log10(vmax), 20)
+                self.seg_scale = 'log'
+            else:
+                manhattan = self.data[self.color_by]
+                vmax = manhattan.max()
+                if self.seg_scale == 'log':
+                    # value 20 maybe should be optional
+                    segmentations = np.logspace(0, log10(vmax), 20)
+                else:
+                    # linear
+                    segmentations = np.linspace(0, vmax ,20)
+
+            for i in range(len(segmentations)-1, 1, -1):
+                mask = (manhattan > segmentations[i-1]) & (manhattan <= segmentations[i])
+                self.painter.set_color(self.cmap.to_color(segmentations[i], vmax, self.seg_scale))
                 self.painter.lines(x0[mask], y0[mask], x1[mask], y1[mask], width=self.linewidth)
 
 
