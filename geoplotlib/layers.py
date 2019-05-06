@@ -290,7 +290,7 @@ class GraphLayer(BaseLayer):
 
 class ShapefileLayer(BaseLayer):
 
-    def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
+    def __init__(self, fname, f_tooltip=None, color=None, linewidth=3, shape_type='full', encoding='utf-8', encodingErrors='strict'):
         """
         Loads and draws shapefiles
 
@@ -312,7 +312,7 @@ class ShapefileLayer(BaseLayer):
         except:
             raise Exception('ShapefileLayer requires pyshp')
 
-        self.reader = shapefile.Reader(fname)
+        self.reader = shapefile.Reader(fname, encoding=encoding, encodingErrors=encodingErrors)
         self.worker = None
         self.queue = Queue.Queue()
 

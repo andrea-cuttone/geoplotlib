@@ -135,7 +135,7 @@ def graph(data, src_lat, src_lon, dest_lat, dest_lon, linewidth=1, alpha=220, co
     _global_config.layers.append(GraphLayer(data, src_lat, src_lon, dest_lat, dest_lon, linewidth, alpha, color))
 
 
-def shapefiles(fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'):
+def shapefiles(fname, f_tooltip=None, color=None, linewidth=3, shape_type='full', encoding='utf-8', encodingErrors='strict'):
     """
     Load and draws shapefiles
 
@@ -146,7 +146,7 @@ def shapefiles(fname, f_tooltip=None, color=None, linewidth=3, shape_type='full'
     :param shape_type: either full or bbox
     """
     from geoplotlib.layers import ShapefileLayer
-    _global_config.layers.append(ShapefileLayer(fname, f_tooltip, color, linewidth, shape_type))
+    _global_config.layers.append(ShapefileLayer(fname, f_tooltip, color, linewidth, shape_type, encoding, encodingErrors))
 
 
 def voronoi(data, line_color=None, line_width=2, f_tooltip=None, cmap=None, max_area=1e4, alpha=220):
