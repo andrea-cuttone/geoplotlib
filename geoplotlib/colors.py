@@ -1,6 +1,8 @@
 from random import shuffle
 import math
 
+from matplotlib.pylab import get_cmap
+
 
 def _convert_color_format(col, alpha):
     return [int(c * 255) for c in col[:3]] + [alpha]
@@ -15,7 +17,7 @@ class ColorMap():
         :param alpha: color alpha
         :param levels: discretize the colorscale into levels
         """
-        from pylab import get_cmap
+
         self.cmap = get_cmap(cmap_name)
         self.alpha = alpha
         self.levels = levels
