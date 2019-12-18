@@ -14,7 +14,7 @@ Examples source code is [here](https://github.com/andrea-cuttone/geoplotlib/tree
 
 geoplotlib requires:
 * [numpy](http://www.numpy.org/)
-* [pyglet 1.2.4](https://bitbucket.org/pyglet/pyglet/wiki/Download)
+* [pyglet 1.2.4](https://github.com/pyglet/pyglet)
 	* **note:** in order for pyglet to work with ipython on Mac, version 1.2.4 or newer is needed
 
 optional requirements:
