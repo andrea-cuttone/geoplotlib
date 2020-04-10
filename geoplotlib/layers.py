@@ -677,8 +677,8 @@ class MarkersLayer(BaseLayer):
         self.f_tooltip = f_tooltip
         self.marker_preferred_size = float(marker_preferred_size)
         self.marker = pyglet.image.load(marker)
-        self.marker.anchor_x = self.marker.width / 2
-        self.marker.anchor_y = self.marker.height / 2
+        self.marker.anchor_x = self.marker.width // 2
+        self.marker.anchor_y = self.marker.height // 2
         self.scale = self.marker_preferred_size / max(self.marker.width, self.marker.height)
 
         self.hotspots = HotspotManager()
