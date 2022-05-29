@@ -71,3 +71,7 @@ git checkout -b 이름 - branch를 바꿈 (git branch 와 git checkout 명령어
 git merge branch이름 - master branch입장에서 branch를 합침
 
 git init 폴더이름 - 폴더를 만들고 그 안에 git 저장소 생성
+git branch 브랜치1 브랜치2 – 브랜치2에서 새로운 브랜치1을 만듦
+git branch -d – 브랜치 삭제
+git log 커밋이름 – 그 커밋의 로그를 보여줌
+
