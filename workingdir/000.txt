@@ -74,4 +74,7 @@ git init 폴더이름 - 폴더를 만들고 그 안에 git 저장소 생성
 git branch 브랜치1 브랜치2 – 브랜치2에서 새로운 브랜치1을 만듦
 git branch -d – 브랜치 삭제
 git log 커밋이름 – 그 커밋의 로그를 보여줌
+git cat-file – hash값 - hash값의 파일 내용을 보여줌
+echo ‘version1’ > test.txt -  test/txt.파일을 만들고 그 내용을 version1으로 함
+git hash-object -w test.txt – hash값 보기
 
