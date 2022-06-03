@@ -64,6 +64,23 @@ branch 바꾸고 commit하면 master branch는 바꾼 시점의 commit에 머물
 
 다시 master로 checkout하면 testing branch일 때 commit 한건 안나옴
 
+git branch 브랜치1 브랜치2 – 브랜치2에서 새로운 브랜치1을 만듦
+
+git branch -d – 브랜치 삭제
+
+git log 커밋이름 – 그 커밋의 로그를 보여줌
+Git log -p -2 – log를 보여주되 각 커밋의 diff걀과를 보여줌. -2는 최근 두개의 커밋에 대한 정보만. 개수가 아닌 시간을 기준
+
+git log –-stat – 어떤 파일이 수정됐는지, 얼마나 많은 파일들이 변경, 추가, 삭제되었는지 보여줌
+
+git log –-pretty – 로그를 기본값이 아닌 다른 형식으로 변경 (online, short, full, format과 같이 씀)
+
+git log –-graph – 브랜치와 머지 히스토리 정보까지 아스키 그래프로 보여줌
+
+git log –since – 최근 n개의 커밋만 조회
+
+git log –author – 입력한 저자의 커밋만 보여줌
+
 git log --oneline --decorate --graph --all  - 역순으로 commit 을 작대기로 보여줌
 
 git checkout -b 이름 - branch를 바꿈 (git branch 와 git checkout 명령어를 합친 것)
@@ -71,10 +88,11 @@ git checkout -b 이름 - branch를 바꿈 (git branch 와 git checkout 명령어
 git merge branch이름 - master branch입장에서 branch를 합침
 
 git init 폴더이름 - 폴더를 만들고 그 안에 git 저장소 생성
-git branch 브랜치1 브랜치2 – 브랜치2에서 새로운 브랜치1을 만듦
-git branch -d – 브랜치 삭제
-git log 커밋이름 – 그 커밋의 로그를 보여줌
+
 git cat-file – hash값 - hash값의 파일 내용을 보여줌
+
 echo ‘version1’ > test.txt -  test/txt.파일을 만들고 그 내용을 version1으로 함
+
 git hash-object -w test.txt – hash값 보기
+
 
