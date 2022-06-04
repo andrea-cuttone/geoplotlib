@@ -95,4 +95,14 @@ echo ‘version1’ > test.txt -  test/txt.파일을 만들고 그 내용을 ver
 
 git hash-object -w test.txt – hash값 보기
 
+git commit –amend – 가장 최근 커밋 수정.
+
+Git remote – 리모트 저장소의 단축 이름을 보여줌. 저장소를 clone하면 origin이라는 리모트 저장소가 자동으로 등록
+
+Git remote -v – 단축 이름과 URL을 같이 보여줌
+
+Git remote add – 위킹 디렉토리에서 새 리모트 저장소 추가
+
+
+
 
