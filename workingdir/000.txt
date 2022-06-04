@@ -103,6 +103,11 @@ Git remote -v – 단축 이름과 URL을 같이 보여줌
 
 Git remote add – 위킹 디렉토리에서 새 리모트 저장소 추가
 
+Git fetch pd – 로컬 저장소에는 없지만 paul의 저장소에 있는 것을 가져옴
+
+Git push origin 태그이름 – 태그를 원격 서버로 전송
+
+find .git/objects -type f – git이 저장한 데이터 보여줌
 
 
 
