@@ -115,5 +115,17 @@ git cat-file -p master^{tree} - master브랜치가 가르키는 tree개체를 �
 
 git cat-file -s – 파일의 크기
 
+git update-index --add –cacheinfo 100644 \ - 파일을 인위적으로 staging area에 추가
+
+git write-tree – staging area를 tree객체로 저장
+
+echo ‘first commit’ | git commit-tree 해쉬값 – 커밋 
+
+git gc -  저장소에 필요 없는 파일을 삭제하고 남은 파일 압축
+
+git verify-pack -v .git/objects/pack/pack-해쉬값 – 압축한 내용 보여줌
+
+
+
 
 
