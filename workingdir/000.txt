@@ -109,5 +109,11 @@ Git push origin 태그이름 – 태그를 원격 서버로 전송
 
 find .git/objects -type f – git이 저장한 데이터 보여줌
 
+git cat-file -p – 파일 내용이 출력됨
+
+git cat-file -p master^{tree} - master브랜치가 가르키는 tree개체를 보여줌
+
+git cat-file -s – 파일의 크기
+
 
 
