@@ -1,0 +1,131 @@
+pwd  - 내가 지금 있는 폴더
+
+mkdir - 폴더생성
+
+dir - 모든 폴더보기
+
+cd - 폴더 안으로 들어가기
+
+git init - .git 디렉터리가 만들어짐
+
+git diff - 같은 파일에 대해 워킹 디렉터리와staging area 파일을 비교함 
+
+git diff --staged - 같은 파일에 대해 staging area 파일과 git 디렉터리 파일을 비교함
+
+git config --global user.name "이름" -사용자의 이름 
+
+git config --global user.email "이메일" - 사용자의 이메일
+
+git config --global core.editor "'C:/Program Files/Notepad++/notepad++.exe' -multiInst -nosession"
+
+dir하면 폴더들이 쭉 나옴 --> . /.. 폴더 나옴 . --> 현재 폴더 , ..--> 상위 폴더
+
+.gitignore - git이 무시하는 폴더 --> dir해도 안나옴
+
+.git폴더 - 숨김 폴더라서 dir해도 안나옴
+
+git add * - 메모리에 올라감 (staging area)    *-->공백문자
+
+git commit - 메모리공간에 있던 파일을 하드디스크로 올림 --> 메모리 공간은 비워짐 (staging area에 있는 파일을 git저장소로) --> working directory에서 staging area로 add 안하면 commit해도실행이 안됨.
+
+rm -삭제 /git 저장소랑 관련없는 명령어. working directory에서 지운거라서 삭제해도 git저장소에 저장된 파일이면 복구가능
+
+git rm -삭제/ git 프로그램에 의해 실행되는 명령어 
+
+git mv README README.md - README파일을 README.md로 이름 바꾸기 
+
+탐색기에서 파일 이름을 바꾸면 git저장소에서는 기존의 파일은 삭제되고 새로운 파일이 생성되었다고 인식함
+
+git cd ~ - 홈 디렉터리로 감
+
+git clone 주소 - github주소의 폴더 복제
+
+git tag -a 태그이름 -m "태그의 자세한 메세지" -현재 commit에 태그 만들기
+
+git tag -d 태그이름 - 태그 삭제
+
+git show 태그이름 - 태그 정보 알려줌
+
+git tag -a 태그이름 원하는 commit -m"태그 설명" - 전에 했던 commit에 태그 만들기
+
+git push origin - 내 컴퓨터에 저장한걸  github로 보냄 origin은 복제된 주소의 별칭
+
+git push origin -d 태그이름 - 태그가 github에서도 삭제됨
+
+branch이름 설정 안하면 master로 설정됨
+
+branch - commit객체의 별칭 [ ex)master ]
+
+git branch 이름 - branch 만듦. 제일 최근 commit을 가르킴
+
+git checkout 이름 - HEAD가 가르키는 branch 바뀜
+
+branch 바꾸고 commit하면 master branch는 바꾼 시점의 commit에 머물러 있음. HEAD와 바뀐branch만 다음 commit으로 이동
+
+다시 master로 checkout하면 testing branch일 때 commit 한건 안나옴
+
+git branch 브랜치1 브랜치2 – 브랜치2에서 새로운 브랜치1을 만듦
+
+git branch -d – 브랜치 삭제
+
+git log 커밋이름 – 그 커밋의 로그를 보여줌
+Git log -p -2 – log를 보여주되 각 커밋의 diff걀과를 보여줌. -2는 최근 두개의 커밋에 대한 정보만. 개수가 아닌 시간을 기준
+
+git log –-stat – 어떤 파일이 수정됐는지, 얼마나 많은 파일들이 변경, 추가, 삭제되었는지 보여줌
+
+git log –-pretty – 로그를 기본값이 아닌 다른 형식으로 변경 (online, short, full, format과 같이 씀)
+
+git log –-graph – 브랜치와 머지 히스토리 정보까지 아스키 그래프로 보여줌
+
+git log –since – 최근 n개의 커밋만 조회
+
+git log –author – 입력한 저자의 커밋만 보여줌
+
+git log --oneline --decorate --graph --all  - 역순으로 commit 을 작대기로 보여줌
+
+git checkout -b 이름 - branch를 바꿈 (git branch 와 git checkout 명령어를 합친 것)
+
+git merge branch이름 - master branch입장에서 branch를 합침
+
+git init 폴더이름 - 폴더를 만들고 그 안에 git 저장소 생성
+
+git cat-file – hash값 - hash값의 파일 내용을 보여줌
+
+echo ‘version1’ > test.txt -  test/txt.파일을 만들고 그 내용을 version1으로 함
+
+git hash-object -w test.txt – hash값 보기
+
+git commit –amend – 가장 최근 커밋 수정.
+
+Git remote – 리모트 저장소의 단축 이름을 보여줌. 저장소를 clone하면 origin이라는 리모트 저장소가 자동으로 등록
+
+Git remote -v – 단축 이름과 URL을 같이 보여줌
+
+Git remote add – 위킹 디렉토리에서 새 리모트 저장소 추가
+
+Git fetch pd – 로컬 저장소에는 없지만 paul의 저장소에 있는 것을 가져옴
+
+Git push origin 태그이름 – 태그를 원격 서버로 전송
+
+find .git/objects -type f – git이 저장한 데이터 보여줌
+
+git cat-file -p – 파일 내용이 출력됨
+
+git cat-file -p master^{tree} - master브랜치가 가르키는 tree개체를 보여줌
+
+git cat-file -s – 파일의 크기
+
+git update-index --add –cacheinfo 100644 \ - 파일을 인위적으로 staging area에 추가
+
+git write-tree – staging area를 tree객체로 저장
+
+echo ‘first commit’ | git commit-tree 해쉬값 – 커밋 
+
+git gc -  저장소에 필요 없는 파일을 삭제하고 남은 파일 압축
+
+git verify-pack -v .git/objects/pack/pack-해쉬값 – 압축한 내용 보여줌
+
+
+
+
+
